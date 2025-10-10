@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Copiloto Niawi Dark Theme Design System
+ * Modern, professional interface for AI-powered business intelligence
+ */
+
+@layer base {
+  :root {
+    --background: 210 17% 6%;
+    --foreground: 213 17% 84%;
+
+    --card: 210 17% 9%;
+    --card-foreground: 213 17% 84%;
+
+    --popover: 210 17% 9%;
+    --popover-foreground: 213 17% 84%;
+
+    --primary: 217 91% 59%;
+    --primary-foreground: 222 84% 4.9%;
+
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217 32% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 212 92% 64%;
+
+    --radius: 0.5rem;
+
+    /* Niawi Brand Colors */
+    --niawi-bg: 210 17% 6%;
+    --niawi-surface: 210 17% 9%;
+    --niawi-border: 217 32% 17%;
+    --niawi-primary: 217 91% 59%;
+    --niawi-secondary: 189 94% 43%;
+    --niawi-accent: 158 64% 52%;
+    --niawi-warning: 43 96% 56%;
+    --niawi-danger: 0 84% 60%;
+
+    --sidebar-background: 220 26% 6%;
+    --sidebar-foreground: 220 10% 95%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 23% 11%;
+    --sidebar-accent-foreground: 220 10% 95%;
+    --sidebar-border: 220 23% 18%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
+}
+
+@layer components {
+  /* Modern gradient backgrounds */
+  .gradient-bg {
+    @apply bg-gradient-to-r from-niawi-primary to-niawi-secondary;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-niawi-primary to-niawi-accent bg-clip-text text-transparent;
+  }
+
+  /* Enhanced hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-niawi-primary/20;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply backdrop-blur-md bg-white/10 border border-white/20;
+  }
+
+  /* Custom focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:ring-offset-2 focus:ring-offset-niawi-bg;
+  }
+
+  /* Animation utilities */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Loading states */
+  .loading-pulse {
+    @apply animate-pulse bg-gradient-to-r from-niawi-surface via-niawi-border to-niawi-surface bg-[length:200%_100%];
+    animation: loading-gradient 1.5s ease-in-out infinite;
+  }
+
+  @keyframes loading-gradient {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Status indicators */
+  .status-online {
+    @apply bg-niawi-accent shadow-lg shadow-niawi-accent/30;
+  }
+
+  .status-warning {
+    @apply bg-niawi-warning shadow-lg shadow-niawi-warning/30;
+  }
+
+  .status-error {
+    @apply bg-niawi-danger shadow-lg shadow-niawi-danger/30;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    backdrop-filter: blur(12px);
+    background: rgba(26, 31, 46, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Custom scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-track-niawi-surface {
+    scrollbar-color: hsl(var(--niawi-border)) hsl(var(--niawi-surface));
+  }
+  
+  .scrollbar-thumb-niawi-border {
+    scrollbar-color: hsl(var(--niawi-border)) hsl(var(--niawi-surface));
+  }
+
+  /* For webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-track-niawi-surface::-webkit-scrollbar-track {
+    background: hsl(var(--niawi-surface));
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thumb-niawi-border::-webkit-scrollbar-thumb {
+    background: hsl(var(--niawi-border));
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thumb-niawi-border::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--niawi-primary) / 0.7);
+  }
+
+  /* Page container utilities */
+  .page-container {
+    @apply h-full flex flex-col overflow-hidden;
+  }
+
+  .page-content {
+    @apply flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border;
+  }
+
+  .page-content-no-scroll {
+    @apply flex-1 overflow-hidden p-6;
+  }
+
+  /* Mobile responsiveness */
+  .mobile-safe-area {
+    @apply pb-safe-bottom;
+  }
+
+  /* Truncate utilities for better text handling */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Mejoras para UI/UX del chat */
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* Smooth transitions para el sidebar */
+  .sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced scrollbar para mensajes largos */
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+      hsl(var(--niawi-border)) 0%, 
+      hsl(var(--niawi-primary) / 0.3) 100%
+    );
+    border-radius: 6px;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, 
+      hsl(var(--niawi-primary) / 0.5) 0%, 
+      hsl(var(--niawi-primary) / 0.7) 100%
+    );
+  }
+}
