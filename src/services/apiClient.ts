@@ -4,7 +4,8 @@ import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, setTo
 import { LoginResponse, RefreshTokenResponse } from '@/types/auth';
 
 // Configuración del cliente
-const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'https://aiauth.e3stores.cloud';
+const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 
+  (import.meta.env.DEV ? '/api' : 'https://aiauth.e3stores.cloud');
 const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID || '019986ed-5fea-7886-a2b6-e35968f8ef17';
 
 // Promise para deduplicar llamadas de refresh
