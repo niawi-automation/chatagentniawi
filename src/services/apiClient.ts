@@ -27,6 +27,7 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
       'Client-Id': CLIENT_ID,
     },
     body: JSON.stringify({ refreshToken: refreshTokenValue }),
+    credentials: 'include', // Incluir cookies en las requests
   });
 
   if (!response.ok) {
@@ -70,6 +71,7 @@ const makeRequest = async <T>(
   let response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: 'include', // Incluir cookies en las requests
   });
 
   // Si es 401 y no es una llamada de auth, intentar refresh
@@ -91,6 +93,7 @@ const makeRequest = async <T>(
         response = await fetch(`${BASE_URL}${endpoint}`, {
           ...options,
           headers,
+          credentials: 'include', // Incluir cookies en las requests
         });
       }
     } catch (refreshError) {
@@ -104,9 +107,17 @@ const makeRequest = async <T>(
   if (!response.ok) {
     let errorMessage = 'Error en la petición';
     
+    // Si es una redirección (302, 301, etc.), probablemente es un problema de autenticación
+    if (response.status >= 300 && response.status < 400) {
+      errorMessage = 'Sesión expirada. Redirigiendo al login...';
+    }
+    
     try {
-      const errorData = await response.json();
-      errorMessage = errorData.detail || errorData.message || errorMessage;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        errorMessage = errorData.detail || errorData.message || errorMessage;
+      }
     } catch {
       // Si no se puede parsear el error, usar el mensaje por defecto
     }
@@ -114,6 +125,7 @@ const makeRequest = async <T>(
     const error = new Error(errorMessage) as any;
     error.status = response.status;
     error.response = response;
+    error.isRedirect = response.status >= 300 && response.status < 400;
     
     throw error;
   }
@@ -175,6 +187,7 @@ export const makeLoginRequest = async <T>(
     method: 'POST',
     headers,
     body: JSON.stringify(data),
+    credentials: 'include', // Incluir cookies en las requests
   });
 
   if (!response.ok) {
@@ -224,6 +237,7 @@ export const makeRegisterRequest = async <T>(
     method: 'POST',
     headers,
     body: JSON.stringify(data),
+    credentials: 'include', // Incluir cookies en las requests
   });
 
   if (!response.ok) {

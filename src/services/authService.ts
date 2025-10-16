@@ -35,7 +35,7 @@ export const login = async (
 
   try {
     const response = await makeLoginRequest<LoginResponse>(
-      '/auth/login?useCookies=false&useSessionCookies=false',
+      '/auth/login?useCookies=true&useSessionCookies=true',
       loginData
     );
 

@@ -116,13 +116,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [navigate, clearError]);
 
-  // Función para cerrar sesión
-  const logout = useCallback(() => {
+  // Función interna para cerrar sesión sin redirección
+  const clearAuthState = useCallback(() => {
     authLogout();
     updateAuthState(null, null);
     setLastError(null);
+  }, [updateAuthState]);
+
+  // Función para cerrar sesión
+  const logout = useCallback(() => {
+    clearAuthState();
     navigate('/login');
-  }, [navigate, updateAuthState]);
+  }, [clearAuthState, navigate]);
 
   // Función para refresh de sesión
   const refreshSession = useCallback(async () => {
@@ -157,23 +162,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       clearError();
 
-      const token = getAccessToken();
-      const refreshTokenValue = getRefreshToken();
-      
-      if (!token || !refreshTokenValue) {
-        setIsLoading(false);
-        return;
-      }
-
-      // Si el token está expirado, intentar refresh
-      if (isTokenExpired()) {
-        await refreshSession();
-      } else {
-        // Obtener información del usuario
+      // Intentar obtener información del usuario directamente
+      // Esto funcionará si hay una cookie de sesión válida
+      try {
         const userInfo = await getUserInfo();
+        
+        // Si obtenemos la info del usuario, significa que hay una sesión válida
+        const token = getAccessToken();
         updateAuthState(token, userInfo);
         
-        // Programar refresh si es necesario
+        // Programar refresh si es necesario y tenemos tokens
         const expiresAt = getTokenExpiresAt();
         if (expiresAt) {
           const expiresIn = Math.floor((expiresAt - Date.now()) / 1000);
@@ -181,17 +179,53 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             scheduleTokenRefresh(expiresIn, refreshSession);
           }
         }
+        
+        return;
+      } catch (userInfoError: any) {
+        // Si es un error de redirección o 401/403, la sesión no es válida
+        if (userInfoError.isRedirect || userInfoError.status === 401 || userInfoError.status === 403) {
+          console.log('Sesión no válida, redirigiendo al login...');
+          // Limpiar estado y redirigir al login
+          clearAuthState();
+          navigate('/login');
+          return;
+        }
+        // Si no podemos obtener info del usuario, intentar con tokens
+        const token = getAccessToken();
+        const refreshTokenValue = getRefreshToken();
+        
+        if (!token || !refreshTokenValue) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Si el token está expirado, intentar refresh
+        if (isTokenExpired()) {
+          await refreshSession();
+        } else {
+          // Obtener información del usuario
+          const userInfo = await getUserInfo();
+          updateAuthState(token, userInfo);
+          
+          // Programar refresh si es necesario
+          const expiresAt = getTokenExpiresAt();
+          if (expiresAt) {
+            const expiresIn = Math.floor((expiresAt - Date.now()) / 1000);
+            if (expiresIn > 60) {
+              scheduleTokenRefresh(expiresIn, refreshSession);
+            }
+          }
+        }
       }
       
     } catch (error) {
       console.error('Error al restaurar sesión:', error);
       // Si falla la restauración, limpiar estado
-      authLogout();
-      updateAuthState(null, null);
+      clearAuthState();
     } finally {
       setIsLoading(false);
     }
-  }, [clearError, refreshSession, updateAuthState]);
+  }, [clearError, refreshSession, updateAuthState, clearAuthState, navigate]);
 
   // Función para actualizar información del usuario
   const updateUserInfoHandler = useCallback(async (data: UpdateUserInfoRequest) => {
