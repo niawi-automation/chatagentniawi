@@ -1,34 +1,33 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Verificar si el usuario está autenticado
-    const authStatus = localStorage.getItem('niawi-auth');
-    setIsAuthenticated(authStatus === 'authenticated');
-    setIsLoading(false);
-  }, []);
-
-  const logout = () => {
-    localStorage.removeItem('niawi-auth');
-    setIsAuthenticated(false);
-    navigate('/login');
-  };
+  const authContext = useAuthContext();
 
   const requireAuth = () => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authContext.isLoading && !authContext.isAuthenticated) {
       navigate('/login');
     }
   };
 
   return {
-    isAuthenticated,
-    isLoading,
-    logout,
-    requireAuth
+    isAuthenticated: authContext.isAuthenticated,
+    isLoading: authContext.isLoading,
+    user: authContext.user,
+    lastError: authContext.lastError,
+    logout: authContext.logout,
+    login: authContext.login,
+    register: authContext.register,
+    requireAuth,
+    clearError: authContext.clearError,
+    // Funciones de gestión de cuenta
+    updateUserInfo: authContext.updateUserInfo,
+    resendConfirmationEmail: authContext.resendConfirmationEmail,
+    forgotPassword: authContext.forgotPassword,
+    resetPassword: authContext.resetPassword,
+    confirmEmail: authContext.confirmEmail,
+    // Funciones de 2FA
+    configure2FA: authContext.configure2FA,
   };
 }; 
