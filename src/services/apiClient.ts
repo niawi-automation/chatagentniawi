@@ -20,10 +20,11 @@ const getBaseUrl = () => {
 const BASE_URL = getBaseUrl();
 const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID || '019986ed-5fea-7886-a2b6-e35968f8ef17';
 
-// Log para verificar la URL en uso (solo en desarrollo)
-if (import.meta.env.DEV) {
-  console.log('🔧 API Base URL:', BASE_URL);
-}
+// Log para verificar la configuración
+console.log('🔧 Configuración API:');
+console.log('  - Base URL:', BASE_URL);
+console.log('  - Client ID:', CLIENT_ID);
+console.log('  - Modo:', import.meta.env.DEV ? 'Desarrollo' : 'Producción');
 
 // Función para forzar HTTPS en cualquier URL
 const ensureHttps = (url: string): string => {
@@ -53,20 +54,8 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     },
     body: JSON.stringify({ refreshToken: refreshTokenValue }),
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'manual', // Evitar seguir redirecciones automáticamente para controlar HTTPS
+    redirect: 'follow', // Permitir redirecciones normales
   });
-
-  // Si el backend intenta redirigir, interceptar y forzar HTTPS
-  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-    const location = response.headers.get('location');
-    if (location) {
-      const secureLocation = ensureHttps(location);
-      if (location !== secureLocation) {
-        console.warn(`⚠️ Redirección HTTP interceptada y corregida a HTTPS: ${location} → ${secureLocation}`);
-      }
-      throw new Error('Redirección detectada - sesión expirada');
-    }
-  }
 
   if (!response.ok) {
     // Si el refresh falla, limpiar tokens
@@ -110,24 +99,8 @@ const makeRequest = async <T>(
     ...options,
     headers,
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
+    redirect: 'follow', // Permitir redirecciones normales
   });
-
-  // Detectar y manejar redirecciones (backend podría redirigir a HTTP)
-  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-    const location = response.headers.get('location');
-    if (location) {
-      const secureLocation = ensureHttps(location);
-      if (location !== secureLocation) {
-        console.warn(`⚠️ Redirección HTTP del backend interceptada: ${location} → ${secureLocation}`);
-      }
-      // Si es una redirección de autenticación, limpiar tokens y lanzar error
-      if (location.includes('/Account/Login') || location.includes('/auth/login')) {
-        clearTokens();
-        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
-      }
-    }
-  }
 
   // Si es 401 y no es una llamada de auth, intentar refresh
   if (response.status === 401 && !isAuthEndpoint && accessToken) {
@@ -149,7 +122,7 @@ const makeRequest = async <T>(
           ...options,
           headers,
           credentials: 'include', // Incluir cookies en las requests
-          redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
+          redirect: 'follow', // Permitir redirecciones normales
         });
       }
     } catch (refreshError) {
@@ -238,29 +211,47 @@ export const makeLoginRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const fullUrl = `${BASE_URL}${endpoint}`;
+  console.log('🔐 Login Request:', {
+    url: fullUrl,
+    clientId: CLIENT_ID,
+    data: { ...data, password: '***' }
+  });
+
+  let response = await fetch(fullUrl, {
     ...options,
     method: 'POST',
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
+    redirect: 'follow', // Permitir redirecciones pero verificaremos la URL
   });
 
-  // Detectar redirecciones del backend
-  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-    const location = response.headers.get('location');
-    if (location) {
-      const secureLocation = ensureHttps(location);
-      if (location !== secureLocation) {
-        console.warn(`⚠️ Redirección HTTP del backend interceptada en login: ${location} → ${secureLocation}`);
-      }
-    }
-    throw new Error('Credenciales inválidas o sesión expirada');
+  console.log('📥 Login Response:', {
+    status: response.status,
+    statusText: response.statusText,
+    ok: response.ok,
+    url: response.url,
+    type: response.type
+  });
+
+  // Verificar si la URL final es HTTPS en producción
+  if (!import.meta.env.DEV && response.url && response.url.startsWith('http://')) {
+    console.warn(`⚠️ El backend redirigió a HTTP: ${response.url}`);
+    // Reintentar con la URL en HTTPS
+    const secureUrl = ensureHttps(response.url);
+    response = await fetch(secureUrl, {
+      ...options,
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
   }
 
   if (!response.ok) {
     let errorMessage = 'Error en el login';
+    console.error('❌ Login failed:', response.status, response.statusText);
     
     try {
       const errorData = await response.json();
@@ -307,20 +298,8 @@ export const makeRegisterRequest = async <T>(
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
+    redirect: 'follow', // Permitir redirecciones normales
   });
-
-  // Detectar redirecciones del backend
-  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-    const location = response.headers.get('location');
-    if (location) {
-      const secureLocation = ensureHttps(location);
-      if (location !== secureLocation) {
-        console.warn(`⚠️ Redirección HTTP del backend interceptada en registro: ${location} → ${secureLocation}`);
-      }
-    }
-    throw new Error('Error en el registro - redirección detectada');
-  }
 
   if (!response.ok) {
     let errorMessage = 'Error en el registro';
