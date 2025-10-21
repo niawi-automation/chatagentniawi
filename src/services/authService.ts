@@ -34,12 +34,20 @@ export const login = async (
   }
 
   try {
+    // Usar useCookies=false para recibir el refreshToken en el response JSON
+    // Esto evita problemas con cookies HTTP-only y redirecciones HTTP del backend
     const response = await makeLoginRequest<LoginResponse>(
-      '/auth/login?useCookies=true&useSessionCookies=true',
+      '/auth/login?useCookies=false',
       loginData
     );
 
-    // Guardar tokens
+    console.log('📦 Response del backend:', response);
+
+    // Guardar tokens (con useCookies=false, todos vienen en el JSON)
+    if (!response.accessToken || !response.refreshToken) {
+      throw new Error('El backend no devolvió los tokens necesarios');
+    }
+    
     setAccessToken(response.accessToken);
     setRefreshToken(response.refreshToken);
     setTokenExpiresAt(Date.now() + (response.expiresIn * 1000));

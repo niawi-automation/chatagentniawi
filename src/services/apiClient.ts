@@ -41,9 +41,12 @@ let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 const refreshToken = async (): Promise<RefreshTokenResponse> => {
   const refreshTokenValue = getRefreshToken();
   
-  if (!refreshTokenValue) {
-    throw new Error('No hay refresh token disponible');
-  }
+  console.log('🔄 Intentando refrescar token...');
+  console.log('  - refreshToken guardado:', refreshTokenValue ? 'presente' : 'ausente');
+  
+  // Si el refreshToken está vacío, significa que estamos usando cookies
+  // El refreshToken está en una cookie HTTP-only, no necesitamos enviarlo en el body
+  const bodyData = refreshTokenValue ? { refreshToken: refreshTokenValue } : {};
 
   const response = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
@@ -52,9 +55,15 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
       'ClientId': CLIENT_ID,
       'Client-Id': CLIENT_ID,
     },
-    body: JSON.stringify({ refreshToken: refreshTokenValue }),
-    credentials: 'include', // Incluir cookies en las requests
+    body: JSON.stringify(bodyData),
+    credentials: 'include', // Incluir cookies en las requests (importante para cookies HTTP-only)
     redirect: 'follow', // Permitir redirecciones normales
+  });
+
+  console.log('📥 Refresh Response:', {
+    status: response.status,
+    ok: response.ok,
+    url: response.url
   });
 
   if (!response.ok) {
@@ -64,11 +73,21 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
   }
 
   const data: RefreshTokenResponse = await response.json();
+  console.log('✅ Refresh exitoso:', { hasAccessToken: !!data.accessToken });
   
   // Guardar nuevos tokens
-  setAccessToken(data.accessToken);
-  setRefreshToken(data.refreshToken);
-  setTokenExpiresAt(Date.now() + (data.expiresIn * 1000));
+  if (data.accessToken) {
+    setAccessToken(data.accessToken);
+  }
+  
+  // Solo actualizar refreshToken si viene en la respuesta
+  if (data.refreshToken) {
+    setRefreshToken(data.refreshToken);
+  }
+  
+  if (data.expiresIn) {
+    setTokenExpiresAt(Date.now() + (data.expiresIn * 1000));
+  }
   
   return data;
 };
@@ -270,10 +289,15 @@ export const makeLoginRequest = async <T>(
   try {
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      return await response.json();
+      const jsonData = await response.json();
+      console.log('✅ Login Success - Response Data:', jsonData);
+      console.log('🍪 Cookies recibidas:', document.cookie);
+      return jsonData;
     }
+    console.log('⚠️ Response no es JSON, retornando objeto vacío');
     return {} as T;
-  } catch {
+  } catch (error) {
+    console.error('❌ Error parseando respuesta:', error);
     return {} as T;
   }
 };
