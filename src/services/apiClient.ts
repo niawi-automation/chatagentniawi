@@ -3,25 +3,27 @@
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, setTokenExpiresAt, clearTokens, isTokenExpired } from '@/utils/tokenManager';
 import { LoginResponse, RefreshTokenResponse } from '@/types/auth';
 
-// Configuración del cliente
-const BASE_URL_SECURE = import.meta.env.VITE_AUTH_BASE_URL_SECURE || 
-  (import.meta.env.DEV ? '/api' : 'https://aiauth.e3stores.cloud');
-
-// Asegurar que siempre se use HTTPS en producción
+// Configuración del cliente - Función para asegurar HTTPS en producción
 const getBaseUrl = () => {
-  const url = import.meta.env.VITE_AUTH_BASE_URL_SECURE || 
+  const url = import.meta.env.VITE_AUTH_BASE_URL || 
     (import.meta.env.DEV ? '/api' : 'https://aiauth.e3stores.cloud');
   
-  // Si no es desarrollo y no es HTTPS, forzar HTTPS
+  // Si no es desarrollo y la URL comienza con http://, forzar https://
   if (!import.meta.env.DEV && url.startsWith('http://')) {
+    console.warn(`⚠️ Convirtiendo HTTP a HTTPS: ${url} → ${url.replace('http://', 'https://')}`);
     return url.replace('http://', 'https://');
   }
   
   return url;
 };
 
-const BASE_URL_SECURE_SECURE = getBaseUrl();
+const BASE_URL = getBaseUrl();
 const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID || '019986ed-5fea-7886-a2b6-e35968f8ef17';
+
+// Log para verificar la URL en uso (solo en desarrollo)
+if (import.meta.env.DEV) {
+  console.log('🔧 API Base URL:', BASE_URL);
+}
 
 // Promise para deduplicar llamadas de refresh
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
@@ -34,7 +36,7 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     throw new Error('No hay refresh token disponible');
   }
 
-  const response = await fetch(`${BASE_URL_SECURE_SECURE}/auth/refresh`, {
+  const response = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -83,7 +85,7 @@ const makeRequest = async <T>(
   }
 
   // Hacer la petición inicial
-  let response = await fetch(`${BASE_URL_SECURE_SECURE}${endpoint}`, {
+  let response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers,
     credentials: 'include', // Incluir cookies en las requests
@@ -105,7 +107,7 @@ const makeRequest = async <T>(
       if (newAccessToken) {
         headers['Authorization'] = `Bearer ${newAccessToken}`;
         
-        response = await fetch(`${BASE_URL_SECURE_SECURE}${endpoint}`, {
+        response = await fetch(`${BASE_URL}${endpoint}`, {
           ...options,
           headers,
           credentials: 'include', // Incluir cookies en las requests
@@ -197,7 +199,7 @@ export const makeLoginRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL_SECURE}${endpoint}`, {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     method: 'POST',
     headers,
@@ -247,7 +249,7 @@ export const makeRegisterRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL_SECURE}${endpoint}`, {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     method: 'POST',
     headers,
