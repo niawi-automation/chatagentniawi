@@ -25,6 +25,14 @@ if (import.meta.env.DEV) {
   console.log('🔧 API Base URL:', BASE_URL);
 }
 
+// Función para forzar HTTPS en cualquier URL
+const ensureHttps = (url: string): string => {
+  if (!import.meta.env.DEV && url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  return url;
+};
+
 // Promise para deduplicar llamadas de refresh
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
@@ -45,7 +53,20 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     },
     body: JSON.stringify({ refreshToken: refreshTokenValue }),
     credentials: 'include', // Incluir cookies en las requests
+    redirect: 'manual', // Evitar seguir redirecciones automáticamente para controlar HTTPS
   });
+
+  // Si el backend intenta redirigir, interceptar y forzar HTTPS
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ Redirección HTTP interceptada y corregida a HTTPS: ${location} → ${secureLocation}`);
+      }
+      throw new Error('Redirección detectada - sesión expirada');
+    }
+  }
 
   if (!response.ok) {
     // Si el refresh falla, limpiar tokens
@@ -89,7 +110,24 @@ const makeRequest = async <T>(
     ...options,
     headers,
     credentials: 'include', // Incluir cookies en las requests
+    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
   });
+
+  // Detectar y manejar redirecciones (backend podría redirigir a HTTP)
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ Redirección HTTP del backend interceptada: ${location} → ${secureLocation}`);
+      }
+      // Si es una redirección de autenticación, limpiar tokens y lanzar error
+      if (location.includes('/Account/Login') || location.includes('/auth/login')) {
+        clearTokens();
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+    }
+  }
 
   // Si es 401 y no es una llamada de auth, intentar refresh
   if (response.status === 401 && !isAuthEndpoint && accessToken) {
@@ -111,6 +149,7 @@ const makeRequest = async <T>(
           ...options,
           headers,
           credentials: 'include', // Incluir cookies en las requests
+          redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
         });
       }
     } catch (refreshError) {
@@ -205,7 +244,20 @@ export const makeLoginRequest = async <T>(
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
+    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
   });
+
+  // Detectar redirecciones del backend
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ Redirección HTTP del backend interceptada en login: ${location} → ${secureLocation}`);
+      }
+    }
+    throw new Error('Credenciales inválidas o sesión expirada');
+  }
 
   if (!response.ok) {
     let errorMessage = 'Error en el login';
@@ -255,7 +307,20 @@ export const makeRegisterRequest = async <T>(
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
+    redirect: 'manual', // Evitar seguir redirecciones HTTP automáticamente
   });
+
+  // Detectar redirecciones del backend
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ Redirección HTTP del backend interceptada en registro: ${location} → ${secureLocation}`);
+      }
+    }
+    throw new Error('Error en el registro - redirección detectada');
+  }
 
   if (!response.ok) {
     let errorMessage = 'Error en el registro';
