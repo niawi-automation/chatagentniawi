@@ -8,7 +8,7 @@ import { BarChart, TrendingUp } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
 
-  // Mock data for the dashboard
+  // Mock data for the dashboardss
   const stats = [
     { label: 'Ventas Totales', value: '$124,500', change: '+12%', changeType: 'positive', icon: BarChart, bgColor: 'bg-green-500/10', iconColor: 'text-green-500' },
     { label: 'Conversiones', value: '8.2%', change: '+2.1%', changeType: 'positive', icon: TrendingUp, bgColor: 'bg-blue-500/10', iconColor: 'text-blue-500' },
