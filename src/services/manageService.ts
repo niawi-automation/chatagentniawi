@@ -216,3 +216,5 @@ export const get2FAStatus = async (): Promise<TwoFactorConfigResponse> => {
 
   return configure2FA(config);
 };
+
+

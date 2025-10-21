@@ -189,3 +189,5 @@ export const isEmailNotConfirmedError = (error: any): boolean => {
          error?.detail?.includes('email') &&
          error?.detail?.includes('confirm');
 };
+
+

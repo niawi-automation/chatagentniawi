@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Mail, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
-import { sanitizeQueryParam, getFriendlyErrorMessage } from '@/utils/validators';
 import NiawiLogoSvg from '@/assets/images/Niawilogo.svg';
 
 const ConfirmEmail = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { confirmEmail, isAuthenticated } = useAuth();
+  const { confirmEmail, resendConfirmation, isAuthenticated } = useAuth();
+
+  // Obtener el token de confirmación de la URL
+  const token = searchParams.get('token');
+  const emailParam = searchParams.get('email');
 
   // Verificar si el usuario ya está autenticado
   useEffect(() => {
@@ -24,34 +28,63 @@ const ConfirmEmail = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Confirmar email al montar el componente
+  // Establecer el email si viene en los parámetros
   useEffect(() => {
-    const confirmEmailAsync = async () => {
-      try {
-        const userId = sanitizeQueryParam(searchParams.get('userId'));
-        const code = sanitizeQueryParam(searchParams.get('code'));
-        const changedEmail = sanitizeQueryParam(searchParams.get('changedEmail'));
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [emailParam]);
 
-        if (!userId || !code) {
-          setError('Parámetros de confirmación inválidos. Verifica que el enlace sea correcto.');
-          return;
-        }
+  // Confirmar email automáticamente si hay token
+  useEffect(() => {
+    if (token && !isSuccess && !error) {
+      handleConfirmEmail();
+    }
+  }, [token]);
 
-        await confirmEmail(userId, code, changedEmail || undefined);
-        setIsSuccess(true);
-        
-      } catch (err: any) {
-        const errorMessage = getFriendlyErrorMessage(err);
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const handleConfirmEmail = async () => {
+    if (!token) {
+      setError('Token de confirmación no válido');
+      return;
+    }
 
-    confirmEmailAsync();
-  }, [searchParams, confirmEmail]);
+    setIsLoading(true);
+    setError('');
 
-  if (isLoading) {
+    try {
+      await confirmEmail(token);
+      setIsSuccess(true);
+    } catch (error: any) {
+      setError(error.message || 'Error al confirmar el email');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError('Email requerido para reenviar confirmación');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await resendConfirmation(email);
+      setError('');
+      // Mostrar mensaje de éxito temporal
+      const originalError = error;
+      setError('Email de confirmación reenviado. Revisa tu bandeja de entrada.');
+      setTimeout(() => setError(originalError), 5000);
+    } catch (error: any) {
+      setError(error.message || 'Error al reenviar confirmación');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isSuccess) {
     return (
       <div className="min-h-screen bg-niawi-bg flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
@@ -64,25 +97,61 @@ const ConfirmEmail = () => {
                 className="h-16 w-auto"
               />
             </div>
-            <h2 className="text-3xl font-bold text-foreground">Confirmando Email</h2>
+            <h2 className="text-3xl font-bold text-foreground">Email Confirmado</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Verificando tu dirección de email...
+              Tu cuenta ha sido verificada exitosamente
             </p>
           </div>
 
-          {/* Loading Card */}
+          {/* Mensaje de éxito */}
           <Card className="bg-niawi-surface border-niawi-border">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-niawi-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <div className="w-8 h-8 border-2 border-niawi-primary border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-8 h-8 text-green-500" />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Procesando confirmación de email...
-                </p>
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    ¡Bienvenido a Niawi!
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Tu email ha sido confirmado correctamente. Ya puedes acceder a todas las funcionalidades de la plataforma.
+                  </p>
+                </div>
+
+                <div className="space-y-3 pt-4">
+                  <Button
+                    onClick={() => navigate('/login')}
+                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/dashboard')}
+                    className="w-full"
+                  >
+                    Ir al Dashboard
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Footer */}
+          <div className="text-center text-sm text-muted-foreground">
+            <p>
+              ¿Necesitas ayuda?{' '}
+              <a href="mailto:soporte@niawi.tech" className="text-niawi-primary hover:text-niawi-accent">
+                Contacta soporte
+              </a>
+            </p>
+            <p className="mt-2">
+              © 2025 Niawi. Todos los derechos reservados.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -100,112 +169,122 @@ const ConfirmEmail = () => {
               className="h-16 w-auto"
             />
           </div>
-          <h2 className="text-3xl font-bold text-foreground">
-            {isSuccess ? 'Email Confirmado' : 'Error de Confirmación'}
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground">Confirmar Email</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            {isSuccess 
-              ? 'Tu email ha sido verificado exitosamente' 
-              : 'Hubo un problema al confirmar tu email'
-            }
+            Verifica tu dirección de email para activar tu cuenta
           </p>
         </div>
 
-        {/* Resultado */}
+        {/* Error */}
+        {error && (
+          <Alert className={`${error.includes('reenviado') ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+            <AlertCircle className={`h-4 w-4 ${error.includes('reenviado') ? 'text-green-500' : 'text-red-500'}`} />
+            <AlertDescription className={error.includes('reenviado') ? 'text-green-700' : 'text-red-700'}>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Formulario */}
         <Card className="bg-niawi-surface border-niawi-border">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              {isSuccess ? (
-                <>
-                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
-                    <CheckCircle className="w-8 h-8 text-green-500" />
+          <CardHeader>
+            <CardTitle className="text-center text-foreground">Confirmación de Email</CardTitle>
+            <CardDescription className="text-center">
+              {token 
+                ? 'Procesando confirmación...' 
+                : 'Ingresa tu email para reenviar el enlace de confirmación'
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {token ? (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <Mail className="w-8 h-8 text-blue-500" />
                   </div>
                   
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-foreground">
-                      ¡Confirmación exitosa!
+                      Confirmando tu email...
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Tu dirección de email ha sido verificada correctamente. 
-                      Ya puedes iniciar sesión con tu cuenta.
+                      Por favor espera mientras verificamos tu cuenta.
                     </p>
                   </div>
 
-                  <div className="pt-4">
-                    <Button
-                      onClick={() => navigate('/login')}
-                      className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
-                    >
-                      <ArrowRight className="w-4 h-4 mr-2" />
-                      Ir al inicio de sesión
-                    </Button>
-                  </div>
-                </>
+                  <Button
+                    onClick={handleConfirmEmail}
+                    disabled={isLoading}
+                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Confirmando...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Confirmar Email
+                      </>
+                    )}
+                  </Button>
+                </div>
               ) : (
-                <>
-                  <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
-                    <AlertCircle className="w-8 h-8 text-red-500" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Error de confirmación
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-8 h-8 text-orange-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      Reenviar Confirmación
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {error || 'No se pudo confirmar tu email. El enlace puede haber expirado o ser inválido.'}
+                      Si no recibiste el email de confirmación, puedes solicitarlo nuevamente.
                     </p>
                   </div>
 
-                  <div className="space-y-3 pt-4">
-                    <Button
-                      onClick={() => navigate('/login')}
-                      className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
-                    >
-                      <ArrowRight className="w-4 h-4 mr-2" />
-                      Ir al inicio de sesión
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate('/forgot-password')}
-                      className="w-full"
-                    >
-                      <Mail className="w-4 h-4 mr-2" />
-                      Solicitar nuevo enlace
-                    </Button>
-                  </div>
-                </>
+                  <Button
+                    onClick={handleResendConfirmation}
+                    disabled={isLoading || !email}
+                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Enviando...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Reenviar Email de Confirmación
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* Información adicional */}
-        {isSuccess ? (
-          <Alert className="bg-green-500/10 border-green-500/20">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            <AlertDescription className="text-green-700">
-              <strong>¡Perfecto!</strong> Tu cuenta está lista para usar. 
-              Ahora puedes acceder a todas las funcionalidades de Niawi.
-            </AlertDescription>
-          </Alert>
-        ) : (
-          <Alert className="bg-red-500/10 border-red-500/20">
-            <AlertCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-red-700">
-              <strong>¿Necesitas ayuda?</strong> Si sigues teniendo problemas, 
-              puedes solicitar un nuevo enlace de confirmación o contactar soporte.
-            </AlertDescription>
-          </Alert>
-        )}
+        <Alert className="bg-blue-500/10 border-blue-500/20">
+          <Mail className="h-4 w-4 text-blue-500" />
+          <AlertDescription className="text-blue-700">
+            <strong>Importante:</strong> El enlace de confirmación expira en 24 horas. 
+            Si no recibes el email, revisa tu carpeta de spam.
+          </AlertDescription>
+        </Alert>
 
         {/* Links adicionales */}
         <div className="text-center space-y-3">
           <p className="text-sm text-muted-foreground">
             <Link 
               to="/login" 
-              className="text-niawi-primary hover:text-niawi-accent underline"
+              className="text-niawi-primary hover:text-niawi-accent underline inline-flex items-center"
             >
+              <ArrowLeft className="w-3 h-3 mr-1" />
               Volver al inicio de sesión
             </Link>
           </p>

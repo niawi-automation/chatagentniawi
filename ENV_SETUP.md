@@ -8,6 +8,8 @@ Las URLs de webhooks ahora están protegidas mediante variables de entorno.
 
 ### Para desarrollo local (.env):
 ```
+VITE_AUTH_BASE_URL=https://aiauth.e3stores.cloud
+VITE_AUTH_CLIENT_ID=019986ed-5fea-7886-a2b6-e35968f8ef17
 VITE_RECOMMENDATIONS_API_URL=https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b
 VITE_CHAT_API_URL=https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c
 VITE_AUTH_EMAIL=admin@niawi.tech
@@ -23,6 +25,8 @@ VITE_AUTH_PASSWORD=d3mo.Niawi
 
 | Name | Value |
 |------|-------|
+| `VITE_AUTH_BASE_URL` | `https://aiauth.e3stores.cloud` |
+| `VITE_AUTH_CLIENT_ID` | `019986ed-5fea-7886-a2b6-e35968f8ef17` |
 | `VITE_RECOMMENDATIONS_API_URL` | `https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b` |
 | `VITE_CHAT_API_URL` | `https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c` |
 | `VITE_AUTH_EMAIL` | `admin@niawi.tech` |
@@ -58,4 +62,20 @@ Si las variables no están configuradas, la aplicación mostrará errores espec�
 - Las credenciales están protegidas en variables de entorno
 - Solo usuarios con credenciales válidas pueden acceder al dashboard
 - La sesión se mantiene hasta hacer logout explícito
-- Al recargar la página, se verifica la autenticación automáticamente 
+- Al recargar la página, se verifica la autenticación automáticamente
+
+## 🔒 Configuración HTTPS
+
+### ⚠️ IMPORTANTE - Mixed Content Error:
+Para evitar errores de "Mixed Content" cuando la aplicación corre en HTTPS, **TODAS** las URLs de API deben usar HTTPS:
+
+- ✅ **Correcto**: `https://aiauth.e3stores.cloud`
+- ❌ **Incorrecto**: `http://aiauth.e3stores.cloud`
+
+### Configuración Automática:
+El código ahora incluye una función que automáticamente convierte URLs HTTP a HTTPS en producción para evitar errores de seguridad del navegador.
+
+### URLs de la Aplicación:
+- **Aplicación**: `https://ema.e3stores.cloud`
+- **Autenticación**: `https://aiauth.e3stores.cloud`
+- **APIs**: Todas configuradas con HTTPS 

@@ -4,8 +4,23 @@ import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, setTo
 import { LoginResponse, RefreshTokenResponse } from '@/types/auth';
 
 // Configuración del cliente
-const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 
+const BASE_URL_SECURE = import.meta.env.VITE_AUTH_BASE_URL_SECURE || 
   (import.meta.env.DEV ? '/api' : 'https://aiauth.e3stores.cloud');
+
+// Asegurar que siempre se use HTTPS en producción
+const getBaseUrl = () => {
+  const url = import.meta.env.VITE_AUTH_BASE_URL_SECURE || 
+    (import.meta.env.DEV ? '/api' : 'https://aiauth.e3stores.cloud');
+  
+  // Si no es desarrollo y no es HTTPS, forzar HTTPS
+  if (!import.meta.env.DEV && url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  
+  return url;
+};
+
+const BASE_URL_SECURE_SECURE = getBaseUrl();
 const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID || '019986ed-5fea-7886-a2b6-e35968f8ef17';
 
 // Promise para deduplicar llamadas de refresh
@@ -19,7 +34,7 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     throw new Error('No hay refresh token disponible');
   }
 
-  const response = await fetch(`${BASE_URL}/auth/refresh`, {
+  const response = await fetch(`${BASE_URL_SECURE_SECURE}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +83,7 @@ const makeRequest = async <T>(
   }
 
   // Hacer la petición inicial
-  let response = await fetch(`${BASE_URL}${endpoint}`, {
+  let response = await fetch(`${BASE_URL_SECURE_SECURE}${endpoint}`, {
     ...options,
     headers,
     credentials: 'include', // Incluir cookies en las requests
@@ -90,7 +105,7 @@ const makeRequest = async <T>(
       if (newAccessToken) {
         headers['Authorization'] = `Bearer ${newAccessToken}`;
         
-        response = await fetch(`${BASE_URL}${endpoint}`, {
+        response = await fetch(`${BASE_URL_SECURE_SECURE}${endpoint}`, {
           ...options,
           headers,
           credentials: 'include', // Incluir cookies en las requests
@@ -182,7 +197,7 @@ export const makeLoginRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(`${BASE_URL_SECURE}${endpoint}`, {
     ...options,
     method: 'POST',
     headers,
@@ -232,7 +247,7 @@ export const makeRegisterRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(`${BASE_URL_SECURE}${endpoint}`, {
     ...options,
     method: 'POST',
     headers,
