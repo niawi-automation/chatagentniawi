@@ -272,11 +272,29 @@ export const makeLoginRequest = async <T>(
     let errorMessage = 'Error en el login';
     console.error('❌ Login failed:', response.status, response.statusText);
     
+    // Intentar obtener el mensaje de error del backend
     try {
       const errorData = await response.json();
-      errorMessage = errorData.detail || errorData.message || errorMessage;
-    } catch {
-      // Si no se puede parsear el error, usar el mensaje por defecto
+      console.log('📋 Error data del backend:', errorData);
+      errorMessage = errorData.detail || errorData.message || errorData.title || errorMessage;
+    } catch (parseError) {
+      console.warn('⚠️ No se pudo parsear el error del backend:', parseError);
+    }
+    
+    // Mensajes amigables según el código de estado
+    if (response.status === 401) {
+      errorMessage = 'Email o contraseña incorrectos. Por favor, verifica tus credenciales.';
+    } else if (response.status === 403) {
+      errorMessage = 'Acceso denegado. Tu cuenta puede estar bloqueada o inactiva.';
+    } else if (response.status === 429) {
+      errorMessage = 'Demasiados intentos fallidos. Por favor, espera unos minutos antes de reintentar.';
+    } else if (response.status >= 500) {
+      errorMessage = 'Error del servidor. Por favor, intenta nuevamente en unos momentos.';
+    } else if (response.status === 400) {
+      // Para 400, usar el mensaje del backend si está disponible
+      errorMessage = errorMessage === 'Error en el login' 
+        ? 'Datos de login inválidos. Verifica tu email y contraseña.' 
+        : errorMessage;
     }
     
     const error = new Error(errorMessage) as any;

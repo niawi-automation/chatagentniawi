@@ -123,16 +123,20 @@ export const validateResetCode = (code: string): boolean => {
 
 /**
  * Obtener mensaje de error amigable para el usuario
+ * Prioriza mensajes ya procesados del backend sobre mensajes genéricos
  */
 export const getFriendlyErrorMessage = (error: any): string => {
+  // Si ya tiene un mensaje personalizado y descriptivo (no genérico), usarlo
+  if (error?.message && 
+      error.message !== 'Failed' && 
+      error.message !== 'Error' &&
+      error.message.length > 10) {
+    return error.message;
+  }
+  
   // Si es un error del backend con estructura conocida
   if (error?.detail) {
     return error.detail;
-  }
-  
-  // Si tiene un mensaje de error
-  if (error?.message) {
-    return error.message;
   }
   
   // Errores comunes de red
@@ -140,24 +144,34 @@ export const getFriendlyErrorMessage = (error: any): string => {
     return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
   }
   
+  // Mensajes por código de estado HTTP (solo si no hay mensaje descriptivo)
   if (error?.status === 401) {
-    return 'Credenciales incorrectas. Verifica tu email y contraseña.';
+    return 'Email o contraseña incorrectos. Por favor, verifica tus credenciales.';
   }
   
   if (error?.status === 403) {
-    return 'No tienes permisos para realizar esta acción.';
+    return 'Acceso denegado. Tu cuenta puede estar bloqueada o inactiva.';
   }
   
   if (error?.status === 429) {
-    return 'Demasiados intentos. Intenta nuevamente en unos minutos.';
+    return 'Demasiados intentos fallidos. Por favor, espera unos minutos antes de reintentar.';
   }
   
   if (error?.status >= 500) {
-    return 'Error del servidor. Intenta nuevamente más tarde.';
+    return 'Error del servidor. Por favor, intenta nuevamente en unos momentos.';
   }
   
-  // Error genérico
-  return 'Ha ocurrido un error inesperado. Intenta nuevamente.';
+  if (error?.status === 400) {
+    return 'Datos inválidos. Verifica la información ingresada.';
+  }
+  
+  // Si tiene un mensaje pero es genérico, usar mensaje genérico mejorado
+  if (error?.message) {
+    return error.message;
+  }
+  
+  // Error genérico como último recurso
+  return 'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.';
 };
 
 /**
