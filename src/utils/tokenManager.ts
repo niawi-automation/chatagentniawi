@@ -54,16 +54,42 @@ export const setRefreshToken = (token: string): void => {
 
 /**
  * Obtener timestamp de expiración del token
+ * Primero intenta desde memoria, si no existe, desde sessionStorage
  */
 export const getTokenExpiresAt = (): number | null => {
-  return memoryStorage.expiresAt;
+  // Primero intentar desde memoria
+  if (memoryStorage.expiresAt) {
+    return memoryStorage.expiresAt;
+  }
+  
+  // Si no está en memoria, intentar desde sessionStorage
+  try {
+    const stored = sessionStorage.getItem(TOKEN_EXPIRES_AT_KEY);
+    if (stored) {
+      const expiresAt = parseInt(stored, 10);
+      // Actualizar memoria para siguiente consulta
+      memoryStorage.expiresAt = expiresAt;
+      return expiresAt;
+    }
+  } catch (error) {
+    console.warn('Error al obtener expiresAt:', error);
+  }
+  
+  return null;
 };
 
 /**
- * Guardar timestamp de expiración del token en memoria
+ * Guardar timestamp de expiración del token en memoria Y sessionStorage
  */
 export const setTokenExpiresAt = (expiresAt: number): void => {
   memoryStorage.expiresAt = expiresAt;
+  
+  // También guardar en sessionStorage para persistir al recargar
+  try {
+    sessionStorage.setItem(TOKEN_EXPIRES_AT_KEY, expiresAt.toString());
+  } catch (error) {
+    console.warn('Error al guardar expiresAt:', error);
+  }
 };
 
 /**

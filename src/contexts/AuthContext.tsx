@@ -162,20 +162,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       clearError();
 
-      // Primero verificar si hay tokens guardados
-      const token = getAccessToken();
+      // Verificar si hay refreshToken (persiste en sessionStorage)
       const refreshTokenValue = getRefreshToken();
       
-      // Si no hay tokens, no hay sesión que restaurar
-      if (!token || !refreshTokenValue) {
-        console.log('No hay tokens guardados, no se puede restaurar sesión');
+      // Si no hay refreshToken, no hay sesión que restaurar
+      if (!refreshTokenValue) {
+        console.log('No hay refreshToken guardado, no se puede restaurar sesión');
         setIsLoading(false);
         return;
       }
 
-      // Si el token está expirado, intentar refresh
-      if (isTokenExpired()) {
-        console.log('Token expirado, intentando refresh...');
+      // Verificar si hay accessToken (se pierde al recargar porque está en memoria)
+      const token = getAccessToken();
+      
+      // Si NO hay accessToken O está expirado, hacer refresh para obtener uno nuevo
+      if (!token || isTokenExpired()) {
+        console.log('AccessToken no disponible o expirado, haciendo refresh...');
         await refreshSession();
         return;
       }
