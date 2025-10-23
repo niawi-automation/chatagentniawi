@@ -91,7 +91,7 @@ const AgentsDashboard: React.FC = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container gradient-agents">
       <div className="page-content">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">

@@ -1,15 +1,15 @@
-# 🤖 Copiloto Niawi
+# 🤖 E.tres Agent - EMA
 
-**Copiloto inteligente para análisis de datos y recomendaciones estratégicas empresariales**
+**EMA: El copiloto inteligente para tu e-commerce**
 
-[![Powered by Niawi Tech](https://img.shields.io/badge/Powered%20by-Niawi%20Tech-blue)](http://niawi.tech/)
+[![Powered by E.tres Stores](https://img.shields.io/badge/Powered%20by-E.tres%20Stores-blue)](https://etres.stores/)
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.11-blue)](https://tailwindcss.com/)
 
 ## 🚀 Descripción
 
-Copiloto Niawi es una aplicación web moderna que funciona como asistente ejecutivo inteligente, proporcionando análisis de datos en tiempo real, recomendaciones estratégicas basadas en IA y un panel de control integral para la gestión empresarial.
+E.tres Agent (EMA) es una aplicación web moderna que funciona como asistente inteligente de negocios, proporcionando automatización de procesos, análisis de datos en tiempo real, recomendaciones estratégicas basadas en IA y un panel de control integral para la gestión de e-commerce.
 
 ### ✨ Características principales
 
@@ -33,8 +33,8 @@ Copiloto Niawi es una aplicación web moderna que funciona como asistente ejecut
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/niawitech/copiloto-niawi.git
-cd copiloto-niawi
+git clone https://github.com/etres-stores/etres-agent.git
+cd etres-agent
 
 # Instalar dependencias
 npm install
@@ -65,7 +65,7 @@ npm run lint
 src/
 ├── components/          # Componentes reutilizables
 │   ├── ui/             # Componentes de UI (Shadcn)
-│   ├── NiawiLogo.tsx   # Logo de la aplicación
+│   ├── EtresLogo.tsx   # Logo de la aplicación
 │   └── DashboardLayout.tsx
 ├── pages/              # Páginas principales
 │   ├── Login.tsx       # Página de autenticación
@@ -86,8 +86,8 @@ Crea un archivo `.env` en la raíz del proyecto:
 
 ```env
 VITE_API_BASE_URL=https://automation.wtsusa.us/webhook/
-VITE_APP_NAME=Copiloto Niawi
-VITE_COMPANY_URL=http://niawi.tech/
+VITE_APP_NAME=E.tres Agent
+VITE_COMPANY_URL=https://etres.stores/
 ```
 
 ### Personalización de colores
@@ -135,7 +135,7 @@ niawi: {
 
 ## 🎨 Design System
 
-Copiloto Niawi utiliza un design system moderno con:
+E.tres Agent utiliza un design system moderno con:
 
 - **Paleta de colores**: Tonos oscuros profesionales con acentos azules y verdes
 - **Tipografía**: Inter font family para máxima legibilidad
@@ -181,14 +181,14 @@ npm run build
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 🏢 Niawi Tech
+## 🏢 E.tres Stores
 
-Desarrollado con ❤️ por **Niawi Tech**
+Desarrollado con ❤️ por **E.tres Stores**
 
-- 🌐 Website: [niawi.tech](http://niawi.tech/)
-- 📧 Email: contact@niawi.tech
-- 💼 LinkedIn: [Niawi Tech](https://linkedin.com/company/niawi-tech)
+- 🌐 Website: [etres.stores](https://etres.stores/)
+- 📧 Email: contact@etres.stores
+- 💼 LinkedIn: [E.tres Stores](https://linkedin.com/company/etres-stores)
 
 ---
 
-**Copiloto Niawi** - *Potenciando decisiones empresariales con inteligencia artificial*
+**E.tres Agent (EMA)** - *El copiloto inteligente para tu e-commerce*

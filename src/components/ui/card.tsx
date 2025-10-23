@@ -9,9 +9,12 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "rounded-xl border backdrop-blur-sm bg-card/95 text-card-foreground shadow-sm transition-all hover:shadow-xl hover:shadow-niawi-primary/10 hover:border-niawi-primary/30 hover:-translate-y-1",
+      "before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-white/5 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none",
+      "relative overflow-hidden",
       className
     )}
+    style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', transform: 'translateZ(0)' }}
     {...props}
   />
 ))

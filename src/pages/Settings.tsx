@@ -600,13 +600,13 @@ const Settings = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Desarrollado por:</span>
-                  <span className="ml-2 text-foreground font-medium">Niawi Tech</span>
+                  <span className="ml-2 text-foreground font-medium">E.tres Stores</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Sitio web:</span>
-                  <a href="http://niawi.tech/" target="_blank" rel="noopener noreferrer" 
+                  <a href="https://etres.stores/" target="_blank" rel="noopener noreferrer" 
                      className="ml-2 text-niawi-primary hover:text-niawi-accent transition-colors">
-                    niawi.tech
+                    etres.stores
                   </a>
                 </div>
                 <div>

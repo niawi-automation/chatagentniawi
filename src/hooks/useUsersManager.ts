@@ -7,7 +7,7 @@ const MOCK_USERS: User[] = [
   {
     id: '1',
     name: 'Super Administrador',
-    email: 'superadmin@niawi.tech',
+    email: 'admin@example.com',
     role: 'super_admin',
     companyId: 'company1',
     availableAgents: ['operations', 'hr', 'sales', 'documents'],

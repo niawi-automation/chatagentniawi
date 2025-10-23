@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
-import NiawiLogoSvg from '@/assets/images/Niawilogo.svg';
+import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 
 const ConfirmEmail = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -92,8 +92,8 @@ const ConfirmEmail = () => {
           <div className="text-center">
             <div className="flex justify-center mb-6">
               <img 
-                src={NiawiLogoSvg} 
-                alt="Niawi" 
+                src={EtresBrandSvg} 
+                alt="E.tres Agent" 
                 className="h-16 w-auto"
               />
             </div>

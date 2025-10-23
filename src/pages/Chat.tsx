@@ -12,7 +12,7 @@ import type { Message, ApiResponse, Attachment } from '@/types/agents';
 import { AGENT_SUGGESTIONS } from '@/constants/agents';
 import { toast } from '@/hooks/use-toast';
 
-const CONVERSATIONS_STORAGE_KEY = 'niawi-agent-conversations';
+const CONVERSATIONS_STORAGE_KEY = 'etres-agent-conversations';
 
 interface AgentConversations {
   [agentId: string]: Message[];
@@ -123,18 +123,10 @@ const Chat = () => {
       // Si hay conversación existente, cargarla
       setMessages(existingConversation);
     } else {
-      // Si no hay conversación, crear mensaje de bienvenida
-      const welcomeMessage: Message = {
-        id: Date.now(),
-        type: 'assistant',
-        content: `¡Hola${currentUser ? `, ${currentUser.name}` : ''}! Soy tu ${selectedAgent.name}. Estoy especializado en ${selectedAgent.description.toLowerCase()}. ¿En qué puedo ayudarte hoy?`,
-        timestamp: new Date(),
-        agentId: selectedAgent.id
-      };
-      
-      setMessages([welcomeMessage]);
+      // Si no hay conversación, mostrar array vacío (pantalla de bienvenida)
+      setMessages([]);
     }
-  }, [selectedAgent?.id, currentUser?.name, selectedAgent?.name, selectedAgent?.description, loadAgentConversation]);
+  }, [selectedAgent?.id, loadAgentConversation]);
 
   // Guardar conversación automáticamente cuando cambien los mensajes
   useEffect(() => {
@@ -144,7 +136,7 @@ const Chat = () => {
   }, [messages, selectedAgent?.id, saveCurrentConversation]);
 
   // Determinar si estamos en una conversación activa
-  const isActiveConversation = messages.length > 1;
+  const isActiveConversation = messages.length > 0;
 
   // Función para manejar el cambio del textarea con auto-resize
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -381,18 +373,11 @@ const Chat = () => {
   const handleNewConversation = () => {
     if (!selectedAgent) return;
     
-    const welcomeMessage: Message = {
-      id: Date.now(),
-      type: 'assistant',
-      content: `¡Hola${currentUser ? `, ${currentUser.name}` : ''}! Soy tu ${selectedAgent.name}. ¿En qué puedo ayudarte hoy?`,
-      timestamp: new Date(),
-      agentId: selectedAgent.id
-    };
+    // Limpiar la conversación (mostrar pantalla de bienvenida)
+    setMessages([]);
     
-    setMessages([welcomeMessage]);
-    
-    // Guardar la nueva conversación (sobrescribir la anterior)
-    saveCurrentConversation(selectedAgent.id, [welcomeMessage]);
+    // Guardar la nueva conversación vacía (sobrescribir la anterior)
+    saveCurrentConversation(selectedAgent.id, []);
   };
 
   const suggestions = selectedAgent ? getAgentSuggestions(selectedAgent.id) : [];
@@ -677,80 +662,130 @@ const Chat = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container gradient-chat">
       {/* Header con selector de agente */}
       <div className="flex-shrink-0 p-4 pb-0 sm:p-6">
         <AgentSelector />
       </div>
 
-      {/* Chat Container */}
+      {/* Chat Container - Glass Premium */}
       <div className="flex-1 p-4 pt-4 sm:p-6 sm:pt-6 overflow-hidden">
-        <Card className="h-full bg-niawi-surface border-niawi-border flex flex-col overflow-hidden shadow-xl">
+        <Card className="h-full glass-premium border-niawi-border/50 flex flex-col overflow-hidden shadow-2xl">
           <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
             {/* Messages Area */}
             <div
-              className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages"
+              className={`flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
+                !isActiveConversation ? 'flex items-center justify-center' : 'space-y-6'
+              }`}
               onDragOver={(e) => { e.preventDefault(); }}
               onDrop={handleDrop}
             >
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-4 animate-fade-in ${
-                    msg.type === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  {msg.type === 'assistant' && selectedAgent && (
-                    <Avatar className={`w-8 h-8 ${selectedAgent.bgColor} flex-shrink-0 mt-1`}>
-                      <AvatarFallback className={`${selectedAgent.color} ${selectedAgent.bgColor} border-0`}>
-                        {msg.isLoading ? (
-                          <Brain className="w-4 h-4 animate-pulse" />
-                        ) : (
-                          <selectedAgent.icon className="w-4 h-4" />
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
+              {!isActiveConversation && selectedAgent ? (
+                // Pantalla de bienvenida inmersiva
+                <div className="max-w-3xl w-full text-center space-y-8 px-4 animate-fade-in">
+                  <div className="space-y-4">
+                    <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+                      Buen día{currentUser?.name ? `, ${currentUser.name.split(' ')[0]}` : ''}! 👋
+                    </h1>
+                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                      ¿Revisamos juntos la agenda ejecutiva?
+                    </p>
+                  </div>
                   
-                  <div
-                    className={`max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 transition-all duration-200 hover:shadow-lg ${
-                      msg.type === 'user'
-                        ? 'bg-niawi-primary text-white ml-auto shadow-lg shadow-niawi-primary/20'
-                        : `bg-niawi-border/30 text-foreground shadow-sm ${
-                            msg.hasError ? 'border border-niawi-danger/50' : ''
-                          }`
-                    }`}
-                  >
-                    {msg.hasError && (
-                      <div className="flex items-center gap-2 mb-2 text-niawi-danger">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-xs font-medium">Error</span>
-                      </div>
-                    )}
-                    
-                    <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
-                      {renderMessageContent(msg.content)}
+                  <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
+                    <div className={`p-2 rounded-lg ${selectedAgent.bgColor}`}>
+                      <selectedAgent.icon className={`w-5 h-5 ${selectedAgent.color}`} />
                     </div>
-                    {renderAttachments(msg.attachments)}
-                    
-                    <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
-                      <span>
-                        {msg.timestamp instanceof Date 
-                          ? msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                          : new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        }
-                      </span>
-                      {msg.agentId && selectedAgent && (
-                        <>
-                          <span>•</span>
-                          <span>{selectedAgent.department}</span>
-                        </>
-                      )}
+                    <span>Conectado con <span className="font-semibold text-foreground">{selectedAgent.name}</span></span>
+                  </div>
+
+                  <div className="pt-4">
+                    <p className="text-sm text-muted-foreground mb-4 flex items-center justify-center gap-2">
+                      <Zap className="w-4 h-4 text-niawi-accent" />
+                      Sugerencias para comenzar
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
+                      {suggestions.slice(0, 4).map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="text-left p-4 rounded-xl border border-niawi-border bg-niawi-border/10 hover:bg-niawi-border/20 hover:border-niawi-primary/30 transition-all duration-300 group"
+                          disabled={isLoading}
+                        >
+                          <div className="flex items-start gap-3">
+                            <Zap className="w-4 h-4 text-niawi-accent flex-shrink-0 mt-0.5 group-hover:text-niawi-primary transition-colors" />
+                            <span className="text-sm text-foreground leading-relaxed">{suggestion}</span>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
+              ) : (
+                // Vista de conversación normal
+                <>
+                  {messages.map((msg, index) => (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-4 animate-slide-in-up ${
+                        msg.type === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {msg.type === 'assistant' && selectedAgent && (
+                        <Avatar className={`w-8 h-8 ${selectedAgent.bgColor} flex-shrink-0 mt-1`}>
+                          <AvatarFallback className={`${selectedAgent.color} ${selectedAgent.bgColor} border-0`}>
+                            {msg.isLoading ? (
+                              <Brain className="w-4 h-4 animate-pulse-slow" />
+                            ) : (
+                              <selectedAgent.icon className="w-4 h-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                      
+                      <div
+                        className={`max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 ${
+                          msg.type === 'user'
+                            ? 'bg-niawi-primary text-white ml-auto shadow-lg shadow-niawi-primary/30 hover:shadow-xl hover:shadow-niawi-primary/40'
+                            : `backdrop-blur-sm bg-niawi-border/20 text-foreground shadow-sm hover:shadow-md ${
+                                msg.hasError ? 'border border-niawi-danger/50' : ''
+                              }`
+                        }`}
+                        style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                      >
+                        {msg.hasError && (
+                          <div className="flex items-center gap-2 mb-2 text-niawi-danger">
+                            <AlertCircle className="w-4 h-4" />
+                            <span className="text-xs font-medium">Error</span>
+                          </div>
+                        )}
+                        
+                        <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
+                          {renderMessageContent(msg.content)}
+                        </div>
+                        {renderAttachments(msg.attachments)}
+                        
+                        <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
+                          <span>
+                            {msg.timestamp instanceof Date 
+                              ? msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                              : new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            }
+                          </span>
+                          {msg.agentId && selectedAgent && (
+                            <>
+                              <span>•</span>
+                              <span>{selectedAgent.department}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Botón Nueva Conversación - Solo si hay conversación activa */}
@@ -767,31 +802,6 @@ const Chat = () => {
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Nueva conversación
                   </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Suggestions - Solo si no hay conversación activa y en pantallas grandes */}
-            {!isActiveConversation && selectedAgent && (
-              <div className="hidden md:block px-6 pb-4 flex-shrink-0">
-                <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Zap className="w-4 h-4 text-niawi-accent" />
-                  <span>Sugerencias para {selectedAgent.department}</span>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {suggestions.map((suggestion, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="text-left h-auto p-4 border-niawi-border bg-niawi-border/20 hover:bg-niawi-border/40 hover:scale-[1.02] text-sm justify-start transition-all duration-200 shadow-sm hover:shadow-lg"
-                      disabled={isLoading}
-                    >
-                      <Zap className="w-4 h-4 mr-3 text-niawi-accent flex-shrink-0" />
-                      <span className="truncate">{suggestion}</span>
-                    </Button>
-                  ))}
                 </div>
               </div>
             )}
@@ -818,7 +828,7 @@ const Chat = () => {
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
                     placeholder={selectedAgent ? `Pregunta a tu ${selectedAgent.name}...` : 'Selecciona un agente primero...'}
-                    className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-niawi-bg border-niawi-border focus:border-niawi-primary transition-all duration-200"
+                    className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary input-enhanced"
                     disabled={isLoading || !selectedAgent}
                     rows={1}
                   />
@@ -862,10 +872,10 @@ const Chat = () => {
                   type="submit"
                   size="sm"
                   disabled={(message.trim().length === 0 && attachments.length === 0) || isLoading || !selectedAgent}
-                  className="bg-niawi-primary hover:bg-niawi-primary/90 text-white h-[44px] px-4"
+                  className="bg-niawi-primary hover:bg-niawi-primary/90 text-white h-[44px] px-4 btn-magnetic hover:shadow-xl hover:shadow-niawi-primary/50"
                 >
                   {isLoading ? (
-                    <Brain className="w-4 h-4 animate-pulse" />
+                    <Brain className="w-4 h-4 animate-pulse-slow" />
                   ) : (
                     <Send className="w-4 h-4" />
                   )}

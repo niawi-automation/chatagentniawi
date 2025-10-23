@@ -3,7 +3,6 @@ import type { Agent, User, AgentContextType } from '../types/agents';
 import { resolveUserAgentAccess, getUserEffectiveAgents, validateAgentAssignment, createAgentAssignmentLog } from '../constants/agents';
 import { useAgentsManager, type AgentWithMetrics } from '../hooks/useAgentsManager';
 import { useUsersManager } from '../hooks/useUsersManager';
-import { useAuthContext } from './AuthContext';
 
 // Create context with proper typing
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -23,42 +22,29 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     createActivityLog
   } = useUsersManager();
 
-  // Obtener usuario autenticado del AuthContext
-  const { user: authUser, isAuthenticated } = useAuthContext();
-
   // Estado inicial del agente seleccionado (convertir AgentWithMetrics a Agent)
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   
-  // Usuario actual - mapear desde AuthContext a estructura local
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  // Efecto para mapear usuario autenticado a estructura local
-  useEffect(() => {
-    if (authUser && isAuthenticated) {
-      // Mapear usuario del backend a estructura local con rol super_admin
-      const mappedUser: User = {
-        id: '1', // Por ahora usar ID fijo hasta que backend proporcione ID de usuario
-        name: authUser.userName || 'Usuario',
-        email: authUser.email,
-        role: 'super_admin', // Por defecto asignar rol super_admin al usuario autenticado
-        companyId: 'company1',
-        availableAgents: [],
-        permissions: {
-          agents: { view: true, create: true, edit: true, delete: true, configure: true, assign: true },
-          users: { view: true, create: true, edit: true, delete: true, assignRoles: true, assignAgents: true },
-          analytics: { view: true, export: true },
-          settings: { view: true, edit: true, advanced: true },
-          chat: { access: ['operations', 'hr', 'sales', 'documents'], export: true, history: true }
-        },
-        isActive: true,
-        createdAt: new Date(),
-        lastLogin: new Date()
-      };
-      setCurrentUser(mappedUser);
-    } else {
-      setCurrentUser(null);
-    }
-  }, [authUser, isAuthenticated]);
+  // Usuario actual con nuevo sistema de permisos
+  // TODO: Sistema de Roles - En producción esto vendrá de autenticación JWT
+  const [currentUser, setCurrentUser] = useState<User | null>({
+    id: '1',
+    name: 'Super Administrador',
+    email: 'admin@example.com',
+    role: 'super_admin', // Cambiar para probar: 'super_admin', 'admin', 'manager', 'employee'
+    companyId: 'company1',
+    availableAgents: [],
+    permissions: {
+      agents: { view: true, create: true, edit: true, delete: true, configure: true, assign: true },
+      users: { view: true, create: true, edit: true, delete: true, assignRoles: true, assignAgents: true },
+      analytics: { view: true, export: true },
+      settings: { view: true, edit: true, advanced: true },
+      chat: { access: ['operations', 'hr', 'sales', 'documents'], export: true, history: true }
+    },
+    isActive: true,
+    createdAt: new Date(),
+    lastLogin: new Date()
+  });
 
   // Convertir AgentWithMetrics a Agent (compatible con el tipo original)
   const convertToAgent = useCallback((agentWithMetrics: AgentWithMetrics): Agent => {

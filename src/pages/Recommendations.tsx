@@ -189,7 +189,7 @@ const Recommendations = () => {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container gradient-recommendations">
       <div className="page-content">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
@@ -232,9 +232,9 @@ const Recommendations = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {metrics.map((metric, index) => (
-            <Card key={index} className="bg-niawi-surface border-niawi-border hover-lift">
+            <Card key={index} className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover-lift animate-slide-in-up shadow-md" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-4 text-center">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${metric.color} mb-2`}>
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${metric.color} mb-2 animate-counter`} style={{ animationDelay: `${index * 0.2}s` }}>
                   <span className="text-xl font-bold">{metric.value}</span>
                 </div>
                 <p className="text-sm font-medium text-foreground">{metric.label}</p>
@@ -273,13 +273,14 @@ const Recommendations = () => {
             ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
             : "space-y-4"
         }>
-          {filteredRecommendations.map((rec) => (
+          {filteredRecommendations.map((rec, index) => (
             <Card 
               key={rec.id} 
-              className={`bg-niawi-surface border-niawi-border hover:border-niawi-primary/50 transition-all cursor-pointer ${
+              className={`bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:border-niawi-primary/50 cursor-pointer animate-slide-in-up hover-lift shadow-md ${
                 viewMode === 'list' ? 'p-4' : ''
               }`}
               onClick={() => openModal(rec)}
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className={viewMode === 'list' ? 'pb-2' : ''}>
                 <div className={`flex ${viewMode === 'list' ? 'items-center' : 'items-start'} justify-between gap-4`}>
