@@ -1,0 +1,259 @@
+Configuración base (obligatoria)
+
+Variables de entorno: BASE_URL=https://aiauth.e3stores.cloud, CLIENT_ID=<id-del-cliente>.
+
+Headers globales en todas las requests: envía ambos hasta confirmar: ClientId y Client-Id con el mismo valor.
+
+Autorización: añade Authorization: Bearer <accessToken> en endpoints protegidos.
+
+Tiempo: considera expiresIn=3600 s para refresco proactivo.
+
+Autenticación (AUTH)
+A. Registro
+
+Pantalla: formulario email, password.
+
+Acción: llamar /auth/register con headers de cliente.
+
+UX: muestra errores de validación (email en uso, password débil).
+
+Listo cuando: alta exitosa y rediriges a login o envías a confirmar email (según política).
+
+B. Login (Bearer + Refresh)
+
+Pantalla: email, password (y segundo paso para 2FA si se requiere).
+
+Acción: llamar /auth/login?useCookies=false&useSessionCookies=false.
+
+Post-login: guarda accessToken en memoria y refreshToken en sessionStorage; programa refresco proactivo ~60 s antes del vencimiento.
+
+Lockout: si el backend informa demasiados intentos, muestra “cuenta bloqueada por 5 minutos”.
+
+Listo cuando: puedes consultar /manage/info sin error.
+
+C. Refresh token
+
+Acción: implementar llamada a /auth/refresh usando el refreshToken cuando:
+
+falten ~60 s para expirar o
+
+recibas un 401 (una sola vez reintentar).
+
+Deduplicación: si varias requests disparan refresh, que esperen la misma operación.
+
+Listo cuando: 401 por expiración se recupera sin sacar al usuario.
+
+Gestión de cuenta (MANAGE)
+D. Información de cuenta
+
+Vista Perfil: muestra datos de /manage/info (userName, email, isEmailConfirmed).
+
+Listo cuando: ves estado de confirmación y email actual.
+
+E. Cambios de email y contraseña
+
+Acción: formulario en Perfil:
+
+Cambiar email: POST /manage/info con newEmail.
+
+Cambiar password: POST /manage/info con oldPassword y newPassword.
+
+Listo cuando: confirmas cambio y reflejas nuevo estado en la vista.
+
+F. Confirmación de email
+
+Resend: botón que llama POST /manage/resendConfirmationEmail (muestra aviso de envío).
+
+Página de confirmación: ruta que lee userId, code, changedEmail y llama GET /manage/confirmEmail?... mostrando éxito/error.
+
+Listo cuando: isEmailConfirmed queda en true después del enlace.
+
+G. Recuperación de contraseña
+
+Olvidé mi contraseña: formulario email → POST /manage/forgotPassword (mensaje neutro: “si existe, te enviamos correo”).
+
+Reset: página que recibe resetCode (desde el email), pide newPassword y llama POST /manage/resetPassword con email, newPassword, resetCode.
+
+Listo cuando: el usuario puede entrar con la nueva contraseña.
+
+H. 2FA (habilitar, usar en login, administrar)
+
+Vista 2FA (en Perfil):
+
+Activar: mostrar shared key / QR (si lo devuelven), pedir twoFactorCode, llamar POST /manage/2fa con enable=true y el código.
+
+Desactivar: POST /manage/2fa con enable=false (y código si lo exige).
+
+Recovery codes: si el backend devuelve recoveryCodes, mostrarlos una sola vez y permitir descargarlos/confirmar guardado.
+
+Login con 2FA:
+
+Si el backend indica que falta segundo factor, muestra paso 2 para twoFactorCode o twoFactorRecoveryCode y reintenta login.
+
+Listo cuando: estado isTwoFactorEnabled refleja la acción y puedes iniciar sesión con 2FA o recovery.
+
+Navegación y seguridad
+I. Rutas protegidas
+
+Guard: si no hay sesión válida (token en memoria) intenta una restauración vía refresh; si falla, redirige a login.
+
+Estado de arranque: muestra “restaurando sesión…” mientras intentas refresh.
+
+J. Manejo de errores
+
+401: intenta refresh una vez; si falla → limpia sesión y redirige a login con “sesión expirada”.
+
+Validaciones: muestra mensajes específicos (no genéricos).
+
+5xx: reintentos solo en GET idempotentes.
+
+K. Buenas prácticas mínimas
+
+No loguear tokens ni guardarlos en localStorage.
+
+Sanitizar cualquier string proveniente de query (ej. changedEmail).
+
+Si migras a cookies en el futuro: CORS con credenciales y cookies SameSite=None; Secure.
+
+Pruebas que debes ejecutar
+
+Registro → Login → Perfil.
+
+Expiración → refresco proactivo y refresco tras 401.
+
+Lockout a los 5 intentos fallidos (mensaje correcto).
+
+Forgot/Reset completo con email y resetCode.
+
+Resend + confirmación de email (estado actualizado).
+
+2FA: activar, login con code; probar también un recovery code.
+
+Multicliente: cambiando CLIENT_ID, los usuarios no se mezclan.
+
+Con esto cubres todos los endpoints entregados (auth + manage) y dejas el front listo para producción. Cuando te pasen los endpoints de clientes y agentes, agregas esos módulos aparte.
+0) Concepto clave: multi-cliente
+
+Todas las requests deben llevar el identificador del cliente.
+En la doc dice “Client-Id”, pero en los ejemplos de Postman aparece como ClientId (sin guion). Confirma con el equipo cuál es el header real; mientras tanto, prepara tu cliente para enviar ambos por seguridad:
+
+ClientId: c0bd9976-4356-0b1a-84ec-4b2f0b168dc8
+Client-Id: c0bd9976-4356-0b1a-84ec-4b2f0b168dc8
+
+
+Si no lo envías o el valor no existe en su base, obtendrás 401/403 en todo.
+
+1) Qué cubre cada grupo de endpoints
+AUTH
+
+POST /auth/register → registrar usuario (en el cliente del header).
+
+POST /auth/login?useCookies={bool}&useSessionCookies={bool} → iniciar sesión.
+
+Cookies: si useCookies=true (recomendado para front web).
+
+Bearer: si useCookies=false (te devuelve {accessToken, refreshToken, expiresIn, tokenType}).
+
+POST /auth/refresh → solo si usaste Bearer; envías { refreshToken } y te devuelve un nuevo par de tokens.
+
+MANAGE (cuenta del usuario autenticado)
+
+GET /manage/info → ver userName, email, isEmailConfirmed.
+
+POST /manage/info → cambiar newEmail y/o password (newPassword, oldPassword).
+
+POST /manage/resendConfirmationEmail → re-enviar confirmación.
+
+GET /manage/confirmEmail?userId&code&changedEmail → confirmar email.
+
+POST /manage/forgotPassword → pedir reset (envía email con resetCode).
+
+POST /manage/resetPassword → aplicar reset (email, newPassword, resetCode).
+
+POST /manage/2fa → activar/desactivar/configurar 2FA (soporta enable, twoFactorCode, resetSharedKey, resetRecoveryCodes, etc.). Responde estado y, si corresponde, sharedKey + recoveryCodes.
+
+Nota: todos los /manage requieren estar autenticado (cookie o bearer válido).
+
+2) Flujo recomendado para front web (simple y robusto)
+
+Usa cookies. Te olvidas de manejar refresh tokens en el front, reduces superficie de errores y cumples mejor con SameSite.
+
+Registro (si corresponde): POST /auth/register (con ClientId/Client-Id).
+
+Login con cookie: POST /auth/login?useCookies=true&useSessionCookies=false
+
+Si quieres que la cookie muera al cerrar navegador, usa useSessionCookies=true.
+
+Hacer requests autenticadas: el navegador enviará la cookie si:
+
+Front: credentials: "include" (o withCredentials: true).
+
+Backend: CORS con Access-Control-Allow-Credentials: true y Access-Control-Allow-Origin específico (no *). Cookie Secure y SameSite=None si hay dominios distintos.
+
+Estado de cuenta (opcional en UI): GET /manage/info.
+
+Confirmar email (si lo exigen): flujo resend → link confirmEmail.
+
+Olvidé mi clave: POST /manage/forgotPassword → email con resetCode → POST /manage/resetPassword.
+
+2FA (opcional): POST /manage/2fa para on/off y manejar códigos.
+
+¿Cuándo usar Bearer?
+Solo si necesitas tokens para apps no-browser o integraciones móviles. En ese caso: login → guardar accessToken y refreshToken → cuando 401 o expira, POST /auth/refresh con el refreshToken.5) Lo pendiente para tu caso “Cliente → Usuarios → Agentes (webhooks n8n)”
+
+Con lo que compartiste, no hay endpoints para crear “clientes” ni “agentes”.
+Este Auth Service solo:
+
+registra usuarios bajo el cliente del header,
+
+autentica (cookie o bearer),
+
+gestiona cuenta/2FA/password/email.
+
+Para implementar tu flujo completo necesitas que te confirmen o te den otra colección con endpoints de Management de negocio, por ej.:
+
+POST /clients (si tú debes crear nuevos clientes) o confirmar que hoy no te corresponde crearlos.
+
+POST /agents / PUT /agents/{id} → crear agente, ligar a userId, guardar URL del webhook de n8n y estados.
+
+GET /agents?userId=... / GET /users?clientId=... para listar y administrar.
+
+Hasta que no te den esos endpoints, tu front puede crear usuarios y loguear, pero no podrás “crear/ligar agentes” desde este microservicio.
+
+6) Errores/comunes a vigilar (te ahorran horas)
+
+Header del cliente mal nombrado (ClientId vs Client-Id) → 401/403 generalizados.
+
+Cookies que no viajan → faltó withCredentials: true en front o CORS sin Allow-Credentials: true y Allow-Origin específico.
+
+SameSite en cookies → si front y backend están en dominios distintos, debe ser SameSite=None; Secure.
+
+Lockout de login → 5 intentos fallidos → bloqueo 5 min. Muestra el mensaje adecuado al usuario.
+
+Usar /auth/refresh con cookies → no hace falta; solo para Bearer.
+
+Algunas pruebas realizadas: 
+
+{{baseUrl}}/auth/login?useCookies=false&useSessionCookies=false
+{
+    "email": "test@e3ecommerce.com.ar",
+    "password": "123Awd@dm1n"//,
+    // "twoFactorCode": "516697"
+}
+
+response 200 
+
+{
+    "tokenType": "Bearer",
+    "accessToken": "CfDJ8KK2lGClIAdOrD0sX-FMu0E-iYPabjbAZBDsl1yT375O44xOeb-RcVC5UzgkZ6t7H0ZG114MPiUvo3lOW9zB70j8mVCe0FC1Q2G6_Zz8ZHiX4seCqrqn24iwLQqGkD25ythHsBh66GqY0lSjNoRVeq5lnm_JtWlIo17yG5LOCAKfX_h3Mjz6SQVI-BWHvRRiP6U3UfqNhS87D--QOZCIyIUHAmBTTZp7NSKw-5iPM0ZCjdkmyHeJLXp3aBvOamCY9AIBtRd7QvRuTRQC1qh__DNRXbYbzVbESoqMufgDw3j0HioCMBu1K1c5RnnsMr0dG07Sp3IMkokSwHWdplQTKvpvr6pe1HceT-1K5c7xfze2ve119kHLEVGGy26UIe4ktbFpmtx8lmZ-nNnbbRwTb2t94uBBBHdK7FgnsruS7dg5Qj-mzdjuo229MjD3WmrqsQLKnDGabSyF1nXTlXvvdUjm_bCzgr-N1nyC4tMAIm-LP_otqKa0XTB4EQT_kXgFsTBg10-oXcAelIemqVHMkauUk6M5fyBJh19_Ut9Wf8TsMQ1ojCkYvchNHib82t1IUPDQLkiPbvPLmo1mWPtOc4AZ3mgvhZ9bohUWGC7OEqKRQhwtcrRHuYKidbAiowlkjX6Y2m_pnp0UEhBe1Rrqluc72lzuWm7ClE_4ljBYrZGZ1YEVQ9_uy4cuoFk6X1diTtFRqYwlq7-gWRCh2ou4Q2hQHqI6JhiG-618b9BopmGam-4UkiujBECBOQfbui_QADvjtW0CtXHCMJCgJWSAMnxqBI7Efp2UaOqa7uSX8ZaV",
+    "expiresIn": 3600,
+    "refreshToken": "CfDJ8KK2lGClIAdOrD0sX-FMu0Gse-FjcBCxrXxVqOEdIPRH151DIkV-TmD0YhSwoJt_vhxPWbQY3oQdaHf_iYfosork3LU0VMOzcSkMV8sX6Uq7S6yl-k1K37THcBPv1AGqxdrGTHtCXxg-5ARTzfyK3Jzb6ANXETQ3LTZ6I_DN4YqI_YcsMBWiMBBFHNl2iRBfFDNDgc0HWou46xcVx86vNryVK1hD8FNfyhNQNWE1yAlZf4mF6-KQ2HSSq6Hnb-R3VrgfebSqB31cSiRWk9Vb8Ys0nfti-JAaJSVfEVIc6nuP_TyL8SDCfTdUGn3MltPwr8g3Ws7eQ9qcm0DxlD9p6XwwsMM1bzdSwfaoejARvkUr3X3k_HIKSdU5doXsUfflHvK7uwnwvKaXsYfbkg7DwSkNHFD9FO9eo5PFr1ILLmdnx_ljtNBYbo1x9kQdAdbTg4jnnYDUvyl4du34-b_wlzebhlXQsgnXg5iANasv_IbVOIDN0BTqUc9-phY9xnBl6nfzfiZz4XSTyDFb8KT8mzz8MEM2gWmsLWv69BXPE415bfch_S6YMozTYfdOoXB7f8VWGNUfYZZrWyZ18RMOW93j5syK-siFGqmw2OSZ15dCfpPQOdizwxQq2AWRLGZKmvB8-Aghve0hR7aiDsq0WiOCD0PuSz6klKy-x2cXDKHn3ACosm79-0XI-i2ktKnJsQOq9keNccwi2IrKWrqhXVY_853KxJZLnPX6AnZtCQ51-6AvnBeX2MR0Gm2FIGEua894CYaJdGK3uosbvR2jU_Idh4I3zv5rf0Z3E78VkT5b"
+}
+
+
+usando las variables de baseUrl y clientId
+ 
+ al hacer login correcto ya tenemos el auth_token requerido para el resto de endpoints que deben funcionar solo cuando ya tenemos logueo
+ la app ya no debe estar con usuario hardcodeado asi que requerimos seguridad. 
+ por ahora no tocar los url de webhook solo enfocarnos en el logueo y que no se acceda a ninguna page sin tener un token valido, recuerda tiempos de expiracion. 
+ hay endpoints para recuperar contraseña , para crear usuario, para el 2fa, resetpassword, etc-

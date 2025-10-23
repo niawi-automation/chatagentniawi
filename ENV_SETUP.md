@@ -1,81 +1,60 @@
-# Variables de Entorno - Copiloto NiawiTech
+# Configuración de Variables de Entorno
 
-## 🔒 Configuración de Seguridad
+## Variables Requeridas
 
-Las URLs de webhooks ahora están protegidas mediante variables de entorno.
+Para que la aplicación funcione correctamente con el backend de autenticación, debes configurar las siguientes variables de entorno.
 
-## 📝 Variables Requeridas
+### Cómo Configurar
 
-### Para desarrollo local (.env):
-```
+Crea un archivo `.env` o `.env.local` en la raíz del proyecto con el siguiente contenido:
+
+```env
+# Backend de Autenticación (IMPORTANTE: Debe usar HTTPS en producción)
 VITE_AUTH_BASE_URL=https://aiauth.e3stores.cloud
+
+# Client ID para autenticación multi-cliente
 VITE_AUTH_CLIENT_ID=019986ed-5fea-7886-a2b6-e35968f8ef17
-VITE_RECOMMENDATIONS_API_URL=https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b
+
+# APIs de Webhooks para Automatizaciones
 VITE_CHAT_API_URL=https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c
-VITE_AUTH_EMAIL=admin@niawi.tech
-VITE_AUTH_PASSWORD=d3mo.Niawi
+VITE_RECOMMENDATIONS_API_URL=https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b
 ```
 
-### Para Vercel (Dashboard):
+### Notas Importantes
 
-1. Ve a tu proyecto en [Vercel Dashboard](https://vercel.com/dashboard)
-2. Selecciona tu proyecto "Copiloto NiawiTech"
-3. Ve a **Settings** > **Environment Variables**
-4. Agrega estas variables:
+1. **VITE_AUTH_BASE_URL**: DEBE usar `https://` en producción. El backend está en `https://aiauth.e3stores.cloud`
 
-| Name | Value |
-|------|-------|
-| `VITE_AUTH_BASE_URL` | `https://aiauth.e3stores.cloud` |
-| `VITE_AUTH_CLIENT_ID` | `019986ed-5fea-7886-a2b6-e35968f8ef17` |
-| `VITE_RECOMMENDATIONS_API_URL` | `https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b` |
-| `VITE_CHAT_API_URL` | `https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c` |
-| `VITE_AUTH_EMAIL` | `admin@niawi.tech` |
-| `VITE_AUTH_PASSWORD` | `d3mo.Niawi` |
+2. **VITE_AUTH_CLIENT_ID**: Es el identificador único del cliente para autenticación multi-tenant. Valor: `019986ed-5fea-7886-a2b6-e35968f8ef17`
 
-5. Asegúrate de marcar las variables para **Production**, **Preview** y **Development**
-6. **Redeploy** el proyecto después de agregar las variables
+3. **Variables de Webhooks**: URLs de n8n para las automatizaciones de chat y recomendaciones
 
-## ⚠️ Importante
+### Verificar Configuración
 
-- Las variables **DEBEN** tener el prefijo `VITE_` para ser accesibles en el frontend
-- Después de agregar variables en Vercel, **debes hacer redeploy**
-- Para desarrollo local, crea un archivo `.env` en la raíz del proyecto
+Después de crear el archivo `.env` o `.env.local`:
 
-## 🔍 Verificación
+1. Reinicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
 
-Si las variables no están configuradas, la aplicación mostrará errores específicos indicando qué variable falta.
+2. Abre la consola del navegador (F12) y busca el mensaje:
+   ```
+   🔧 Configuración API:
+     - Base URL: https://aiauth.e3stores.cloud
+     - Client ID: 019986ed-5fea-7886-a2b6-e35968f8ef17
+     - Modo: Desarrollo
+   ```
 
-## 🔒 Seguridad y Autenticación
+3. Verifica que las URLs sean HTTPS (no HTTP)
 
-### Credenciales de Acceso Demo:
-- **Email**: `admin@niawi.tech`
-- **Password**: `d3mo.Niawi`
+### Para Vercel
 
-### Funcionalidades de Seguridad:
-- ✅ Validación de credenciales mediante variables de entorno
-- ✅ Protección de rutas - redirección automática al login
-- ✅ Persistencia de sesión con localStorage
-- ✅ Función de logout que limpia la sesión
-- ✅ Credenciales no visibles en el código fuente
+Las mismas variables deben configurarse en Vercel Dashboard:
 
-### Notas Importantes:
-- Las credenciales están protegidas en variables de entorno
-- Solo usuarios con credenciales válidas pueden acceder al dashboard
-- La sesión se mantiene hasta hacer logout explícito
-- Al recargar la página, se verifica la autenticación automáticamente
+1. Ve a tu proyecto en Vercel
+2. Settings → Environment Variables
+3. Agrega cada variable con los valores mostrados arriba
+4. Marca: Production, Preview, Development
+5. Haz Redeploy del proyecto
 
-## 🔒 Configuración HTTPS
-
-### ⚠️ IMPORTANTE - Mixed Content Error:
-Para evitar errores de "Mixed Content" cuando la aplicación corre en HTTPS, **TODAS** las URLs de API deben usar HTTPS:
-
-- ✅ **Correcto**: `https://aiauth.e3stores.cloud`
-- ❌ **Incorrecto**: `http://aiauth.e3stores.cloud`
-
-### Configuración Automática:
-El código ahora incluye una función que automáticamente convierte URLs HTTP a HTTPS en producción para evitar errores de seguridad del navegador.
-
-### URLs de la Aplicación:
-- **Aplicación**: `https://ema.e3stores.cloud`
-- **Autenticación**: `https://aiauth.e3stores.cloud`
-- **APIs**: Todas configuradas con HTTPS 
+Ver `INSTRUCCIONES_VERCEL.md` para más detalles.

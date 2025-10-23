@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { validateEmail, validatePassword, getFriendlyErrorMessage } from '@/utils/validators';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 
@@ -20,7 +20,7 @@ const Register = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   const navigate = useNavigate();
-  const { register, lastError, clearError, isAuthenticated } = useAuth();
+  const { register, lastError, clearError, isAuthenticated } = useAuthContext();
 
   // Verificar si el usuario ya está autenticado
   useEffect(() => {

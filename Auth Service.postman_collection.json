@@ -1,0 +1,1257 @@
+{
+	"info": {
+		"_postman_id": "8a1cc4f5-5a1d-4b86-91d4-456064dcd566",
+		"name": "Auth Service",
+		"description": "Microservicio de autenticación y autorización para el proyecto de AI.\n\nEl mismo esta enfocado para ser utilizado de manera multicliente, por lo que en cada request, en el listado de encabezados, se debe especificar el \"Client-Id\" para el cual se van a realizar las acciones.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27970035"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "/auth/register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "ClientId",
+								"value": "{{clientId}}",
+								"description": "(Required) "
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/problem+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@e3ecommerce.com.ar\",\n    \"password\": \"123Awd@dm1n\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "ClientId",
+										"value": "c0bd9976-4356-0b1a-84ec-4b2f0b168dc8",
+										"description": "(Required) "
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/register",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "ClientId",
+										"value": "c0bd9976-4356-0b1a-84ec-4b2f0b168dc8",
+										"description": "(Required) "
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						}
+					]
+				},
+				{
+					"name": "/auth/login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@e3ecommerce.com.ar\",\n    \"password\": \"123Awd@dm1n\"//,\n    // \"twoFactorCode\": \"516697\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login?useCookies=false&useSessionCookies=false",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false",
+									"description": "Si se establece como verdadero utiliza una cookie en vez de un token de acceso"
+								},
+								{
+									"key": "useSessionCookies",
+									"value": "false",
+									"description": "Si se establece como verdadero la cookie solo sera valida lo que perdure la sesión del usuario"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\",\n  \"twoFactorCode\": \"string\",\n  \"twoFactorRecoveryCode\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/login?useCookies=false&useSessionCookies=false",
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "useCookies",
+											"value": "false"
+										},
+										{
+											"key": "useSessionCookies",
+											"value": "false"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"accessToken\": \"string\",\n  \"expiresIn\": 2108,\n  \"refreshToken\": \"string\",\n  \"tokenType\": \"string\"\n}"
+						}
+					]
+				},
+				{
+					"name": "/auth/refresh",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"CfDJ8KK2lGClIAdOrD0sX-FMu0ECIOY5LFLRh0N8ysBNUJ9KcwdDBOWT9mNoltYpb0sW_FcQ6htGjH7DK-ST7W0adcbUjsYPOs-4R3X1S6XAhoemzpqyUtMLbDh00qPfkg_e8-bpJXQpcrECOYcsGVx8Y6SS5UhXPx2-jW0aD3hKeuXCGI8qE-qXov4kOAzZMTLF-SmpaPZZDK5t94NHocu9_rqWGlQvy7Bqfv294FL59dfauRWGC5HDm7vr1NzaUuHWyP26uy253RUvL-MdT6isoR2e6rdk6PxGtP3DLnGyvH8cWd9JHsalTsOunDhlbTtfVSwk6Vdx0kUtHUw720uFtIg2n-nh_bVDjELmNkMwa6GVWOha0q2feZFEk3Ayw4q9ueDts_JCckW1YdhjwqUkkWp3sqzHgAgKTB9Fk6AFktp8oM71S8VMZt9yuyw88fCrVPlOnTtk1e7A1mzDlKsCKLneBsCMJLk6T7O8nO8HtM1FnTh679wzObwvpCawopH-k30MGcRA3gIh8IFCgwjHRBxLJgg17vD8LrIpsSwdSJQHOdKciB4reZ6WX7c8BebUwZMALerfHbK04NJT09jMPunIpub0H3QsMnv-Em04_oiGCnd7d7fzA4wYIm16lHo11Zt6yvBl0b3i5XcCmHPwRc0UhwVcAIWzcjTcnQ7EzGFltiXMjU8pJFz1I36RePsEVPXJcKNqEUGeZtPxIvUch1Aoubch1nkrLY17CfXfQDlIzhQMTMkZN7H6ebReIpphg82-0s3kyvPQ5ughME7fNvjoa7UNXPk2opAi9SyQRHnr\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refreshToken\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/refresh",
+									"path": [
+										"auth",
+										"refresh"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"accessToken\": \"string\",\n  \"expiresIn\": 2108,\n  \"refreshToken\": \"string\",\n  \"tokenType\": \"string\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Este recurso contiene los web services necesarios para:\n\n- Registrar nuevos usuarios\n    \n- Iniciar sesión de un usuario ya registrado\n    \n- Actualizar el token de autorización (Cuando se utiliza Bearer)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "manage",
+			"item": [
+				{
+					"name": "Map Identity Api Endpoints-/manage/confirm Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/manage/confirmEmail?userId=string&code=string&changedEmail=string",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"confirmEmail"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "string",
+									"description": "(Required) "
+								},
+								{
+									"key": "code",
+									"value": "string",
+									"description": "(Required) "
+								},
+								{
+									"key": "changedEmail",
+									"value": "string"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "/auth/confirmEmail?userId=string&code=string&changedEmail=string",
+									"path": [
+										"auth",
+										"confirmEmail"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "string",
+											"description": "(Required) "
+										},
+										{
+											"key": "code",
+											"value": "string",
+											"description": "(Required) "
+										},
+										{
+											"key": "changedEmail",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/manage/resendConfirmationEmail",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/manage/resendConfirmationEmail",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"resendConfirmationEmail"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/resendConfirmationEmail",
+									"path": [
+										"auth",
+										"resendConfirmationEmail"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/manage/forgotPassword",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/problem+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.com\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/manage/forgotPassword",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"forgotPassword"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/forgotPassword",
+									"path": [
+										"auth",
+										"forgotPassword"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/forgotPassword",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"forgotPassword"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						}
+					]
+				},
+				{
+					"name": "/manage/resetPassword",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/problem+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.com\",\n  \"newPassword\": \"Awd123@\",\n  \"resetCode\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/manage/resetPassword",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"resetPassword"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"newPassword\": \"string\",\n  \"resetCode\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/resetPassword",
+									"path": [
+										"auth",
+										"resetPassword"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"newPassword\": \"string\",\n  \"resetCode\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/resetPassword",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"resetPassword"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						}
+					]
+				},
+				{
+					"name": "/manage/2fa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"enable\": true,\n  \"twoFactorCode\": \"747022\"//,\n//   \"resetSharedKey\": true,\n//   \"resetRecoveryCodes\": true,\n//   \"forgetMachine\": true\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/manage/2fa",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"2fa"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"enable\": true,\n  \"twoFactorCode\": \"string\",\n  \"resetSharedKey\": true,\n  \"resetRecoveryCodes\": true,\n  \"forgetMachine\": true\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/manage/2fa",
+									"path": [
+										"auth",
+										"manage",
+										"2fa"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isMachineRemembered\": false,\n  \"isTwoFactorEnabled\": true,\n  \"recoveryCodesLeft\": 851,\n  \"sharedKey\": \"string\",\n  \"recoveryCodes\": [\n    \"string\",\n    \"string\"\n  ]\n}"
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"enable\": true,\n  \"twoFactorCode\": \"string\",\n  \"resetSharedKey\": true,\n  \"resetRecoveryCodes\": true,\n  \"forgetMachine\": true\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/2fa",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"2fa"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"enable\": true,\n  \"twoFactorCode\": \"string\",\n  \"resetSharedKey\": true,\n  \"resetRecoveryCodes\": true,\n  \"forgetMachine\": true\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/2fa",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"2fa"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/manage/info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/manage/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"info"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "/auth/manage/info",
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"userName\": \"string\",\n  \"email\": \"string\",\n  \"isEmailConfirmed\": false\n}"
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/manage/info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newEmail\": \"test@test.example.com\"//,\n//   \"newPassword\": \"string\",\n//   \"oldPassword\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/manage/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manage",
+								"info"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"newEmail\": \"string\",\n  \"newPassword\": \"string\",\n  \"oldPassword\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"email\": \"string\",\n  \"isEmailConfirmed\": false\n}"
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/problem+json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"newEmail\": \"string\",\n  \"newPassword\": \"string\",\n  \"oldPassword\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"status\": 3484,\n  \"detail\": \"string\",\n  \"instance\": \"string\",\n  \"errors\": {\n    \"key_0\": [\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"key_0\": {}\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"newEmail\": \"string\",\n  \"newPassword\": \"string\",\n  \"oldPassword\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/manage/info",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"manage",
+										"info"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"pm.request.addHeader({ key: 'Client-Id', value: pm.variables.get('clientId') });"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		},
+		{
+			"key": "clientId",
+			"value": ""
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		}
+	]
+}

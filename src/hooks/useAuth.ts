@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateCredentials, isEnvironmentConfigured } from '@/utils/authSecurity';
 
+/**
+ * @deprecated Este hook usa autenticación mock con credenciales hardcodeadas.
+ * 
+ * Para el sistema de autenticación real con backend, usar:
+ * `useAuthContext` de @/contexts/AuthContext
+ * 
+ * Este archivo se mantiene temporalmente por compatibilidad con código legacy.
+ * No debe usarse para nuevas implementaciones.
+ */
+
 // Definir tipos de usuarios
 export interface UserAuth {
   id: string;
@@ -11,6 +21,9 @@ export interface UserAuth {
   accessType: 'full' | 'automations_only';
 }
 
+/**
+ * @deprecated Usar useAuthContext de @/contexts/AuthContext en su lugar
+ */
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);

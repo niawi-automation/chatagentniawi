@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { validateEmail, getFriendlyErrorMessage } from '@/utils/validators';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 
@@ -17,7 +17,7 @@ const ForgotPassword = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   const navigate = useNavigate();
-  const { forgotPassword, lastError, clearError, isAuthenticated } = useAuth();
+  const { forgotPassword, lastError, clearError, isAuthenticated } = useAuthContext();
 
   // Verificar si el usuario ya está autenticado
   useEffect(() => {
@@ -144,8 +144,8 @@ const ForgotPassword = () => {
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <img 
-              src={NiawiLogoSvg} 
-              alt="Niawi" 
+              src={EtresBrandSvg} 
+              alt="E.tres Agent" 
               className="h-16 w-auto"
             />
           </div>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { validateEmail, validatePassword, validateResetCode, getFriendlyErrorMessage } from '@/utils/validators';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 
@@ -22,7 +22,7 @@ const ResetPassword = () => {
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { resetPassword, lastError, clearError, isAuthenticated } = useAuth();
+  const { resetPassword, lastError, clearError, isAuthenticated } = useAuthContext();
 
   // Obtener resetCode de los query params
   useEffect(() => {

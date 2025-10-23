@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 
 const ConfirmEmail = () => {
@@ -15,11 +17,12 @@ const ConfirmEmail = () => {
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { confirmEmail, resendConfirmation, isAuthenticated } = useAuth();
+  const { confirmEmail, resendConfirmationEmail, isAuthenticated } = useAuthContext();
 
-  // Obtener el token de confirmación de la URL
-  const token = searchParams.get('token');
-  const emailParam = searchParams.get('email');
+  // Obtener parámetros de confirmación de la URL (backend espera userId, code, y opcionalmente changedEmail)
+  const userId = searchParams.get('userId');
+  const code = searchParams.get('code');
+  const changedEmail = searchParams.get('changedEmail') || undefined;
 
   // Verificar si el usuario ya está autenticado
   useEffect(() => {
@@ -28,23 +31,16 @@ const ConfirmEmail = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Establecer el email si viene en los parámetros
+  // Confirmar email automáticamente si hay userId y code
   useEffect(() => {
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [emailParam]);
-
-  // Confirmar email automáticamente si hay token
-  useEffect(() => {
-    if (token && !isSuccess && !error) {
+    if (userId && code && !isSuccess && !error) {
       handleConfirmEmail();
     }
-  }, [token]);
+  }, [userId, code]);
 
   const handleConfirmEmail = async () => {
-    if (!token) {
-      setError('Token de confirmación no válido');
+    if (!userId || !code) {
+      setError('Parámetros de confirmación no válidos. Verifica el enlace del email.');
       return;
     }
 
@@ -52,7 +48,7 @@ const ConfirmEmail = () => {
     setError('');
 
     try {
-      await confirmEmail(token);
+      await confirmEmail(userId, code, changedEmail);
       setIsSuccess(true);
     } catch (error: any) {
       setError(error.message || 'Error al confirmar el email');
@@ -63,7 +59,7 @@ const ConfirmEmail = () => {
 
   const handleResendConfirmation = async () => {
     if (!email) {
-      setError('Email requerido para reenviar confirmación');
+      setError('Por favor ingresa tu email para reenviar la confirmación');
       return;
     }
 
@@ -71,12 +67,11 @@ const ConfirmEmail = () => {
     setError('');
 
     try {
-      await resendConfirmation(email);
+      await resendConfirmationEmail(email);
       setError('');
       // Mostrar mensaje de éxito temporal
-      const originalError = error;
       setError('Email de confirmación reenviado. Revisa tu bandeja de entrada.');
-      setTimeout(() => setError(originalError), 5000);
+      setTimeout(() => setError(''), 5000);
     } catch (error: any) {
       setError(error.message || 'Error al reenviar confirmación');
     } finally {
@@ -164,8 +159,8 @@ const ConfirmEmail = () => {
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <img 
-              src={NiawiLogoSvg} 
-              alt="Niawi" 
+              src={EtresBrandSvg} 
+              alt="E.tres Agent" 
               className="h-16 w-auto"
             />
           </div>
@@ -190,7 +185,7 @@ const ConfirmEmail = () => {
           <CardHeader>
             <CardTitle className="text-center text-foreground">Confirmación de Email</CardTitle>
             <CardDescription className="text-center">
-              {token 
+              {userId && code 
                 ? 'Procesando confirmación...' 
                 : 'Ingresa tu email para reenviar el enlace de confirmación'
               }
@@ -198,7 +193,7 @@ const ConfirmEmail = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {token ? (
+              {userId && code ? (
                 <div className="text-center space-y-4">
                   <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto">
                     <Mail className="w-8 h-8 text-blue-500" />
@@ -243,6 +238,23 @@ const ConfirmEmail = () => {
                     <p className="text-sm text-muted-foreground">
                       Si no recibiste el email de confirmación, puedes solicitarlo nuevamente.
                     </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email" className="text-foreground">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-1 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground"
+                      placeholder="tu@empresa.com"
+                    />
                   </div>
 
                   <Button

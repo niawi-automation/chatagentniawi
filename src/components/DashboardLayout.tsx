@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { TrendingUp, Bot, Zap, Settings, Menu, LogOut, User, Shield, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import EtresLogo from './EtresLogo';
 import ThemeToggle from './ThemeToggle';
 // import RoleSwitcher from './RoleSwitcher'; // TODO: Mover a Settings cuando se implemente sistema super_admin
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { useAgent } from '@/hooks/useAgent';
 import { hasPermission } from '@/constants/agents';
 
@@ -16,15 +16,24 @@ const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, logout, requireAuth, currentUser: authUser } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
   const { currentUser } = useAgent();
   
-
-
-  // Proteger rutas - verificar autenticación
-  useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+  // Mapear el usuario del backend al formato del sistema de roles actual
+  // Como el backend no maneja roles, mapeamos todos los usuarios autenticados como super_admin
+  const authUser = useMemo(() => {
+    if (!user) return null;
+    
+    return {
+      id: user.email,
+      email: user.email,
+      name: user.userName || user.email,
+      role: 'super_admin' as const,
+      accessType: 'full' as const
+    };
+  }, [user]);
+  
+  
 
   // Configurar elementos del menú con control de permisos
   const getMenuItems = () => {

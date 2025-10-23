@@ -1,46 +1,65 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { Eye, EyeOff, LogIn, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { validateEmail } from '@/utils/validators';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
-  const { login, currentUser } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { login, isLoading, lastError, clearError, isAuthenticated } = useAuthContext();
+
+  // Verificar si el usuario ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Limpiar errores cuando cambian los campos
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      setErrors({});
+      clearError();
+    }
+  }, [email, password]);
+
+  // Obtener mensajes de success de query params
+  const registered = searchParams.get('registered');
+  const resetSuccess = searchParams.get('reset-success');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setErrors({});
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Intentando login con:', email, password);
-      const result = login(email, password);
-      console.log('Resultado del login:', result);
-      
-      if (result.success && result.user) {
-        console.log('Login exitoso, redirigiendo...');
-        // Determinar la ruta de redirección según el tipo de usuario
-        if (result.user.accessType === 'automations_only') {
-          navigate('/dashboard/automations');
-        } else {
-          navigate('/dashboard');
-        }
-      } else {
-        console.log('Login fallido:', result.message);
-        // Mostrar error de credenciales inválidas
-        alert(result.message || 'Credenciales incorrectas. Acceso denegado.');
-      }
-      setIsLoading(false);
-    }, 1500);
+    // Validaciones
+    if (!validateEmail(email)) {
+      setErrors({ email: 'Por favor ingresa un email válido' });
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setErrors({ password: 'La contraseña debe tener al menos 6 caracteres' });
+      return;
+    }
+
+    try {
+      await login(email, password);
+      // La navegación la hace automáticamente el AuthContext
+    } catch (error: any) {
+      // Los errores se manejan en el contexto
+      console.error('Error en login:', error);
+    }
   };
 
   return (
@@ -67,6 +86,36 @@ const Login = () => {
           </p>
         </div>
 
+        {/* Mensaje de éxito de registro */}
+        {registered && (
+          <Alert className="glass-premium border-green-500/50 bg-green-500/10">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <AlertDescription className="text-green-700">
+              Registro exitoso. Por favor, inicia sesión con tus credenciales.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Mensaje de éxito de reset password */}
+        {resetSuccess && (
+          <Alert className="glass-premium border-green-500/50 bg-green-500/10">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <AlertDescription className="text-green-700">
+              Contraseña restablecida exitosamente. Ya puedes iniciar sesión.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Error general */}
+        {(errors.general || lastError) && (
+          <Alert className="glass-premium border-red-500/50 bg-red-500/10">
+            <AlertCircle className="h-4 w-4 text-red-500" />
+            <AlertDescription className="text-red-700">
+              {errors.general || lastError}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Login Form - Glass Premium */}
         <Card className="glass-premium border-niawi-border/50 shadow-2xl specular-reflection ambient-pattern">
           <CardContent className="pt-6">
@@ -84,9 +133,14 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300"
+                    className={`mt-1 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300 ${
+                      errors.email ? 'border-red-500' : ''
+                    }`}
                     placeholder="tu@empresa.com"
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
 
                 <div>
@@ -102,7 +156,9 @@ const Login = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pr-10 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300"
+                      className={`pr-10 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300 ${
+                        errors.password ? 'border-red-500' : ''
+                      }`}
                       placeholder="••••••••"
                     />
                     <button
@@ -117,7 +173,19 @@ const Login = () => {
                       )}
                     </button>
                   </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                  )}
                 </div>
+              </div>
+
+              <div className="flex items-center justify-end">
+                <Link 
+                  to="/forgot-password" 
+                  className="text-sm text-niawi-primary hover:text-niawi-accent underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
               </div>
 
               <Button
@@ -140,6 +208,19 @@ const Login = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* Link a registro */}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">
+            ¿No tienes una cuenta?{' '}
+            <Link 
+              to="/register" 
+              className="text-niawi-primary hover:text-niawi-accent underline font-medium"
+            >
+              Regístrate aquí
+            </Link>
+          </p>
+        </div>
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground">
