@@ -162,16 +162,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       clearError();
 
-      // Intentar obtener información del usuario directamente
-      // Esto funcionará si hay una cookie de sesión válida
+      // Primero verificar si hay tokens guardados
+      const token = getAccessToken();
+      const refreshTokenValue = getRefreshToken();
+      
+      // Si no hay tokens, no hay sesión que restaurar
+      if (!token || !refreshTokenValue) {
+        console.log('No hay tokens guardados, no se puede restaurar sesión');
+        setIsLoading(false);
+        return;
+      }
+
+      // Si el token está expirado, intentar refresh
+      if (isTokenExpired()) {
+        console.log('Token expirado, intentando refresh...');
+        await refreshSession();
+        return;
+      }
+
+      // Si hay token válido, obtener información del usuario
       try {
         const userInfo = await getUserInfo();
-        
-        // Si obtenemos la info del usuario, significa que hay una sesión válida
-        const token = getAccessToken();
         updateAuthState(token, userInfo);
         
-        // Programar refresh si es necesario y tenemos tokens
+        // Programar refresh si es necesario
         const expiresAt = getTokenExpiresAt();
         if (expiresAt) {
           const expiresIn = Math.floor((expiresAt - Date.now()) / 1000);
@@ -179,43 +193,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             scheduleTokenRefresh(expiresIn, refreshSession);
           }
         }
-        
-        return;
       } catch (userInfoError: any) {
-        // Si es un error de redirección o 401/403, la sesión no es válida
-        if (userInfoError.isRedirect || userInfoError.status === 401 || userInfoError.status === 403) {
-          console.log('Sesión no válida, redirigiendo al login...');
-          // Limpiar estado y redirigir al login
-          clearAuthState();
-          navigate('/login');
-          return;
-        }
-        // Si no podemos obtener info del usuario, intentar con tokens
-        const token = getAccessToken();
-        const refreshTokenValue = getRefreshToken();
-        
-        if (!token || !refreshTokenValue) {
-          setIsLoading(false);
-          return;
-        }
-
-        // Si el token está expirado, intentar refresh
-        if (isTokenExpired()) {
-          await refreshSession();
-        } else {
-          // Obtener información del usuario
-          const userInfo = await getUserInfo();
-          updateAuthState(token, userInfo);
-          
-          // Programar refresh si es necesario
-          const expiresAt = getTokenExpiresAt();
-          if (expiresAt) {
-            const expiresIn = Math.floor((expiresAt - Date.now()) / 1000);
-            if (expiresIn > 60) {
-              scheduleTokenRefresh(expiresIn, refreshSession);
-            }
-          }
-        }
+        // Si falla obtener info del usuario, la sesión no es válida
+        console.log('Error al obtener info del usuario:', userInfoError.status);
+        clearAuthState();
       }
       
     } catch (error) {
@@ -225,7 +206,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [clearError, refreshSession, updateAuthState, clearAuthState, navigate]);
+  }, [clearError, refreshSession, updateAuthState, clearAuthState]);
 
   // Función para actualizar información del usuario
   const updateUserInfoHandler = useCallback(async (data: UpdateUserInfoRequest) => {
