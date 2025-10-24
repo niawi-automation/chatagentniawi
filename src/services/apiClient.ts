@@ -57,14 +57,29 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     },
     body: JSON.stringify(bodyData),
     credentials: 'include', // Incluir cookies en las requests (importante para cookies HTTP-only)
-    redirect: 'follow', // Permitir redirecciones normales
+    redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
 
   console.log('📥 Refresh Response:', {
     status: response.status,
     ok: response.ok,
-    url: response.url
+    url: response.url,
+    type: response.type
   });
+
+  // Manejar redirecciones (302, 301, etc.) - el backend puede intentar redirigir a HTTP
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ El backend intentó redirigir a HTTP: ${location} → ${secureLocation}`);
+      }
+    }
+    // Si es una redirección, significa que la sesión expiró
+    clearTokens();
+    throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+  }
 
   if (!response.ok) {
     // Si el refresh falla, limpiar tokens
@@ -118,8 +133,31 @@ const makeRequest = async <T>(
     ...options,
     headers,
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'follow', // Permitir redirecciones normales
+    redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
+
+  // Manejar redirecciones (302, 301, etc.) - el backend puede intentar redirigir a HTTP
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ El backend intentó redirigir a HTTP: ${location} → ${secureLocation}`);
+      }
+    }
+    // Si es una redirección, probablemente es un problema de autenticación
+    if (!isAuthEndpoint && accessToken) {
+      // Intentar refresh si hay token
+      // El código de 401 manejará esto
+      response = new Response(null, { status: 401 });
+    } else {
+      // Si no hay token o es endpoint de auth, es un error
+      const error = new Error('Sesión expirada. Redirigiendo al login...') as any;
+      error.status = 302;
+      error.isRedirect = true;
+      throw error;
+    }
+  }
 
   // Si es 401 y no es una llamada de auth, intentar refresh
   if (response.status === 401 && !isAuthEndpoint && accessToken) {
@@ -141,8 +179,20 @@ const makeRequest = async <T>(
           ...options,
           headers,
           credentials: 'include', // Incluir cookies en las requests
-          redirect: 'follow', // Permitir redirecciones normales
+          redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
         });
+
+        // Manejar redirecciones en el reintento también
+        if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+          const location = response.headers.get('location');
+          if (location) {
+            const secureLocation = ensureHttps(location);
+            if (location !== secureLocation) {
+              console.warn(`⚠️ El backend intentó redirigir a HTTP en reintento: ${location} → ${secureLocation}`);
+            }
+          }
+          throw new Error('Sesión expirada después del refresh. Por favor, inicia sesión nuevamente.');
+        }
       }
     } catch (refreshError) {
       // Si el refresh falla, limpiar tokens y lanzar error
@@ -243,7 +293,7 @@ export const makeLoginRequest = async <T>(
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'follow', // Permitir redirecciones pero verificaremos la URL
+    redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
 
   console.log('📥 Login Response:', {
@@ -254,18 +304,30 @@ export const makeLoginRequest = async <T>(
     type: response.type
   });
 
-  // Verificar si la URL final es HTTPS en producción
-  if (!import.meta.env.DEV && response.url && response.url.startsWith('http://')) {
-    console.warn(`⚠️ El backend redirigió a HTTP: ${response.url}`);
-    // Reintentar con la URL en HTTPS
-    const secureUrl = ensureHttps(response.url);
-    response = await fetch(secureUrl, {
-      ...options,
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
+  // Manejar redirecciones - el backend puede intentar redirigir a HTTP
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ El backend intentó redirigir a HTTP en login: ${location} → ${secureLocation}`);
+      }
+      // Intentar seguir la redirección con HTTPS
+      console.log(`🔄 Siguiendo redirección segura a: ${secureLocation}`);
+      response = await fetch(secureLocation, {
+        ...options,
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data),
+        credentials: 'include',
+        redirect: 'manual',
+      });
+
+      // Si la segunda petición también redirige, es un error
+      if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+        throw new Error('El servidor está redirigiendo múltiples veces. Por favor, verifica la configuración del backend.');
+      }
+    }
   }
 
   if (!response.ok) {
@@ -334,14 +396,40 @@ export const makeRegisterRequest = async <T>(
     ...options.headers,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  let response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     method: 'POST',
     headers,
     body: JSON.stringify(data),
     credentials: 'include', // Incluir cookies en las requests
-    redirect: 'follow', // Permitir redirecciones normales
+    redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
+
+  // Manejar redirecciones - el backend puede intentar redirigir a HTTP
+  if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+    const location = response.headers.get('location');
+    if (location) {
+      const secureLocation = ensureHttps(location);
+      if (location !== secureLocation) {
+        console.warn(`⚠️ El backend intentó redirigir a HTTP en registro: ${location} → ${secureLocation}`);
+      }
+      // Intentar seguir la redirección con HTTPS
+      console.log(`🔄 Siguiendo redirección segura a: ${secureLocation}`);
+      response = await fetch(secureLocation, {
+        ...options,
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data),
+        credentials: 'include',
+        redirect: 'manual',
+      });
+
+      // Si la segunda petición también redirige, es un error
+      if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+        throw new Error('El servidor está redirigiendo múltiples veces. Por favor, verifica la configuración del backend.');
+      }
+    }
+  }
 
   if (!response.ok) {
     let errorMessage = 'Error en el registro';
