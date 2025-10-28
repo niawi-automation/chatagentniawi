@@ -1,0 +1,443 @@
+1) Fin, foco y alcance
+
+Fin
+Un chat “a medida” que se siente consultor: integra datos (ventas, GA, inventario, CRM, partners), detecta desvíos, prioriza foco y sugiere la acción correcta.
+
+Foco
+
+Inicio con contexto: saludo dinámico + micro-copy ejecutiva + 2–4 preguntas relevantes al instante.
+
+Mientras procesa: “loading tips” con valor (insights accionables) en vez de un spinner bobo.
+
+Personalización: nombre, franja horaria, branding, dialecto (tuteo/voseo) y gating por integraciones disponibles.
+
+Evitar ruido: no mostrar preguntas/tips que no se pueden responder (sin datos).
+
+Alcance (frontend)
+
+Rediseño del header de conversación (saludo), bloque de sugerencias, contenedor de “loading tips”, reglas de rotación/cooldown, accesibilidad, telemetría básica y data model JSON.
+
+2) Cómo funciona (flujo UX)
+
+Estados del hilo
+
+Idle/Inicio → Renderizar saludo + N preguntas sugeridas.
+
+Enviada consulta → isLoading=true → mostrar “loading tips” rotativos desde el 3s.
+
+Respuesta lista → isLoading=false → ocultar tips (con anti-flicker).
+
+Error o sin datos → fallback de copy (“No hay datos de GA conectados… ¿Conectamos ahora?”).
+
+Personalización mínima
+
+firstName, agentBrand, spanishVariant (tuteo/voseo), daypart (mañana, tarde, noche).
+
+Gating: preguntas/tips se muestran solo si las integraciones requeridas están disponibles.
+
+3) ¿Cuántas preguntas sugeridas mostrar?
+
+Recomendación: 3 visibles por defecto.
+Por qué:
+
+2 a veces se queda corto (si una no aplica, pierdes la otra).
+
+4 sube la fricción (Hick), baja CTR en escritorio mediano y rompe en móvil.
+
+3 ofrece variedad sin ruido y se adapta bien a card/chips.
+
+Responsive
+
+Móvil: 2 (stack).
+
+Escritorio medio: 3 (grid 3).
+
+Escritorio ancho: 3 (o 4 si pasa gating y no hay truncamiento).
+
+“Ver más” opcional si quieres catálogo expandible.
+
+4) Contenidos consolidados (catálogo)
+4.1 Encabezados (9 variantes)
+
+¿Dónde está el mayor impacto ahora?
+
+{agentBrand} disponible para decisiones clave.
+
+Seguimiento de acciones comerciales en curso.
+
+¿Qué área necesita foco ahora?
+
+Optimicemos tu {tarde|mañana|noche} con insights.
+
+¿Hacemos check-in de tus KPIs?
+
+Seguimos impulsando resultados.
+
+¿Quer{v_os_e}s una vista ejecutiva rápida?
+
+¿Cómo viene la rentabilidad hoy?
+
+(Extra nueva) Priorizamos decisiones de alto margen hoy.
+
+4.2 Subencabezados (4 variantes)
+
+Veamos alertas de negocio o desvíos.
+
+{agentBrand} para tomas de decisión rápidas.
+
+Estrategia clara para tu jornada empresarial.
+
+Seguimiento de acciones comerciales en curso.
+
+4.3 Preguntas sugeridas (priorizadas y con gating)
+
+Tomadas de tus ejemplos, deduplicadas y ordenadas por utilidad. Añadí 6 nuevas marcadas como [nuevo].
+
+Alertas y foco
+
+¿Hay desviaciones críticas en curso? (requires: —)
+
+¿Dónde concentrar inversión y foco ahora? (ga|ventas)
+
+¿Qué KPIs requieren atención inmediata? (—)
+
+[nuevo] ¿Qué alertas superaron umbral en las últimas 24 h? (ga|crm|erp)
+
+Rentabilidad / ingresos
+
+¿Qué margen bruto logramos hoy? (contable)
+
+¿Cuál fue la rentabilidad neta por país? (contable)
+
+[nuevo] ¿Qué canal aportó mayor margen incremental esta semana? (ga|ventas)
+
+¿Qué facturación logramos hoy por canal? (ga|ventas)
+
+Geografía / partners
+
+¿Cómo está la performance país por país? (ventas)
+
+¿Qué partner requiere ajustes urgentes? (crm)
+
+Marketing / GA
+
+¿Qué inversión en pauta fue más eficiente? (ga)
+
+¿Cómo evoluciona el funnel de conversión? (ga)
+
+¿Qué categorías están rindiendo mejor? (ga)
+
+[nuevo] ¿Qué campaña tiene mayor CPA vs objetivo? (ga)
+
+[nuevo] ¿Qué promoción explicó el pico de ayer? (ga)
+
+Operaciones / inventario
+
+¿Dónde tenemos quiebres de stock críticos? (inventario)
+
+¿Dónde se pierde más tiempo operativo? (ops)
+
+¿Qué área tuvo menor eficiencia hoy? (ops)
+
+[nuevo] ¿Qué artículos estrella perdieron disponibilidad esta semana? (inventario)
+
+Riesgo / eficiencia
+
+¿Dónde está el mayor riesgo de pérdida hoy? (ga|ventas)
+
+¿Qué herramientas están poco aprovechadas? (—)
+
+¿Qué oportunidad comercial es clave hoy? (crm)
+
+¿Qué alertas pueden resolverse con reglas? (—)
+
+¿Qué tareas deberíamos delegar o escalar? (ops)
+
+[nuevo] ¿Qué cohortes de clientes están en riesgo de churn? (crm|ga)
+
+Navegación rápida
+
+¿Quer{v_os_e}s revisar performance por partner o país? (ga|ventas)
+
+[nuevo] Muéstrame el tablero ejecutivo de hoy. (—)
+
+Mantén 3 visibles por defecto; selecciona por gating + cooldown + seed.
+
+4.4 “Loading tips” (20 únicos + 5 nuevos)
+
+Conversión/Marketing
+
+Monitorea la tasa de conversión por fuente de tráfico (ga)
+
+Utiliza encuestas post-compra para mejorar la experiencia (ecom)
+
+Utiliza testimonios específicos para productos de alto valor (ecom)
+
+Configura alertas para cambios significativos en métricas clave (ga)
+
+Simplifica el proceso de checkout para reducir abandonos (ecom)
+
+Ofrece envío gratuito con un mínimo de compra (ecom)
+
+Implementa chat en vivo para resolver dudas inmediatas (helpdesk|ecom)
+
+Optimiza la velocidad de carga de las páginas de producto (ga|ecom)
+
+Analiza el rendimiento por dispositivo y optimiza la experiencia (ga)
+
+Analiza el comportamiento de abandono de carrito (ga|ecom)
+
+[nuevo] Prueba microcopys en CTAs con tests A/B simples (ga|ecom)
+
+Analytics/Valor de cliente
+
+Identifica tus productos más rentables, no solo los más vendidos (ecom|erp)
+
+Monitorea el CLV por segmento (crm|ga)
+
+Segmenta clientes por valor y comportamiento (crm|ga)
+
+Utiliza análisis predictivo para anticipar demanda (wms|erp|ga)
+
+[nuevo] Construye cohortes por primera compra para detectar reactivación (ga|crm)
+
+Inventario/Operaciones
+
+Realiza auditorías de inventario regulares (wms|erp)
+
+Analiza productos de baja rotación para promociones (wms|erp|ecom)
+
+Optimiza niveles de stock de seguridad por producto (wms|erp)
+
+Utiliza RFID para seguimiento de inventario (wms)
+
+Implementa dropshipping para productos de prueba (ecom)
+
+[nuevo] Ajusta lead times según cumplimiento real de proveedores (wms|erp)
+
+CX/Backoffice
+
+Implementa un sistema de gestión de quejas eficiente (helpdesk)
+
+[nuevo] Activa respuestas rápidas para preguntas frecuentes en chat (helpdesk)
+
+5) Reglas de selección (claras y aplicables)
+
+Seed y cooldown
+
+Seed por userId + fecha (estabilidad diaria).
+
+No repetir la misma pregunta en últimas N=5 vistas del usuario.
+
+No repetir el mismo tip en últimas N=20 exposiciones del usuario.
+
+No duplicar contenido dentro del mismo bloque.
+
+Gating
+
+requires: ["ga"] → solo si GA está conectado. Operador | = cualquiera.
+
+Si el pool queda vacío por gating, usa fallbacks neutrales (KPIs/alertas generales).
+
+Rotación de “loading tips”
+
+Mostrar desde t=3s.
+
+Rotar cada 7s.
+
+Máximo 5 tips por request.
+
+Anti-flicker: si un tip se mostró y llega la respuesta, sostener 1.2s antes de ocultar.
+
+Localización
+
+spanishVariant=tuteo (CO) por defecto: “¿Quieres…?”
+
+voseo para AR/URU: “¿Querés…?”
+
+Normalizar copy (performance → desempeño, pauta vs ads, etc.) por tenant.
+
+6) Mejores prácticas visuales (lo que se ve bien)
+
+Saludo + encabezado
+
+Tipografía 16–18 px, peso medio; ícono 👋 ok (o un dot animado suave).
+
+Subencabezado en 13–14 px, color neutro #6–7xx.
+
+Preguntas sugeridas (chips o botones fantasma)
+
+3 chips en grid con gap-8px, padding 8–12px.
+
+Línea única, ellipsis si hay overflow.
+
+Hover: subrayado + ligero cambio de fondo.
+
+Click área completa.
+
+En móvil: 2 columnas o stack vertical.
+
+Loading tips
+
+Ubicación fija bajo el input o en header de respuesta.
+
+aria-live="polite"; animación muy leve (pulse/ellipsis).
+
+Evita skeletons pesados; el contenido es el tip.
+
+Accesibilidad
+
+Contraste AA mínimo.
+
+Focus visible en chips.
+
+Roles/labels semánticos.
+
+7) Data model (JSON único)
+{
+  "meta": {
+    "agentBrand": "E3Agent",
+    "spanishVariant": "tuteo",
+    "daypartRules": {
+      "morning": ["checkin_kpis", "vista_ejecutiva"],
+      "afternoon": ["impacto_ahora", "seguimiento", "optimicemos_tarde"],
+      "evening": ["cierre_fuerte", "rentabilidad_hoy"]
+    }
+  },
+  "headers": {
+    "impacto_ahora": "¿Dónde está el mayor impacto ahora?",
+    "decisiones_clave": "{agentBrand} disponible para decisiones clave.",
+    "seguimiento": "Seguimiento de acciones comerciales en curso.",
+    "foco_ahora": "¿Qué área necesita foco ahora?",
+    "optimicemos_tarde": "Optimicemos tu {daypart_es} con insights.",
+    "checkin_kpis": "¿Hacemos check-in de tus KPIs?",
+    "seguimos_impulsando": "Seguimos impulsando resultados.",
+    "vista_ejecutiva": "¿Quer{v_os_e}s una vista ejecutiva rápida?",
+    "rentabilidad_hoy": "¿Cómo viene la rentabilidad hoy?",
+    "cierre_fuerte": "Vamos por un cierre fuerte."
+  },
+  "subheaders": [
+    "Veamos alertas de negocio o desvíos.",
+    "{agentBrand} para tomas de decisión rápidas.",
+    "Estrategia clara para tu jornada empresarial.",
+    "Seguimiento de acciones comerciales en curso."
+  ],
+  "questions": [
+    { "id":"desv_criticas","text":"¿Hay desviaciones críticas en curso?","requires":[] },
+    { "id":"foco_inversion","text":"¿Dónde concentrar inversión y foco ahora?","requires":["ga|ventas"] },
+    { "id":"kpis_atencion","text":"¿Qué KPIs requieren atención inmediata?","requires":[] },
+    { "id":"alertas_24h","text":"¿Qué alertas superaron umbral en las últimas 24 h?","requires":["ga|crm|erp"] },
+    { "id":"margen_bruto_hoy","text":"¿Qué margen bruto logramos hoy?","requires":["contable"] },
+    { "id":"rentab_neta_pais","text":"¿Cuál fue la rentabilidad neta por país?","requires":["contable"] },
+    { "id":"margen_incremental","text":"¿Qué canal aportó mayor margen incremental esta semana?","requires":["ga|ventas"] },
+    { "id":"facturacion_canal","text":"¿Qué facturación logramos hoy por canal?","requires":["ga|ventas"] },
+    { "id":"performance_pais","text":"¿Cómo está la performance país por país?","requires":["ventas"] },
+    { "id":"partner_ajustes","text":"¿Qué partner requiere ajustes urgentes?","requires":["crm"] },
+    { "id":"pauta_eficiente","text":"¿Qué inversión en pauta fue más eficiente?","requires":["ga"] },
+    { "id":"funnel","text":"¿Cómo evoluciona el funnel de conversión?","requires":["ga"] },
+    { "id":"categorias_mejor","text":"¿Qué categorías están rindiendo mejor?","requires":["ga"] },
+    { "id":"campana_cpa","text":"¿Qué campaña tiene mayor CPA vs objetivo?","requires":["ga"] },
+    { "id":"promo_pico","text":"¿Qué promoción explicó el pico de ayer?","requires":["ga"] },
+    { "id":"quiebres_stock","text":"¿Dónde tenemos quiebres de stock críticos?","requires":["inventario"] },
+    { "id":"tiempo_operativo","text":"¿Dónde se pierde más tiempo operativo?","requires":["ops"] },
+    { "id":"area_menos_eficiente","text":"¿Qué área tuvo menor eficiencia hoy?","requires":["ops"] },
+    { "id":"articulos_estrella_stock","text":"¿Qué artículos estrella perdieron disponibilidad esta semana?","requires":["inventario"] },
+    { "id":"riesgo_perdida","text":"¿Dónde está el mayor riesgo de pérdida hoy?","requires":["ga|ventas"] },
+    { "id":"herr_poco_aprovech","text":"¿Qué herramientas están poco aprovechadas?","requires":[] },
+    { "id":"oportunidad_clave","text":"¿Qué oportunidad comercial es clave hoy?","requires":["crm"] },
+    { "id":"alertas_reglas","text":"¿Qué alertas pueden resolverse con reglas?","requires":[] },
+    { "id":"delegar_escalar","text":"¿Qué tareas deberíamos delegar o escalar?","requires":["ops"] },
+    { "id":"cohortes_churn","text":"¿Qué cohortes de clientes están en riesgo de churn?","requires":["crm|ga"] },
+    { "id":"abrir_tablero","text":"Muéstrame el tablero ejecutivo de hoy.","requires":[] }
+  ],
+  "loadingTips": [
+    { "id":"conv_fuente","text":"Monitorea la tasa de conversión por fuente de tráfico","requires":["ga"] },
+    { "id":"encuesta_post","text":"Utiliza encuestas post-compra para mejorar la experiencia","requires":["ecom"] },
+    { "id":"testimonios_high","text":"Utiliza testimonios específicos para productos de alto valor","requires":["ecom"] },
+    { "id":"alertas_metricas","text":"Configura alertas para cambios significativos en métricas clave","requires":["ga"] },
+    { "id":"checkout_simple","text":"Simplifica el proceso de checkout para reducir abandonos","requires":["ecom"] },
+    { "id":"envio_minimo","text":"Ofrece envío gratuito con un mínimo de compra","requires":["ecom"] },
+    { "id":"chat_en_vivo","text":"Implementa chat en vivo para resolver dudas inmediatas","requires":["helpdesk|ecom"] },
+    { "id":"speed_producto","text":"Optimiza la velocidad de carga de las páginas de producto","requires":["ga|ecom"] },
+    { "id":"rend_dispositivo","text":"Analiza el rendimiento por dispositivo y optimiza la experiencia","requires":["ga"] },
+    { "id":"abandono_carrito","text":"Analiza el comportamiento de abandono de carrito","requires":["ga|ecom"] },
+    { "id":"productos_rentables","text":"Identifica tus productos más rentables, no solo los más vendidos","requires":["ecom|erp"] },
+    { "id":"clv_segmento","text":"Monitorea el CLV por segmento","requires":["crm|ga"] },
+    { "id":"segmenta_valor","text":"Segmenta clientes por valor y comportamiento","requires":["crm|ga"] },
+    { "id":"predictivo_demanda","text":"Utiliza análisis predictivo para anticipar demanda","requires":["wms|erp|ga"] },
+    { "id":"auditoria_inventario","text":"Realiza auditorías de inventario regulares","requires":["wms|erp"] },
+    { "id":"baja_rotacion","text":"Analiza productos de baja rotación para promociones","requires":["wms|erp|ecom"] },
+    { "id":"dropshipping_test","text":"Implementa dropshipping para productos de prueba","requires":["ecom"] },
+    { "id":"rfid","text":"Utiliza RFID para seguimiento de inventario","requires":["wms"] },
+    { "id":"stock_seguridad","text":"Optimiza niveles de stock de seguridad por producto","requires":["wms|erp"] },
+    { "id":"microcopy_cta","text":"Prueba microcopys en CTAs con tests A/B simples","requires":["ga|ecom"] },
+    { "id":"cohortes_reactivacion","text":"Construye cohortes por primera compra para detectar reactivación","requires":["ga|crm"] },
+    { "id":"lead_times_prov","text":"Ajusta lead times según cumplimiento real de proveedores","requires":["wms|erp"] },
+    { "id":"respuestas_rapidas","text":"Activa respuestas rápidas para preguntas frecuentes en chat","requires":["helpdesk"] }
+  ]
+}
+
+8) Lógica (pseudocódigo breve)
+// saludo
+const daypart = getDaypart(user.tz); // morning/afternoon/evening
+const headersPool = meta.daypartRules[daypart].map(k => headers[k]);
+const header = seededPick(headersPool, seed(user.id+today));
+const sub = coinFlip() ? seededPick(subheaders, seed(user.id+session)) : null;
+
+// preguntas
+let pool = questions.filter(q => requiresOK(q.requires, integrations));
+pool = cooldown(pool, user.lastQuestions, 5);
+const visible = pick(pool, countByBreakpoint()); // 2/3/3-4
+
+renderGreeting({ saludo, header, sub, visibleQs: visible, name, brand });
+
+// loading tips
+if (isLoading) {
+  wait(3000);
+  const tipsPool = loadingTips.filter(t => requiresOK(t.requires, integrations));
+  const seq = cooldown(tipsPool, user.lastTips, 20).slice(0, 5);
+  show(seq[0]);
+  rotateEvery(7000, next(seq));
+}
+
+9) Telemetría mínima (para decidir rápido)
+
+greeting_shown: {header_id, sub_id, q_ids[], daypart}
+
+question_click: {q_id, latency_to_answer, has_data:true/false}
+
+loading_tip_shown: {tip_id, t_show, request_latency_bucket}
+
+loading_tip_click (si pones CTA)
+
+KPIs: CTR por pregunta, % preguntas sin datos, tiempo medio hasta primera interacción, abandono durante “loading”.
+
+10) Plan de implementación (orden óptimo)
+
+Data model JSON (arriba) y helpers (requiresOK, seededPick, cooldown).
+
+Greeting block con 3 chips responsive (+2 en móvil).
+
+Loading tips con rotación y anti-flicker.
+
+Gating por integraciones reales.
+
+Accesibilidad (aria-live, focus states).
+
+Telemetría básica.
+
+A/B (cuando tengas datos): 2 vs 3 vs 4 chips en desktop.
+
+Cierro con decisiones claras
+
+Número de preguntas visibles: 3 por defecto (2 móvil, 3 desktop; opcional 4 en pantallas anchas si pasa gating).
+
+Mostrar “loading tips” desde 3s, rotación cada 7s, máx. 5 por request.
+
+Gating estricto para evitar prometer lo que no existe.
+
+Dialectos y branding parametrizados por tenant.
+
+Seed diaria + cooldown para no repetir.
+
+Si quieres, te empaqueto este JSON en dos archivos (greetings.json y loading_tips.json) y te doy un helper TS listo para pegar en tu proyecto (Next/React).

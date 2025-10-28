@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Paperclip, AlertCircle, RotateCcw, Zap, Brain, Mic, Square, X } from 'lucide-react';
+import { Send, Paperclip, AlertCircle, RotateCcw, Brain, Mic, Square, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import DynamicGreeting from '@/components/DynamicGreeting';
+import SuggestedQuestions from '@/components/SuggestedQuestions';
+import LoadingInsights from '@/components/LoadingInsights';
 import { useAgent } from '@/hooks/useAgent';
+import { useIntegrations } from '@/hooks/useIntegrations';
 import type { Message, ApiResponse, Attachment } from '@/types/agents';
-import { AGENT_SUGGESTIONS } from '@/constants/agents';
 import { toast } from '@/hooks/use-toast';
 
 const CONVERSATIONS_STORAGE_KEY = 'etres-agent-conversations';
@@ -27,8 +30,9 @@ const Chat = () => {
   const [isRecording, setIsRecording] = useState(false);
   const recordingStartRef = useRef<number | null>(null);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  
+
   const { selectedAgent, getAgentEndpoint, currentUser } = useAgent();
+  const { integrations } = useIntegrations(currentUser?.id);
 
   // Función para cargar conversaciones desde localStorage
   const loadConversations = useCallback((): AgentConversations => {
@@ -104,11 +108,6 @@ const Chat = () => {
       </div>
     );
   }
-
-  // Sugerencias dinámicas según el agente seleccionado - optimizado con useCallback
-  const getAgentSuggestions = useCallback((agentId: string): readonly string[] => {
-    return AGENT_SUGGESTIONS[agentId] || AGENT_SUGGESTIONS.operations;
-  }, []);
 
   // Inicializar conversación cuando cambia el agente
   useEffect(() => {
@@ -362,12 +361,6 @@ const Chat = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    if (!isLoading) {
-      setMessage(suggestion);
-    }
-  };
-
   const handleNewConversation = () => {
     if (!selectedAgent) return;
     
@@ -377,8 +370,6 @@ const Chat = () => {
     // Guardar la nueva conversación vacía (sobrescribir la anterior)
     saveCurrentConversation(selectedAgent.id, []);
   };
-
-  const suggestions = selectedAgent ? getAgentSuggestions(selectedAgent.id) : [];
 
   // Configuración de adjuntos (MVP)
   const MAX_FILE_MB = 5; // tamaño por archivo
@@ -673,42 +664,31 @@ const Chat = () => {
               onDragOver={(e) => { e.preventDefault(); }}
               onDrop={handleDrop}
             >
-              {!isActiveConversation && selectedAgent ? (
-                // Pantalla de bienvenida inmersiva
-                <div className="max-w-4xl w-full text-center space-y-10 px-4 animate-fade-in">
-                  <div className="space-y-6">
-                    <div className={`inline-flex p-4 rounded-2xl ${selectedAgent.bgColor} mb-4`}>
-                      <selectedAgent.icon className={`w-12 h-12 ${selectedAgent.color}`} />
-                    </div>
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
-                      Buen día{currentUser?.name ? `, ${currentUser.name.split(' ')[0]}` : ''}! 👋
-                    </h1>
-                    <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-                      ¿Revisamos juntos la agenda ejecutiva?
-                    </p>
-                  </div>
+              {!isActiveConversation && selectedAgent && currentUser ? (
+                // Pantalla de bienvenida dinámica con nuevos componentes
+                <div className="max-w-4xl w-full text-center space-y-12 px-4">
+                  {/* Saludo dinámico */}
+                  <DynamicGreeting
+                    userName={currentUser.name}
+                    userId={currentUser.id}
+                    agentIcon={selectedAgent.icon}
+                    agentColor={selectedAgent.color}
+                    agentBgColor={selectedAgent.bgColor}
+                  />
 
-                  <div className="pt-6">
-                    <p className="text-base text-muted-foreground mb-6 flex items-center justify-center gap-2">
-                      <Zap className="w-5 h-5 text-niawi-accent" />
-                      Sugerencias para comenzar
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                      {suggestions.slice(0, 4).map((suggestion, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSuggestionClick(suggestion)}
-                          className="text-left p-5 rounded-xl border border-niawi-border bg-niawi-border/10 hover:bg-niawi-border/20 hover:border-niawi-primary/30 hover:scale-[1.02] transition-all duration-300 group"
-                          disabled={isLoading}
-                        >
-                          <div className="flex items-start gap-3">
-                            <Zap className="w-5 h-5 text-niawi-accent flex-shrink-0 mt-0.5 group-hover:text-niawi-primary transition-colors" />
-                            <span className="text-base text-foreground leading-relaxed">{suggestion}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Preguntas sugeridas con gating */}
+                  <SuggestedQuestions
+                    userId={currentUser.id}
+                    integrations={integrations}
+                    onQuestionClick={(question) => {
+                      setMessage(question);
+                      // Auto-submit la pregunta
+                      setTimeout(() => {
+                        textareaRef.current?.focus();
+                      }, 100);
+                    }}
+                    isLoading={isLoading}
+                  />
                 </div>
               ) : (
                 // Vista de conversación normal
@@ -773,6 +753,17 @@ const Chat = () => {
                     </div>
                   ))}
                   <div ref={messagesEndRef} />
+
+                  {/* Loading Insights - Mostrar cuando está cargando */}
+                  {isLoading && currentUser && (
+                    <div className="mt-6">
+                      <LoadingInsights
+                        isLoading={isLoading}
+                        userId={currentUser.id}
+                        integrations={integrations}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
