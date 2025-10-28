@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Paperclip, AlertCircle, RotateCcw, Brain, Mic, Square, X } from 'lucide-react';
+import { Send, Paperclip, AlertCircle, Brain, Mic, Square, X, Menu, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,21 +8,17 @@ import MarkdownRenderer from '@/components/MarkdownRenderer';
 import DynamicGreeting from '@/components/DynamicGreeting';
 import SuggestedQuestions from '@/components/SuggestedQuestions';
 import LoadingInsights from '@/components/LoadingInsights';
+import ConversationsSidebar from '@/components/ConversationsSidebar';
 import { useAgent } from '@/hooks/useAgent';
 import { useIntegrations } from '@/hooks/useIntegrations';
+import { useConversations } from '@/hooks/useConversations';
 import type { Message, ApiResponse, Attachment } from '@/types/agents';
 import { toast } from '@/hooks/use-toast';
 
-const CONVERSATIONS_STORAGE_KEY = 'etres-agent-conversations';
-
-interface AgentConversations {
-  [agentId: string]: Message[];
-}
-
 const Chat = () => {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,69 +30,21 @@ const Chat = () => {
   const { selectedAgent, getAgentEndpoint, currentUser } = useAgent();
   const { integrations } = useIntegrations(currentUser?.id);
 
-  // Función para cargar conversaciones desde localStorage
-  const loadConversations = useCallback((): AgentConversations => {
-    try {
-      const stored = localStorage.getItem(CONVERSATIONS_STORAGE_KEY);
-      if (!stored) return {};
-      
-      const conversations = JSON.parse(stored);
-      
-      // Validar y limpiar datos corrupto
-      const cleanConversations: AgentConversations = {};
-      Object.keys(conversations).forEach(agentId => {
-        const messages = conversations[agentId];
-        if (Array.isArray(messages)) {
-          cleanConversations[agentId] = messages.filter(msg => 
-            msg && typeof msg === 'object' && msg.timestamp
-          );
-        }
-      });
-      
-      return cleanConversations;
-    } catch (error) {
-      console.error('Error loading conversations, clearing corrupted data:', error);
-      localStorage.removeItem(CONVERSATIONS_STORAGE_KEY);
-      return {};
-    }
-  }, []);
+  // Sistema de conversaciones
+  const {
+    currentConversationId,
+    createNewConversation,
+    deleteConversation,
+    switchConversation,
+    updateConversationMessages,
+    renameConversation,
+    getCurrentConversation,
+    getConversationsMetadata
+  } = useConversations(currentUser?.id || 'anonymous');
 
-  // Función para guardar conversaciones en localStorage
-  const saveConversations = useCallback((conversations: AgentConversations) => {
-    try {
-      localStorage.setItem(CONVERSATIONS_STORAGE_KEY, JSON.stringify(conversations));
-    } catch (error) {
-      console.error('Error saving conversations:', error);
-    }
-  }, []);
-
-  // Función para guardar la conversación actual del agente
-  const saveCurrentConversation = useCallback((agentId: string, messages: Message[]) => {
-    const conversations = loadConversations();
-    // Sanitizar mensajes para no almacenar binarios en localStorage
-    const sanitized = messages.map(msg => ({
-      ...msg,
-      attachments: msg.attachments?.map(att => {
-        const { data, url, ...rest } = att;
-        // Evitar persistir base64 o data URLs; solo metadatos
-        return { ...rest } as Attachment;
-      })
-    }));
-    conversations[agentId] = sanitized;
-    saveConversations(conversations);
-  }, [loadConversations, saveConversations]);
-
-  // Función para cargar la conversación de un agente específico
-  const loadAgentConversation = useCallback((agentId: string): Message[] => {
-    const conversations = loadConversations();
-    const messages = conversations[agentId] || [];
-    
-    // Convertir timestamps de string a Date cuando se cargan desde localStorage
-    return messages.map(msg => ({
-      ...msg,
-      timestamp: typeof msg.timestamp === 'string' ? new Date(msg.timestamp) : msg.timestamp
-    }));
-  }, [loadConversations]);
+  // Mensajes de la conversación actual
+  const currentConversation = getCurrentConversation();
+  const messages = currentConversation?.messages || [];
 
   // Validación de selectedAgent
   if (!selectedAgent) {
@@ -108,29 +56,6 @@ const Chat = () => {
       </div>
     );
   }
-
-  // Inicializar conversación cuando cambia el agente
-  useEffect(() => {
-    if (!selectedAgent) return;
-    
-    // Cargar conversación existente para este agente
-    const existingConversation = loadAgentConversation(selectedAgent.id);
-    
-    if (existingConversation.length > 0) {
-      // Si hay conversación existente, cargarla
-      setMessages(existingConversation);
-    } else {
-      // Si no hay conversación, mostrar array vacío (pantalla de bienvenida)
-      setMessages([]);
-    }
-  }, [selectedAgent?.id, loadAgentConversation]);
-
-  // Guardar conversación automáticamente cuando cambien los mensajes
-  useEffect(() => {
-    if (selectedAgent && messages.length > 0) {
-      saveCurrentConversation(selectedAgent.id, messages);
-    }
-  }, [messages, selectedAgent?.id, saveCurrentConversation]);
 
   // Determinar si estamos en una conversación activa
   const isActiveConversation = messages.length > 0;
@@ -255,9 +180,8 @@ const Chat = () => {
         },
         body: JSON.stringify({
           mensaje: userMessage,
-          agente: selectedAgent.id,
-          contexto: selectedAgent.department,
-          usuario: currentUser?.id,
+          usuario: currentUser?.id || 'anonymous',
+          conversationId: currentConversationId, // ID único de la conversación
           attachments: atts.map(a => ({
             id: a.id,
             name: a.name,
@@ -327,28 +251,38 @@ const Chat = () => {
       agentId: selectedAgent.id
     };
 
-    setMessages(prev => [...prev, userMessageObj, loadingMessageObj]);
+    // Actualizar conversación con mensaje del usuario y mensaje de carga
+    const updatedMessages = [...messages, userMessageObj, loadingMessageObj];
+    if (currentConversationId) {
+      updateConversationMessages(currentConversationId, updatedMessages);
+    }
 
     try {
       const aiResponse = await sendMessageToAPI(userMessage, attachments);
-      
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingMessageObj.id 
+
+      // Actualizar el mensaje de carga con la respuesta real
+      const finalMessages = updatedMessages.map(msg =>
+        msg.id === loadingMessageObj.id
           ? {
               ...msg,
               content: aiResponse,
               isLoading: false
             }
           : msg
-      ));
+      );
+
+      if (currentConversationId) {
+        updateConversationMessages(currentConversationId, finalMessages);
+      }
 
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : 'Error desconocido al procesar tu mensaje';
 
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingMessageObj.id 
+      // Actualizar el mensaje de carga con el error
+      const errorMessages = updatedMessages.map(msg =>
+        msg.id === loadingMessageObj.id
           ? {
               ...msg,
               content: `Lo siento, hubo un problema al procesar tu mensaje: ${errorMessage}. Por favor, inténtalo nuevamente.`,
@@ -356,7 +290,11 @@ const Chat = () => {
               hasError: true
             }
           : msg
-      ));
+      );
+
+      if (currentConversationId) {
+        updateConversationMessages(currentConversationId, errorMessages);
+      }
     } finally {
       setIsLoading(false);
       setAttachments([]);
@@ -364,13 +302,8 @@ const Chat = () => {
   };
 
   const handleNewConversation = () => {
-    if (!selectedAgent) return;
-    
-    // Limpiar la conversación (mostrar pantalla de bienvenida)
-    setMessages([]);
-    
-    // Guardar la nueva conversación vacía (sobrescribir la anterior)
-    saveCurrentConversation(selectedAgent.id, []);
+    // Crear nueva conversación
+    createNewConversation();
   };
 
   // Configuración de adjuntos (MVP)
@@ -654,10 +587,52 @@ const Chat = () => {
 
   return (
     <div className="page-container gradient-chat p-0">
-      {/* Chat Container - Inmersivo pantalla completa */}
-      <div className="h-full w-full overflow-hidden">
-        <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
-          <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
+      {/* Chat Container - Inmersivo pantalla completa con sidebar */}
+      <div className="h-full w-full overflow-hidden flex">
+        {/* Sidebar de conversaciones - Desktop siempre visible, Mobile como overlay */}
+        <div
+          className={`${
+            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-30 w-80 bg-niawi-surface border-r border-niawi-border transition-transform duration-300 ease-in-out`}
+        >
+          <ConversationsSidebar
+            conversations={getConversationsMetadata()}
+            currentConversationId={currentConversationId}
+            onSelectConversation={switchConversation}
+            onNewConversation={createNewConversation}
+            onDeleteConversation={deleteConversation}
+            onRenameConversation={renameConversation}
+          />
+        </div>
+
+        {/* Overlay para cerrar sidebar en mobile */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main Chat Area */}
+        <div className="flex-1 h-full overflow-hidden">
+          <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
+            {/* Header con botón de menú para mobile */}
+            <div className="lg:hidden border-b border-niawi-border px-4 py-3 flex items-center justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="hover:bg-niawi-border/50"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+              <span className="text-sm font-medium text-foreground">
+                {currentConversation?.title || 'Nueva conversación'}
+              </span>
+              <div className="w-9" /> {/* Spacer for centering */}
+            </div>
+
+            <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
             {/* Messages Area */}
             <div
               className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
@@ -876,6 +851,7 @@ const Chat = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
