@@ -3,9 +3,7 @@ import { Send, Paperclip, AlertCircle, RotateCcw, Zap, Brain, Mic, Square, X } f
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import AgentSelector from '@/components/AgentSelector';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { useAgent } from '@/hooks/useAgent';
 import type { Message, ApiResponse, Attachment } from '@/types/agents';
@@ -662,19 +660,14 @@ const Chat = () => {
   };
 
   return (
-    <div className="page-container gradient-chat">
-      {/* Header con selector de agente */}
-      <div className="flex-shrink-0 p-4 pb-0 sm:p-6">
-        <AgentSelector />
-      </div>
-
-      {/* Chat Container - Glass Premium */}
-      <div className="flex-1 p-4 pt-4 sm:p-6 sm:pt-6 overflow-hidden">
-        <Card className="h-full glass-premium border-niawi-border/50 flex flex-col overflow-hidden shadow-2xl">
+    <div className="page-container gradient-chat p-0">
+      {/* Chat Container - Inmersivo pantalla completa */}
+      <div className="h-full w-full overflow-hidden">
+        <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
           <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
             {/* Messages Area */}
             <div
-              className={`flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
+              className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
                 !isActiveConversation ? 'flex items-center justify-center' : 'space-y-6'
               }`}
               onDragOver={(e) => { e.preventDefault(); }}
@@ -682,39 +675,35 @@ const Chat = () => {
             >
               {!isActiveConversation && selectedAgent ? (
                 // Pantalla de bienvenida inmersiva
-                <div className="max-w-3xl w-full text-center space-y-8 px-4 animate-fade-in">
-                  <div className="space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+                <div className="max-w-4xl w-full text-center space-y-10 px-4 animate-fade-in">
+                  <div className="space-y-6">
+                    <div className={`inline-flex p-4 rounded-2xl ${selectedAgent.bgColor} mb-4`}>
+                      <selectedAgent.icon className={`w-12 h-12 ${selectedAgent.color}`} />
+                    </div>
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
                       Buen día{currentUser?.name ? `, ${currentUser.name.split(' ')[0]}` : ''}! 👋
                     </h1>
-                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
                       ¿Revisamos juntos la agenda ejecutiva?
                     </p>
                   </div>
-                  
-                  <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
-                    <div className={`p-2 rounded-lg ${selectedAgent.bgColor}`}>
-                      <selectedAgent.icon className={`w-5 h-5 ${selectedAgent.color}`} />
-                    </div>
-                    <span>Conectado con <span className="font-semibold text-foreground">{selectedAgent.name}</span></span>
-                  </div>
 
-                  <div className="pt-4">
-                    <p className="text-sm text-muted-foreground mb-4 flex items-center justify-center gap-2">
-                      <Zap className="w-4 h-4 text-niawi-accent" />
+                  <div className="pt-6">
+                    <p className="text-base text-muted-foreground mb-6 flex items-center justify-center gap-2">
+                      <Zap className="w-5 h-5 text-niawi-accent" />
                       Sugerencias para comenzar
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                       {suggestions.slice(0, 4).map((suggestion, index) => (
                         <button
                           key={index}
                           onClick={() => handleSuggestionClick(suggestion)}
-                          className="text-left p-4 rounded-xl border border-niawi-border bg-niawi-border/10 hover:bg-niawi-border/20 hover:border-niawi-primary/30 transition-all duration-300 group"
+                          className="text-left p-5 rounded-xl border border-niawi-border bg-niawi-border/10 hover:bg-niawi-border/20 hover:border-niawi-primary/30 hover:scale-[1.02] transition-all duration-300 group"
                           disabled={isLoading}
                         >
                           <div className="flex items-start gap-3">
-                            <Zap className="w-4 h-4 text-niawi-accent flex-shrink-0 mt-0.5 group-hover:text-niawi-primary transition-colors" />
-                            <span className="text-sm text-foreground leading-relaxed">{suggestion}</span>
+                            <Zap className="w-5 h-5 text-niawi-accent flex-shrink-0 mt-0.5 group-hover:text-niawi-primary transition-colors" />
+                            <span className="text-base text-foreground leading-relaxed">{suggestion}</span>
                           </div>
                         </button>
                       ))}
@@ -723,7 +712,7 @@ const Chat = () => {
                 </div>
               ) : (
                 // Vista de conversación normal
-                <>
+                <div className="max-w-5xl mx-auto w-full space-y-6">
                   {messages.map((msg, index) => (
                     <div
                       key={msg.id}
@@ -784,19 +773,19 @@ const Chat = () => {
                     </div>
                   ))}
                   <div ref={messagesEndRef} />
-                </>
+                </div>
               )}
             </div>
 
             {/* Botón Nueva Conversación - Solo si hay conversación activa */}
             {isActiveConversation && (
-              <div className="px-6 pb-2 flex-shrink-0">
-                <div className="flex justify-end">
+              <div className="px-4 md:px-8 lg:px-16 xl:px-24 pb-3 flex-shrink-0">
+                <div className="max-w-5xl mx-auto flex justify-end">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleNewConversation}
-                    className="border-niawi-border hover:bg-niawi-border/50"
+                    className="border-niawi-border hover:bg-niawi-border/50 hover:scale-105 transition-all"
                     disabled={isLoading}
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />
@@ -807,18 +796,8 @@ const Chat = () => {
             )}
 
             {/* Input Area */}
-            <div className="border-t border-niawi-border p-4 pb-6 flex-shrink-0">
-              {selectedAgent && (
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge className={`${selectedAgent.bgColor} ${selectedAgent.color} border-0 text-xs`}>
-                    {selectedAgent.department}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    Conectado a {selectedAgent.name}
-                  </span>
-                </div>
-              )}
-              
+            <div className="border-t border-niawi-border px-4 py-6 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
+              <div className="max-w-5xl mx-auto">
               <form onSubmit={handleSendMessage} className="flex gap-3 items-end">
                 <div className="flex-1 relative">
                   <Textarea
@@ -827,7 +806,7 @@ const Chat = () => {
                     onChange={handleTextareaChange}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    placeholder={selectedAgent ? `Pregunta a tu ${selectedAgent.name}...` : 'Selecciona un agente primero...'}
+                    placeholder="Escribe tu mensaje aquí..."
                     className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary input-enhanced"
                     disabled={isLoading || !selectedAgent}
                     rows={1}
@@ -900,6 +879,7 @@ const Chat = () => {
                   ))}
                 </div>
               )}
+              </div>
             </div>
           </CardContent>
         </Card>
