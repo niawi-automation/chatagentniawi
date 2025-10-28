@@ -80,17 +80,18 @@ const DashboardLayout = () => {
     });
 
     // 3. Administrar Agentes - Solo si puede gestionar agentes
-    if (currentUser && hasPermission(currentUser, 'agents', 'view')) {
-      menuItems.push({
-        title: 'Administrar Agentes',
-        path: '/dashboard/agents',
-        icon: Settings,
-        badge: '4',
-        badgeColor: 'bg-niawi-accent',
-        subtitle: 'Gestión y analytics del ecosistema IA',
-        permission: { module: 'agents' as const, action: 'view' }
-      });
-    }
+    // Temporalmente oculto del menú
+    // if (currentUser && hasPermission(currentUser, 'agents', 'view')) {
+    //   menuItems.push({
+    //     title: 'Administrar Agentes',
+    //     path: '/dashboard/agents',
+    //     icon: Settings,
+    //     badge: '4',
+    //     badgeColor: 'bg-niawi-accent',
+    //     subtitle: 'Gestión y analytics del ecosistema IA',
+    //     permission: { module: 'agents' as const, action: 'view' }
+    //   });
+    // }
 
     // 4. Integraciones - Solo para admin y super_admin
     if (currentUser && ['admin', 'super_admin'].includes(currentUser.role)) {
