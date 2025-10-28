@@ -40,18 +40,19 @@ const DashboardLayout = () => {
     const menuItems = [];
 
     // Si es usuario bot, solo mostrar automatizaciones
-    if (authUser && authUser.accessType === 'automations_only') {
-      menuItems.push({
-        title: 'Automatizaciones',
-        path: '/dashboard/automations',
-        icon: FileSpreadsheet,
-        badge: '3',
-        badgeColor: 'bg-niawi-secondary',
-        subtitle: 'Procesamiento automático de archivos Excel',
-        permission: null
-      });
-      return menuItems;
-    }
+    // Temporalmente oculto del menú
+    // if (authUser && authUser.accessType === 'automations_only') {
+    //   menuItems.push({
+    //     title: 'Automatizaciones',
+    //     path: '/dashboard/automations',
+    //     icon: FileSpreadsheet,
+    //     badge: '3',
+    //     badgeColor: 'bg-niawi-secondary',
+    //     subtitle: 'Procesamiento automático de archivos Excel',
+    //     permission: null
+    //   });
+    //   return menuItems;
+    // }
 
     // Menú completo para usuarios normales
     // 1. Recomendaciones - Primera opción si puede ver analytics
@@ -105,15 +106,16 @@ const DashboardLayout = () => {
     }
 
     // 5. Automatizaciones - Acceso general para todos los usuarios
-    menuItems.push({
-      title: 'Automatizaciones',
-      path: '/dashboard/automations',
-      icon: FileSpreadsheet,
-      badge: '3',
-      badgeColor: 'bg-niawi-secondary',
-      subtitle: 'Procesamiento automático de archivos Excel',
-      permission: null // Acceso general
-    });
+    // Temporalmente oculto del menú
+    // menuItems.push({
+    //   title: 'Automatizaciones',
+    //   path: '/dashboard/automations',
+    //   icon: FileSpreadsheet,
+    //   badge: '3',
+    //   badgeColor: 'bg-niawi-secondary',
+    //   subtitle: 'Procesamiento automático de archivos Excel',
+    //   permission: null // Acceso general
+    // });
 
     // 6. Configuración - Solo si puede ver settings
     if (currentUser && hasPermission(currentUser, 'settings', 'view')) {
