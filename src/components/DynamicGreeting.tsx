@@ -52,11 +52,12 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
   agentBgColor = 'bg-niawi-accent/10',
   className = ''
 }) => {
-  // Calcular franja horaria y contenidos dinámicos
+  // Calcular franja horaria y contenidos dinámicos - SE RECALCULA EN CADA RENDER
   const { daypart, greeting, header, subheader } = useMemo(() => {
     const now = new Date();
     const currentDaypart = getDaypart(now);
-    const seed = generateSeed(userId, now);
+    // Usar timestamp completo para seed aleatorio en cada refresh
+    const seed = Math.floor(Math.random() * 1000000);
 
     // Seleccionar header según franja horaria
     const daypartHeaders = CHAT_CONTENT.meta.daypartRules[currentDaypart];
@@ -88,7 +89,7 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
       header: processedHeader,
       subheader: processedSubheader
     };
-  }, [userId]);
+  }); // Sin dependencies = recalcula en cada render
 
   // Nombre del usuario (primer nombre)
   const firstName = userName?.split(' ')[0] || '';
@@ -107,19 +108,19 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
 
       {/* Saludo principal */}
       <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight text-center">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight text-center">
           {greeting}
           {firstName && `, ${firstName}`}! 👋
         </h1>
 
         {/* Header dinámico */}
-        <p className="text-xl md:text-2xl text-muted-foreground text-center max-w-3xl mx-auto">
+        <p className="text-lg md:text-xl text-muted-foreground text-center max-w-3xl mx-auto">
           {header}
         </p>
 
         {/* Subheader opcional */}
         {subheader && (
-          <p className="text-base md:text-lg text-muted-foreground/80 text-center max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground/80 text-center max-w-2xl mx-auto">
             {subheader}
           </p>
         )}

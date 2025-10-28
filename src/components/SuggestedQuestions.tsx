@@ -9,7 +9,7 @@
  * - Tracking de clics
  */
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { Zap } from 'lucide-react';
 import { CHAT_CONTENT } from '@/constants/chatContent';
 import {
@@ -39,16 +39,25 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
   isLoading = false,
   className = ''
 }) => {
-  // Seleccionar preguntas con gating y cooldown
+  // Estado para forzar re-render y obtener nuevas preguntas aleatorias
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Forzar nueva selección en cada montaje del componente
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
+
+  // Seleccionar preguntas con gating - SIN cooldown para que cambien en cada refresh
   const selectedQuestions = useMemo(() => {
-    const history = loadUserHistory(userId);
+    // No usar historial para permitir rotación libre
+    const emptyHistory = { lastQuestions: [], lastTips: [], lastUpdate: new Date().toISOString() };
     return selectSuggestedQuestions(
       CHAT_CONTENT.questions,
       integrations,
-      history,
-      userId
+      emptyHistory,
+      userId + refreshKey // Agregar refreshKey para forzar nuevas selecciones
     );
-  }, [userId, integrations]);
+  }, [userId, integrations, refreshKey]); // Se recalcula cuando cambia refreshKey
 
   // Manejar clic en pregunta
   const handleQuestionClick = useCallback((question: ChatQuestion) => {
