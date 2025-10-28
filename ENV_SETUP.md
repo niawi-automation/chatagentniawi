@@ -17,7 +17,9 @@ VITE_AUTH_CLIENT_ID=019986ed-5fea-7886-a2b6-e35968f8ef17
 
 # APIs de Webhooks para Automatizaciones
 VITE_CHAT_API_URL=https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c
-VITE_RECOMMENDATIONS_API_URL=https://automation.wtsusa.us/webhook/2a2f2d36-9a66-4ca0-9f80-a8db6fea206b
+
+# API de Recomendaciones IA - Actualizado
+VITE_RECOMMENDATIONS_API_URL=https://flow.e3stores.cloud/webhook/agent
 ```
 
 ### Notas Importantes
