@@ -239,12 +239,14 @@ const Chat = () => {
     }
 
     try {
-      // Usar el endpoint dinámico del agente seleccionado
-      const apiUrl = getAgentEndpoint(selectedAgent.id);
-      
+      // Usar variable de entorno VITE_CHAT_API_URL o fallback al endpoint del agente
+      const apiUrl = import.meta.env.VITE_CHAT_API_URL || getAgentEndpoint(selectedAgent.id);
+
       if (!apiUrl) {
-        throw new Error('Endpoint del agente no configurado');
+        throw new Error('Endpoint del chat no configurado. Configura VITE_CHAT_API_URL en variables de entorno.');
       }
+
+      console.log('📡 Enviando mensaje a:', apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'POST',
