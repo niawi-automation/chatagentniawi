@@ -91,23 +91,17 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Header */}
+      {/* Botón Nueva Conversación */}
       <div className="p-4 border-b border-niawi-border">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-niawi-primary" />
-            Conversaciones
-          </h2>
-          <Button
-            onClick={onNewConversation}
-            size="sm"
-            className="bg-niawi-primary hover:bg-niawi-primary/90 text-white"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Nueva
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">
+        <Button
+          onClick={onNewConversation}
+          size="sm"
+          className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nueva Conversación
+        </Button>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
           {conversations.length} {conversations.length === 1 ? 'conversación' : 'conversaciones'}
         </p>
       </div>

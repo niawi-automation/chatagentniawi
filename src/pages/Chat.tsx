@@ -18,7 +18,7 @@ import { toast } from '@/hooks/use-toast';
 const Chat = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Por defecto cerrado
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -587,52 +587,10 @@ const Chat = () => {
 
   return (
     <div className="page-container gradient-chat p-0">
-      {/* Chat Container - Inmersivo pantalla completa con sidebar */}
-      <div className="h-full w-full overflow-hidden flex">
-        {/* Sidebar de conversaciones - Desktop siempre visible, Mobile como overlay */}
-        <div
-          className={`${
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-30 w-80 bg-niawi-surface border-r border-niawi-border transition-transform duration-300 ease-in-out`}
-        >
-          <ConversationsSidebar
-            conversations={getConversationsMetadata()}
-            currentConversationId={currentConversationId}
-            onSelectConversation={switchConversation}
-            onNewConversation={createNewConversation}
-            onDeleteConversation={deleteConversation}
-            onRenameConversation={renameConversation}
-          />
-        </div>
-
-        {/* Overlay para cerrar sidebar en mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-20 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Main Chat Area */}
-        <div className="flex-1 h-full overflow-hidden">
-          <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
-            {/* Header con botón de menú para mobile */}
-            <div className="lg:hidden border-b border-niawi-border px-4 py-3 flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="hover:bg-niawi-border/50"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-              <span className="text-sm font-medium text-foreground">
-                {currentConversation?.title || 'Nueva conversación'}
-              </span>
-              <div className="w-9" /> {/* Spacer for centering */}
-            </div>
-
-            <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
+      {/* Chat Container - Inmersivo pantalla completa */}
+      <div className="h-full w-full overflow-hidden relative">
+        <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
+          <CardContent className="flex-1 p-0 flex flex-col overflow-hidden relative">
             {/* Messages Area */}
             <div
               className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
@@ -763,6 +721,71 @@ const Chat = () => {
               </div>
             )}
 
+            {/* Botón flotante para abrir conversaciones - Posición fija arriba a la derecha */}
+            <Button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              size="sm"
+              variant="outline"
+              className={`fixed top-6 right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
+                isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+              title="Ver conversaciones"
+            >
+              <Menu className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Conversaciones</span>
+              {getConversationsMetadata().length > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full">
+                  {getConversationsMetadata().length}
+                </span>
+              )}
+            </Button>
+
+            {/* Sidebar de conversaciones - Desliza desde la derecha */}
+            <div
+              className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-niawi-surface border-l border-niawi-border shadow-2xl transition-transform duration-300 ease-in-out ${
+                isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              {/* Header del sidebar con botón cerrar */}
+              <div className="p-4 border-b border-niawi-border flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Conversaciones</h2>
+                <Button
+                  onClick={() => setIsSidebarOpen(false)}
+                  size="sm"
+                  variant="ghost"
+                  className="hover:bg-niawi-border/50"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+
+              {/* Contenido del sidebar */}
+              <div className="h-[calc(100%-73px)]">
+                <ConversationsSidebar
+                  conversations={getConversationsMetadata()}
+                  currentConversationId={currentConversationId}
+                  onSelectConversation={(id) => {
+                    switchConversation(id);
+                    setIsSidebarOpen(false); // Cerrar al seleccionar
+                  }}
+                  onNewConversation={() => {
+                    createNewConversation();
+                    setIsSidebarOpen(false); // Cerrar al crear nueva
+                  }}
+                  onDeleteConversation={deleteConversation}
+                  onRenameConversation={renameConversation}
+                />
+              </div>
+            </div>
+
+            {/* Overlay oscuro cuando el sidebar está abierto */}
+            {isSidebarOpen && (
+              <div
+                className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            )}
+
             {/* Input Area */}
             <div className="border-t border-niawi-border px-4 py-6 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
               <div className="max-w-5xl mx-auto">
@@ -851,7 +874,6 @@ const Chat = () => {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );
