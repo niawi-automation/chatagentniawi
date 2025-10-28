@@ -96,18 +96,15 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Icono del agente con animación */}
+      {/* Icono del agente */}
       <div className="flex justify-center">
-        <div
-          className={`inline-flex p-4 rounded-2xl ${agentBgColor} animate-fade-in animate-pulse-slow`}
-          style={{ animationDelay: '0.1s' }}
-        >
+        <div className={`inline-flex p-4 rounded-2xl ${agentBgColor}`}>
           <AgentIcon className={`w-12 h-12 ${agentColor}`} />
         </div>
       </div>
 
       {/* Saludo principal */}
-      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+      <div className="space-y-3">
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight text-center">
           {greeting}
           {firstName && `, ${firstName}`}! 👋
@@ -127,9 +124,9 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
       </div>
 
       {/* Badge de franja horaria (sutil) */}
-      <div className="flex justify-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+      <div className="flex justify-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-niawi-border/20 text-xs text-muted-foreground">
-          <div className="w-1.5 h-1.5 rounded-full bg-niawi-accent animate-pulse-slow" />
+          <div className="w-1.5 h-1.5 rounded-full bg-niawi-accent" />
           <span>{DAYPART_ES[daypart]}</span>
         </div>
       </div>

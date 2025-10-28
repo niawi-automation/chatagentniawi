@@ -91,8 +91,8 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header de sección */}
-      <div className="flex items-center justify-center gap-2 text-base text-muted-foreground animate-fade-in">
-        <Zap className="w-5 h-5 text-niawi-accent animate-pulse-slow" />
+      <div className="flex items-center justify-center gap-2 text-base text-muted-foreground">
+        <Zap className="w-5 h-5 text-niawi-accent" />
         <span>Sugerencias para comenzar</span>
       </div>
 
@@ -106,9 +106,7 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
             className="group relative text-left p-5 rounded-xl border border-niawi-border bg-niawi-border/10
                      hover:bg-niawi-border/20 hover:border-niawi-primary/30 hover:scale-[1.02]
                      transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-                     focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:ring-offset-2
-                     animate-slide-in-up"
-            style={{ animationDelay: `${index * 0.1}s` }}
+                     focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:ring-offset-2"
             aria-label={`Pregunta sugerida: ${question.text}`}
           >
             {/* Efecto de brillo en hover */}
@@ -137,8 +135,8 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
       </div>
 
       {/* Hint sutil */}
-      <p className="text-center text-xs text-muted-foreground/60 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-        Las sugerencias se actualizan diariamente según tus integraciones
+      <p className="text-center text-xs text-muted-foreground/60">
+        Las sugerencias cambian en cada actualización
       </p>
     </div>
   );
