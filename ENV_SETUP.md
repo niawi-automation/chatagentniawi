@@ -2,25 +2,32 @@
 
 ## Variables Requeridas
 
-Para que la aplicación funcione correctamente con el backend de autenticación, debes configurar las siguientes variables de entorno.
+Para que la aplicación funcione correctamente con el backend de autenticación y los servicios externos, debes configurar las siguientes variables de entorno.
 
 ### Cómo Configurar
 
-Crea un archivo `.env` o `.env.local` en la raíz del proyecto con el siguiente contenido:
+Crea un archivo `.env.local` en la raíz del proyecto con el siguiente contenido:
 
 ```env
-# Backend de Autenticación (IMPORTANTE: Debe usar HTTPS en producción)
+# Backend de Autenticación (REQUERIDO)
 VITE_AUTH_BASE_URL=https://aiauth.e3stores.cloud
+VITE_AUTH_CLIENT_ID=<tu-client-id>
 
-# Client ID para autenticación multi-cliente
-VITE_AUTH_CLIENT_ID=019986ed-5fea-7886-a2b6-e35968f8ef17
+# Webhooks de Automatizaciones (REQUERIDO)
+VITE_WEBHOOK_WIP=<url-webhook-wip>
+VITE_WEBHOOK_PACKING_LIST=<url-webhook-packing-list>
+VITE_N8N_WEBHOOK_POBUYS=<url-webhook-pobuys>
 
-# APIs de Webhooks para Automatizaciones
-VITE_CHAT_API_URL=https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c
+# Webhooks de Agentes IA (REQUERIDO)
+VITE_WEBHOOK_AGENT_OPERATIONS=<url-webhook-pcp>
+VITE_WEBHOOK_AGENT_DOCUMENTS=<url-webhook-wts>
 
-# API de Recomendaciones IA - Actualizado
+# APIs Externas (REQUERIDO)
+VITE_CHAT_API_URL=<url-api-chat>
 VITE_RECOMMENDATIONS_API_URL=https://flow.e3stores.cloud/webhook/agent
 ```
+
+**IMPORTANTE:** Reemplaza los valores `<...>` con las URLs reales proporcionadas por el equipo.
 
 ### Notas Importantes
 

@@ -6,7 +6,7 @@ export const PROCESS_TYPES_CONFIG = {
     id: 'WIP' as ProcessType,
     label: 'Work in Progress',
     description: 'Procesamiento de documentos de trabajo en progreso',
-    webhookUrl: 'https://automation.wtsusa.us/webhook/WIPautomation',
+    webhookUrl: import.meta.env.VITE_WEBHOOK_WIP || '',
     acceptedFileTypes: ['.xlsx', '.xls'],
     maxFileSize: 10 // MB
   },
@@ -22,7 +22,7 @@ export const PROCESS_TYPES_CONFIG = {
     id: 'PACKING_LIST' as ProcessType,
     label: 'Packing List',
     description: 'Procesamiento de listas de empaque',
-    webhookUrl: 'https://automation.wtsusa.us/webhook/automatizacionpackinglist',
+    webhookUrl: import.meta.env.VITE_WEBHOOK_PACKING_LIST || '',
     acceptedFileTypes: ['.xlsx', '.xls'],
     maxFileSize: 10 // MB
   }
@@ -131,10 +131,7 @@ export const processFile = async (
       // Manejar si es array o objeto único
       const dataArray = Array.isArray(result) ? result : [result];
       
-      console.log('📦 Procesando datos de Packing List:', dataArray.length, 'elementos');
-      
       dataArray.forEach((item: any, index: number) => {
-        console.log(`📦 Procesando elemento ${index}:`, item);
         
         // Verificar si tiene la estructura esperada: { index, message: { role, content } }
         if (item.message?.content?.packs && Array.isArray(item.message.content.packs)) {
@@ -148,15 +145,10 @@ export const processFile = async (
             PONumberEDI 
           } = item.message.content;
           
-          console.log('📦 Datos principales:', { buyerName, factoryName, userName, buyerERPCode, factoryERPCode, buyerPONumber, PONumberEDI });
-          
           item.message.content.packs.forEach((pack: any, packIndex: number) => {
-            console.log(`📦 Procesando pack ${packIndex}:`, pack);
             
             if (pack.sizeDetail && Array.isArray(pack.sizeDetail)) {
               pack.sizeDetail.forEach((sizeDetail: any, sizeIndex: number) => {
-                console.log(`📦 Procesando sizeDetail ${sizeIndex}:`, sizeDetail);
-                
                 const flattenedRecord: PackingListRecord = {
                   BuyerName: buyerName || '',
                   FactoryName: factoryName || '',
@@ -185,15 +177,12 @@ export const processFile = async (
                   ShippedQty: sizeDetail.ShippedQty || 0
                 };
                 
-                console.log('📦 Registro aplanado creado:', flattenedRecord);
                 flattenedRecords.push(flattenedRecord);
               });
             }
           });
         }
       });
-
-      console.log('📦 Total de registros aplanados:', flattenedRecords.length);
 
       if (flattenedRecords.length > 0) {
         const wrapped: ProcessResults = {

@@ -17,6 +17,7 @@ import {
   scheduleTokenRefresh 
 } from '@/utils/tokenManager';
 import { getFriendlyErrorMessage, isTwoFactorRequiredError, isLockoutError } from '@/utils/validators';
+import logger from '@/utils/logger';
 
 // Crear el contexto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -150,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       scheduleTokenRefresh(response.expiresIn, refreshSession);
       
     } catch (error) {
-      console.error('Error al refrescar sesión:', error);
+      logger.error('Error al refrescar sesión', error);
       // Si falla el refresh, cerrar sesión
       logout();
     }
@@ -167,7 +168,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Si no hay refreshToken, no hay sesión que restaurar
       if (!refreshTokenValue) {
-        console.log('No hay refreshToken guardado, no se puede restaurar sesión');
+        logger.debug('No hay refreshToken guardado, no se puede restaurar sesión');
         setIsLoading(false);
         return;
       }
@@ -177,7 +178,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Si NO hay accessToken O está expirado, hacer refresh para obtener uno nuevo
       if (!token || isTokenExpired()) {
-        console.log('AccessToken no disponible o expirado, haciendo refresh...');
+        logger.debug('AccessToken no disponible o expirado, haciendo refresh...');
         await refreshSession();
         return;
       }
@@ -197,12 +198,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (userInfoError: any) {
         // Si falla obtener info del usuario, la sesión no es válida
-        console.log('Error al obtener info del usuario:', userInfoError.status);
+        logger.debug('Error al obtener info del usuario');
         clearAuthState();
       }
       
     } catch (error) {
-      console.error('Error al restaurar sesión:', error);
+      logger.error('Error al restaurar sesión', error);
       // Si falla la restauración, limpiar estado
       clearAuthState();
     } finally {

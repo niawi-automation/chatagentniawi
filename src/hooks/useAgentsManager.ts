@@ -46,11 +46,11 @@ export const useAgentsManager = () => {
         let webhookUrl = `https://api.niawi.tech${agent.endpoint}`;
         
         if (agent.id === 'operations') {
-          // Agente PCP - URL específica proporcionada
-          webhookUrl = 'https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c';
+          // Agente PCP - URL desde variables de entorno
+          webhookUrl = import.meta.env.VITE_WEBHOOK_AGENT_OPERATIONS || webhookUrl;
         } else if (agent.id === 'documents') {
-          // Agente WTS - URL específica proporcionada
-          webhookUrl = 'https://automation.wtsusa.us/webhook/067c480e-c554-4e28-a4e1-4212e4b7c8f2';
+          // Agente WTS - URL desde variables de entorno
+          webhookUrl = import.meta.env.VITE_WEBHOOK_AGENT_DOCUMENTS || webhookUrl;
         }
         
         return {
@@ -72,9 +72,9 @@ export const useAgentsManager = () => {
         let webhookUrl = `https://api.niawi.tech${agent.endpoint}`;
         
         if (agent.id === 'operations') {
-          webhookUrl = 'https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c';
+          webhookUrl = import.meta.env.VITE_WEBHOOK_AGENT_OPERATIONS || webhookUrl;
         } else if (agent.id === 'documents') {
-          webhookUrl = 'https://automation.wtsusa.us/webhook/067c480e-c554-4e28-a4e1-4212e4b7c8f2';
+          webhookUrl = import.meta.env.VITE_WEBHOOK_AGENT_DOCUMENTS || webhookUrl;
         }
         
         return {

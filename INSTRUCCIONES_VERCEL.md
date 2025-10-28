@@ -33,9 +33,16 @@ Necesitas configurar las siguientes variables. Para cada una:
 | Name (Nombre) | Value (Valor) |
 |---------------|---------------|
 | `VITE_AUTH_BASE_URL` | `https://aiauth.e3stores.cloud` |
-| `VITE_AUTH_CLIENT_ID` | `019986ed-5fea-7886-a2b6-e35968f8ef17` |
-| `VITE_CHAT_API_URL` | `https://automation.wtsusa.us/webhook/153ed783-a4e4-49be-8e89-16ae2d01ec1c` |
+| `VITE_AUTH_CLIENT_ID` | `<tu-client-id>` |
+| `VITE_WEBHOOK_WIP` | `<url-webhook-wip>` |
+| `VITE_WEBHOOK_PACKING_LIST` | `<url-webhook-packing-list>` |
+| `VITE_N8N_WEBHOOK_POBUYS` | `<url-webhook-pobuys>` |
+| `VITE_WEBHOOK_AGENT_OPERATIONS` | `<url-webhook-pcp>` |
+| `VITE_WEBHOOK_AGENT_DOCUMENTS` | `<url-webhook-wts>` |
+| `VITE_CHAT_API_URL` | `<url-api-chat>` |
 | `VITE_RECOMMENDATIONS_API_URL` | `https://flow.e3stores.cloud/webhook/agent` |
+
+**NOTA:** Los valores `<...>` deben ser reemplazados con las URLs reales. No expongas estos valores en repositorios públicos.
 
 #### ⚠️ MUY IMPORTANTE:
 

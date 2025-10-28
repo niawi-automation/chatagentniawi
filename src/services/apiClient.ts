@@ -2,6 +2,7 @@
 
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, setTokenExpiresAt, clearTokens, isTokenExpired } from '@/utils/tokenManager';
 import { LoginResponse, RefreshTokenResponse } from '@/types/auth';
+import logger from '@/utils/logger';
 
 // Configuración del cliente - Función para asegurar HTTPS en producción
 const getBaseUrl = () => {
@@ -10,7 +11,7 @@ const getBaseUrl = () => {
   
   // Si no es desarrollo y la URL comienza con http://, forzar https://
   if (!import.meta.env.DEV && url.startsWith('http://')) {
-    console.warn(`⚠️ Convirtiendo HTTP a HTTPS: ${url} → ${url.replace('http://', 'https://')}`);
+    logger.warn(`Convirtiendo HTTP a HTTPS: ${url} → ${url.replace('http://', 'https://')}`);
     return url.replace('http://', 'https://');
   }
   
@@ -18,13 +19,18 @@ const getBaseUrl = () => {
 };
 
 const BASE_URL = getBaseUrl();
-const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID || '019986ed-5fea-7886-a2b6-e35968f8ef17';
+const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID;
 
-// Log para verificar la configuración
-console.log('🔧 Configuración API:');
-console.log('  - Base URL:', BASE_URL);
-console.log('  - Client ID:', CLIENT_ID);
-console.log('  - Modo:', import.meta.env.DEV ? 'Desarrollo' : 'Producción');
+// Validar que CLIENT_ID esté configurado
+if (!CLIENT_ID) {
+  throw new Error('VITE_AUTH_CLIENT_ID no está configurado. Configura las variables de entorno.');
+}
+
+// Log para verificar la configuración solo en desarrollo
+logger.debug('Configuración API:', {
+  baseUrl: BASE_URL,
+  mode: import.meta.env.DEV ? 'Desarrollo' : 'Producción'
+});
 
 // Función para forzar HTTPS en cualquier URL
 const ensureHttps = (url: string): string => {
@@ -41,8 +47,7 @@ let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 const refreshToken = async (): Promise<RefreshTokenResponse> => {
   const refreshTokenValue = getRefreshToken();
   
-  console.log('🔄 Intentando refrescar token...');
-  console.log('  - refreshToken guardado:', refreshTokenValue ? 'presente' : 'ausente');
+  logger.debug('Intentando refrescar token...');
   
   // Si el refreshToken está vacío, significa que estamos usando cookies
   // El refreshToken está en una cookie HTTP-only, no necesitamos enviarlo en el body
@@ -60,11 +65,9 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
 
-  console.log('📥 Refresh Response:', {
+  logger.debug('Refresh Response:', {
     status: response.status,
-    ok: response.ok,
-    url: response.url,
-    type: response.type
+    ok: response.ok
   });
 
   // Manejar redirecciones (302, 301, etc.) - el backend puede intentar redirigir a HTTP
@@ -73,7 +76,7 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
     if (location) {
       const secureLocation = ensureHttps(location);
       if (location !== secureLocation) {
-        console.warn(`⚠️ El backend intentó redirigir a HTTP: ${location} → ${secureLocation}`);
+        logger.warn(`El backend intentó redirigir a HTTP`);
       }
     }
     // Si es una redirección, significa que la sesión expiró
@@ -88,7 +91,7 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
   }
 
   const data: RefreshTokenResponse = await response.json();
-  console.log('✅ Refresh exitoso:', { hasAccessToken: !!data.accessToken });
+  logger.debug('Refresh exitoso');
   
   // Guardar nuevos tokens
   if (data.accessToken) {
@@ -142,7 +145,7 @@ const makeRequest = async <T>(
     if (location) {
       const secureLocation = ensureHttps(location);
       if (location !== secureLocation) {
-        console.warn(`⚠️ El backend intentó redirigir a HTTP: ${location} → ${secureLocation}`);
+        logger.warn('El backend intentó redirigir a HTTP');
       }
     }
     // Si es una redirección, probablemente es un problema de autenticación
@@ -188,7 +191,7 @@ const makeRequest = async <T>(
           if (location) {
             const secureLocation = ensureHttps(location);
             if (location !== secureLocation) {
-              console.warn(`⚠️ El backend intentó redirigir a HTTP en reintento: ${location} → ${secureLocation}`);
+              logger.warn('El backend intentó redirigir a HTTP en reintento');
             }
           }
           throw new Error('Sesión expirada después del refresh. Por favor, inicia sesión nuevamente.');
@@ -281,11 +284,7 @@ export const makeLoginRequest = async <T>(
   };
 
   const fullUrl = `${BASE_URL}${endpoint}`;
-  console.log('🔐 Login Request:', {
-    url: fullUrl,
-    clientId: CLIENT_ID,
-    data: { ...data, password: '***' }
-  });
+  logger.debug('Login Request iniciado');
 
   let response = await fetch(fullUrl, {
     ...options,
@@ -296,12 +295,9 @@ export const makeLoginRequest = async <T>(
     redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
   });
 
-  console.log('📥 Login Response:', {
+  logger.debug('Login Response:', {
     status: response.status,
-    statusText: response.statusText,
-    ok: response.ok,
-    url: response.url,
-    type: response.type
+    ok: response.ok
   });
 
   // Manejar redirecciones - el backend puede intentar redirigir a HTTP
@@ -310,10 +306,10 @@ export const makeLoginRequest = async <T>(
     if (location) {
       const secureLocation = ensureHttps(location);
       if (location !== secureLocation) {
-        console.warn(`⚠️ El backend intentó redirigir a HTTP en login: ${location} → ${secureLocation}`);
+        logger.warn('El backend intentó redirigir a HTTP en login');
       }
       // Intentar seguir la redirección con HTTPS
-      console.log(`🔄 Siguiendo redirección segura a: ${secureLocation}`);
+      logger.debug('Siguiendo redirección segura');
       response = await fetch(secureLocation, {
         ...options,
         method: 'POST',
@@ -332,15 +328,15 @@ export const makeLoginRequest = async <T>(
 
   if (!response.ok) {
     let errorMessage = 'Error en el login';
-    console.error('❌ Login failed:', response.status, response.statusText);
+    logger.debug('Login failed:', response.status);
     
     // Intentar obtener el mensaje de error del backend
     try {
       const errorData = await response.json();
-      console.log('📋 Error data del backend:', errorData);
+      logger.debug('Error data del backend recibido');
       errorMessage = errorData.detail || errorData.message || errorData.title || errorMessage;
     } catch (parseError) {
-      console.warn('⚠️ No se pudo parsear el error del backend:', parseError);
+      logger.debug('No se pudo parsear el error del backend');
     }
     
     // Mensajes amigables según el código de estado
@@ -370,14 +366,13 @@ export const makeLoginRequest = async <T>(
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       const jsonData = await response.json();
-      console.log('✅ Login Success - Response Data:', jsonData);
-      console.log('🍪 Cookies recibidas:', document.cookie);
+      logger.debug('Login exitoso');
       return jsonData;
     }
-    console.log('⚠️ Response no es JSON, retornando objeto vacío');
+    logger.debug('Response no es JSON, retornando objeto vacío');
     return {} as T;
   } catch (error) {
-    console.error('❌ Error parseando respuesta:', error);
+    logger.error('Error parseando respuesta de login', error);
     return {} as T;
   }
 };
@@ -411,10 +406,10 @@ export const makeRegisterRequest = async <T>(
     if (location) {
       const secureLocation = ensureHttps(location);
       if (location !== secureLocation) {
-        console.warn(`⚠️ El backend intentó redirigir a HTTP en registro: ${location} → ${secureLocation}`);
+        logger.warn('El backend intentó redirigir a HTTP en registro');
       }
       // Intentar seguir la redirección con HTTPS
-      console.log(`🔄 Siguiendo redirección segura a: ${secureLocation}`);
+      logger.debug('Siguiendo redirección segura');
       response = await fetch(secureLocation, {
         ...options,
         method: 'POST',

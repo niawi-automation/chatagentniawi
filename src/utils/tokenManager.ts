@@ -1,5 +1,7 @@
 // Utilidades para manejo seguro de tokens
 
+import logger from './logger';
+
 interface TokenStorage {
   accessToken: string | null;
   expiresAt: number | null;
@@ -36,7 +38,7 @@ export const getRefreshToken = (): string | null => {
   try {
     return sessionStorage.getItem(REFRESH_TOKEN_KEY);
   } catch (error) {
-    console.warn('Error al obtener refresh token:', error);
+    logger.error('Error al obtener refresh token', error);
     return null;
   }
 };
@@ -48,7 +50,7 @@ export const setRefreshToken = (token: string): void => {
   try {
     sessionStorage.setItem(REFRESH_TOKEN_KEY, token);
   } catch (error) {
-    console.warn('Error al guardar refresh token:', error);
+    logger.error('Error al guardar refresh token', error);
   }
 };
 
@@ -72,7 +74,7 @@ export const getTokenExpiresAt = (): number | null => {
       return expiresAt;
     }
   } catch (error) {
-    console.warn('Error al obtener expiresAt:', error);
+    logger.error('Error al obtener expiresAt', error);
   }
   
   return null;
@@ -88,7 +90,7 @@ export const setTokenExpiresAt = (expiresAt: number): void => {
   try {
     sessionStorage.setItem(TOKEN_EXPIRES_AT_KEY, expiresAt.toString());
   } catch (error) {
-    console.warn('Error al guardar expiresAt:', error);
+    logger.error('Error al guardar expiresAt', error);
   }
 };
 
@@ -130,7 +132,7 @@ export const clearTokens = (): void => {
     sessionStorage.removeItem(REFRESH_TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_EXPIRES_AT_KEY);
   } catch (error) {
-    console.warn('Error al limpiar tokens:', error);
+    logger.error('Error al limpiar tokens', error);
   }
 };
 
@@ -151,7 +153,7 @@ export const scheduleTokenRefresh = (
   
   const timeoutId = setTimeout(() => {
     callback().catch(error => {
-      console.error('Error en refresh automático:', error);
+      logger.error('Error en refresh automático', error);
     });
   }, refreshDelay);
   
