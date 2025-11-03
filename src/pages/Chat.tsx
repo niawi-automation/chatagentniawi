@@ -731,10 +731,10 @@ const Chat = () => {
               }`}
               title="Ver conversaciones"
             >
-              <Menu className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Conversaciones</span>
+              <Menu className="w-4 h-4 sm:mr-2" />
+              <span className="hidden md:inline">Conversaciones</span>
               {getConversationsMetadata().length > 0 && (
-                <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full">
+                <span className="ml-1 md:ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
                   {getConversationsMetadata().length}
                 </span>
               )}
