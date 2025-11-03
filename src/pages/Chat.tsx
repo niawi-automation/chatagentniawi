@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Paperclip, AlertCircle, Brain, Mic, Square, X, Menu, RotateCcw } from 'lucide-react';
+import { Send, Paperclip, AlertCircle, Brain, Mic, Square, X, Menu, RotateCcw, Edit2, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,8 +19,11 @@ const Chat = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Por defecto cerrado
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -585,12 +588,143 @@ const Chat = () => {
     mediaRecorderRef.current.stop();
   };
 
+  // Funciones para editar el título de la conversación
+  const handleStartEditTitle = () => {
+    if (currentConversation) {
+      setEditedTitle(currentConversation.title);
+      setIsEditingTitle(true);
+      // Enfocar el input después de renderizar
+      setTimeout(() => titleInputRef.current?.focus(), 0);
+    }
+  };
+
+  const handleSaveTitle = () => {
+    if (currentConversationId && editedTitle.trim()) {
+      renameConversation(currentConversationId, editedTitle.trim());
+      setIsEditingTitle(false);
+      toast({ title: 'Título actualizado', description: 'El nombre de la conversación se actualizó correctamente' });
+    }
+  };
+
+  const handleCancelEditTitle = () => {
+    setIsEditingTitle(false);
+    setEditedTitle('');
+  };
+
+  const handleKeyDownTitle = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      handleCancelEditTitle();
+    }
+  };
+
+  const handleDeleteConversation = () => {
+    if (currentConversationId && currentConversation) {
+      if (window.confirm(`¿Estás seguro de eliminar la conversación "${currentConversation.title}"?`)) {
+        deleteConversation(currentConversationId);
+        toast({ title: 'Conversación eliminada', description: 'La conversación se eliminó correctamente' });
+      }
+    }
+  };
+
   return (
     <div className="page-container gradient-chat p-0">
       {/* Chat Container - Inmersivo pantalla completa */}
       <div className="h-full w-full overflow-hidden relative">
         <Card className="h-full glass-premium border-0 rounded-none flex flex-col overflow-hidden shadow-none">
           <CardContent className="flex-1 p-0 flex flex-col overflow-hidden relative">
+            {/* Banner de título de conversación - Solo si hay conversación activa */}
+            {isActiveConversation && currentConversation && (
+              <div className="border-b border-niawi-border bg-niawi-surface/80 backdrop-blur-sm px-4 py-3 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
+                <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
+                  {/* Título editable */}
+                  <div className="flex-1 min-w-0">
+                    {isEditingTitle ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          ref={titleInputRef}
+                          type="text"
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          onKeyDown={handleKeyDownTitle}
+                          onBlur={handleSaveTitle}
+                          className="flex-1 px-3 py-1.5 text-base font-semibold bg-niawi-bg border border-niawi-border rounded-lg focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:border-transparent"
+                          placeholder="Nombre de la conversación"
+                          maxLength={100}
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleSaveTitle}
+                          className="h-8 w-8 p-0 hover:bg-niawi-border/50"
+                          title="Guardar"
+                        >
+                          <Check className="w-4 h-4 text-green-600" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <h1 className="text-base md:text-lg font-semibold text-foreground truncate">
+                          {currentConversation.title}
+                        </h1>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleStartEditTitle}
+                          className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 hover:bg-niawi-border/50 transition-opacity"
+                          title="Editar nombre"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Acciones */}
+                  <div className="flex items-center gap-2">
+                    {!isEditingTitle && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleStartEditTitle}
+                          className="h-8 px-2 hover:bg-niawi-border/50"
+                          title="Editar nombre"
+                        >
+                          <Edit2 className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleDeleteConversation}
+                          className="h-8 px-2 hover:bg-red-500/10 hover:text-red-600"
+                          title="Eliminar conversación"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {/* Botón de conversaciones integrado en el banner */}
+                        <Button
+                          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2 border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary"
+                          title="Gestionar conversaciones"
+                        >
+                          <Menu className="w-4 h-4" />
+                          {getConversationsMetadata().length > 1 && (
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
+                              {getConversationsMetadata().length}
+                            </span>
+                          )}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Messages Area */}
             <div
               className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
@@ -721,23 +855,25 @@ const Chat = () => {
               </div>
             )}
 
-            {/* Botón flotante para abrir conversaciones - Posición fija arriba a la derecha */}
-            <Button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              size="sm"
-              variant="outline"
-              className={`fixed top-6 right-4 md:right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
-                isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              }`}
-              title="Gestionar conversaciones"
-            >
-              <Menu className="w-4 h-4" />
-              {getConversationsMetadata().length > 0 && (
-                <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
-                  {getConversationsMetadata().length}
-                </span>
-              )}
-            </Button>
+            {/* Botón flotante para abrir conversaciones - Solo cuando NO hay conversación activa */}
+            {!isActiveConversation && (
+              <Button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                size="sm"
+                variant="outline"
+                className={`fixed top-6 right-4 md:right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
+                  isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                }`}
+                title="Gestionar conversaciones"
+              >
+                <Menu className="w-4 h-4" />
+                {getConversationsMetadata().length > 0 && (
+                  <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
+                    {getConversationsMetadata().length}
+                  </span>
+                )}
+              </Button>
+            )}
 
             {/* Sidebar de conversaciones - Desliza desde la derecha */}
             <div
