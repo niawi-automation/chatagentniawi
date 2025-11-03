@@ -726,15 +726,14 @@ const Chat = () => {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               size="sm"
               variant="outline"
-              className={`fixed top-6 right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
+              className={`fixed top-6 right-4 md:right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
                 isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
-              title="Ver conversaciones"
+              title="Gestionar conversaciones"
             >
-              <Menu className="w-4 h-4 sm:mr-2" />
-              <span className="hidden md:inline">Conversaciones</span>
+              <Menu className="w-4 h-4" />
               {getConversationsMetadata().length > 0 && (
-                <span className="ml-1 md:ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
+                <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
                   {getConversationsMetadata().length}
                 </span>
               )}
@@ -748,7 +747,7 @@ const Chat = () => {
             >
               {/* Header del sidebar con botón cerrar */}
               <div className="p-4 border-b border-niawi-border flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">Conversaciones</h2>
+                <h2 className="text-lg font-semibold text-foreground">Gestionar conversaciones</h2>
                 <Button
                   onClick={() => setIsSidebarOpen(false)}
                   size="sm"
