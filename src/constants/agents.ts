@@ -5,7 +5,7 @@ export const AGENTS: Agent[] = [
   {
     id: 'operations',
     name: 'Agente de Operaciones',
-    department: 'PCP',
+    department: 'Operaciones',
     description: 'Especialista en planificación de producción, inventarios y logística',
     icon: BarChart3,
     color: 'text-blue-400',

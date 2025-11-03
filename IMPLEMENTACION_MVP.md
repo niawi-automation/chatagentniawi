@@ -187,7 +187,7 @@ interface Company {
 
 ## 🤖 **AGENTES IMPLEMENTADOS**
 
-### 1. **Agente de Operaciones (PCP)**
+### 1. **Agente de Operaciones**
 - 🎯 **Especialidad:** Planificación de producción, inventarios, logística
 - 📍 **Endpoint:** `/operations`
 - 🎨 **Color:** Azul
@@ -232,7 +232,7 @@ VITE_CHAT_API_URL=https://tu-n8n-instance.com/webhook
 {
   "mensaje": "¿Qué programas tienen mayor volumen?",
   "agente": "operations",
-  "contexto": "PCP",
+  "contexto": "Operaciones",
   "usuario": "user123"
 }
 ```

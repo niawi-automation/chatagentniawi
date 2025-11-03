@@ -135,7 +135,7 @@ http://localhost:5173/dashboard/agents
 {
   "mensaje": "test",
   "agente": "operations", // ← Debe cambiar según agente
-  "contexto": "PCP",
+  "contexto": "Operaciones",
   "usuario": "1"
 }
 ```

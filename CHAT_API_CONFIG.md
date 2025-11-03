@@ -102,7 +102,7 @@ Cuando un usuario envía un mensaje, se hace un `POST` a la URL configurada con 
 {
   "mensaje": "¿Qué facturación logramos hoy?",
   "agente": "operations",
-  "contexto": "PCP",
+  "contexto": "Operaciones",
   "usuario": "user-id-123",
   "attachments": []
 }
@@ -155,7 +155,7 @@ curl -X POST https://flow.e3stores.cloud/webhook/tu-id \
   -d '{
     "mensaje": "Test",
     "agente": "operations",
-    "contexto": "PCP",
+    "contexto": "Operaciones",
     "usuario": "test-user"
   }'
 ```

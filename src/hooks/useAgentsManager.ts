@@ -46,7 +46,7 @@ export const useAgentsManager = () => {
         let webhookUrl = `https://api.niawi.tech${agent.endpoint}`;
         
         if (agent.id === 'operations') {
-          // Agente PCP - URL desde variables de entorno
+          // Agente de Operaciones - URL desde variables de entorno
           webhookUrl = import.meta.env.VITE_WEBHOOK_AGENT_OPERATIONS || webhookUrl;
         } else if (agent.id === 'documents') {
           // Agente WTS - URL desde variables de entorno
@@ -59,7 +59,7 @@ export const useAgentsManager = () => {
           conversations: Math.floor(Math.random() * 300) + 50,
           usage: Math.floor(Math.random() * 40) + 50,
           accuracy: Math.floor(Math.random() * 15) + 85,
-          // Solo PCP (operations) y WTS (documents) activos por defecto
+          // Solo Operaciones (operations) y WTS (documents) activos por defecto
           isEnabled: agent.id === 'operations' || agent.id === 'documents',
           webhookUrl,
           lastActivity: new Date().toISOString()
@@ -79,7 +79,7 @@ export const useAgentsManager = () => {
         
         return {
           ...agent,
-          // Solo PCP (operations) y WTS (documents) activos por defecto
+          // Solo Operaciones (operations) y WTS (documents) activos por defecto
           isEnabled: agent.id === 'operations' || agent.id === 'documents',
           webhookUrl
         };
