@@ -175,7 +175,7 @@ const Chat = () => {
       }
 
       console.log('📡 Enviando mensaje a:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -205,28 +205,143 @@ const Chat = () => {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-      
-      // Manejar tanto formato de array como objeto directo
-      let data: ApiResponse;
-      if (Array.isArray(responseData)) {
-        // Si es un array, tomar el primer elemento
-        data = responseData[0];
+      // Leer el texto completo de la respuesta
+      const responseText = await response.text();
+      console.log('📥 Respuesta recibida (raw):', responseText.substring(0, 200) + '...');
+
+      // Procesar la respuesta que puede venir en diferentes formatos:
+      // 1. JSON único: [{"output": "..."}] o {"output": "..."}
+      // 2. Streaming NDJSON: múltiples líneas de JSON
+      // 3. Streaming concatenado: múltiples objetos JSON sin separador
+
+      const outputs: string[] = [];
+
+      // Intentar procesar como NDJSON (newline-delimited JSON)
+      const lines = responseText.trim().split('\n').filter(line => line.trim());
+
+      if (lines.length > 1) {
+        // Múltiples líneas - procesar cada una
+        console.log(`📋 Detectado formato NDJSON con ${lines.length} líneas`);
+        for (const line of lines) {
+          try {
+            const chunk = JSON.parse(line);
+            const extractedOutput = extractOutputFromChunk(chunk);
+            if (extractedOutput) outputs.push(extractedOutput);
+          } catch (lineError) {
+            console.warn('⚠️ No se pudo parsear línea:', line.substring(0, 100), lineError);
+          }
+        }
       } else {
-        // Si es un objeto directo
-        data = responseData;
+        // Una sola línea - intentar parsear como JSON normal
+        try {
+          const data = JSON.parse(responseText);
+          const extractedOutput = extractOutputFromChunk(data);
+          if (extractedOutput) outputs.push(extractedOutput);
+        } catch (singleParseError) {
+          // Si falla, intentar buscar múltiples objetos JSON concatenados
+          console.log('⚠️ Parsing único falló, intentando extraer múltiples JSONs...');
+          const extracted = extractMultipleJSONs(responseText);
+          outputs.push(...extracted);
+        }
       }
-      
-      if (data && data.output) {
-        return data.output;
-      } else {
-        console.error('Formato de respuesta recibido:', responseData);
-        throw new Error('Formato de respuesta inválido');
+
+      if (outputs.length > 0) {
+        // Concatenar todos los outputs recibidos
+        const finalOutput = outputs.join('\n\n');
+        console.log('✅ Output procesado exitosamente:', finalOutput.substring(0, 100) + '...');
+        return finalOutput;
       }
+
+      console.error('❌ No se pudo extraer output de la respuesta');
+      throw new Error('No se pudo extraer output de la respuesta');
     } catch (error) {
       console.error('Error al comunicarse con el agente:', error);
       throw error;
     }
+  };
+
+  // Función auxiliar para extraer output de un chunk JSON
+  const extractOutputFromChunk = (chunk: any): string | null => {
+    if (!chunk) return null;
+
+    if (Array.isArray(chunk)) {
+      // Si es un array, extraer outputs de todos los elementos
+      const outputs = chunk
+        .map(item => item?.output)
+        .filter(output => output && typeof output === 'string');
+      return outputs.length > 0 ? outputs.join('\n\n') : null;
+    } else if (chunk.output && typeof chunk.output === 'string') {
+      return chunk.output;
+    }
+
+    return null;
+  };
+
+  // Función auxiliar para extraer múltiples JSONs concatenados
+  const extractMultipleJSONs = (text: string): string[] => {
+    const outputs: string[] = [];
+    let startIndex = 0;
+
+    while (startIndex < text.length) {
+      try {
+        // Intentar encontrar el siguiente objeto JSON válido
+        let depth = 0;
+        let inString = false;
+        let escape = false;
+        let jsonStart = -1;
+        let jsonEnd = -1;
+
+        for (let i = startIndex; i < text.length; i++) {
+          const char = text[i];
+
+          if (escape) {
+            escape = false;
+            continue;
+          }
+
+          if (char === '\\') {
+            escape = true;
+            continue;
+          }
+
+          if (char === '"') {
+            inString = !inString;
+            continue;
+          }
+
+          if (inString) continue;
+
+          if (char === '{' || char === '[') {
+            if (depth === 0) jsonStart = i;
+            depth++;
+          } else if (char === '}' || char === ']') {
+            depth--;
+            if (depth === 0 && jsonStart !== -1) {
+              jsonEnd = i + 1;
+              break;
+            }
+          }
+        }
+
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          const jsonStr = text.substring(jsonStart, jsonEnd);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const extractedOutput = extractOutputFromChunk(parsed);
+            if (extractedOutput) outputs.push(extractedOutput);
+          } catch (e) {
+            console.warn('No se pudo parsear JSON extraído:', jsonStr.substring(0, 50));
+          }
+          startIndex = jsonEnd;
+        } else {
+          break;
+        }
+      } catch (e) {
+        break;
+      }
+    }
+
+    return outputs;
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
