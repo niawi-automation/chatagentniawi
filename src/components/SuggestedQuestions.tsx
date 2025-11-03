@@ -13,7 +13,7 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { Zap } from 'lucide-react';
 import { CHAT_CONTENT } from '@/constants/chatContent';
 import {
-  selectSuggestedQuestions,
+  selectSuggestedQuestionsRandom,
   loadUserHistory,
   saveUserHistory,
   updateHistory,
@@ -47,15 +47,15 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
     setRefreshKey(prev => prev + 1);
   }, []);
 
-  // Seleccionar preguntas con gating - SIN cooldown para que cambien en cada refresh
+  // Seleccionar preguntas con gating y rotación aleatoria real
   const selectedQuestions = useMemo(() => {
-    // No usar historial para permitir rotación libre
-    const emptyHistory = { lastQuestions: [], lastTips: [], lastUpdate: new Date().toISOString() };
-    return selectSuggestedQuestions(
+    // Cargar historial del usuario para cooldown ligero
+    const history = loadUserHistory(userId);
+
+    return selectSuggestedQuestionsRandom(
       CHAT_CONTENT.questions,
       integrations,
-      emptyHistory,
-      userId + refreshKey // Agregar refreshKey para forzar nuevas selecciones
+      history
     );
   }, [userId, integrations, refreshKey]); // Se recalcula cuando cambia refreshKey
 
@@ -136,7 +136,7 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
 
       {/* Hint sutil */}
       <p className="text-center text-xs text-muted-foreground/60">
-        Las sugerencias cambian en cada actualización
+        Las sugerencias se renuevan en cada visita
       </p>
     </div>
   );

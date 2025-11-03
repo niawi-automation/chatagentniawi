@@ -100,6 +100,26 @@ export function seededPickMultiple<T>(items: T[], count: number, seed: number): 
 }
 
 /**
+ * Selección verdaderamente aleatoria de N elementos únicos de un array
+ * Usa Math.random() en lugar de seeding para rotación real
+ */
+export function randomPickMultiple<T>(items: T[], count: number): T[] {
+  if (items.length === 0) return [];
+  if (count >= items.length) return [...items];
+
+  const results: T[] = [];
+  const available = [...items];
+
+  for (let i = 0; i < count && available.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * available.length);
+    results.push(available[randomIndex]);
+    available.splice(randomIndex, 1);
+  }
+
+  return results;
+}
+
+/**
  * Verifica si un item cumple con los requisitos de integración
  *
  * Formato de requires:
@@ -301,6 +321,39 @@ export function selectSuggestedQuestions(
   // 5. Selección seeded
   const seed = generateSeed(userId);
   return seededPickMultiple(pool, visibleCount, seed);
+}
+
+/**
+ * Selecciona preguntas sugeridas con rotación real (aleatorio verdadero)
+ * Usa Math.random() para que cambien en cada refresh
+ */
+export function selectSuggestedQuestionsRandom(
+  questions: ChatQuestion[],
+  integrations: UserIntegrations,
+  userHistory: UserHistory,
+  count?: number
+): ChatQuestion[] {
+  // 1. Aplicar gating
+  let pool = applyGating(questions, integrations);
+
+  // 2. Aplicar cooldown ligero (N=3 para permitir más variedad)
+  pool = applyCooldown(pool, userHistory.lastQuestions, 3);
+
+  // 3. Si el pool quedó vacío, usar fallbacks neutrales
+  if (pool.length === 0) {
+    pool = questions.filter(q => q.requires.length === 0);
+  }
+
+  // Si aún está vacío, usar todas las preguntas
+  if (pool.length === 0) {
+    pool = questions;
+  }
+
+  // 4. Determinar cantidad a mostrar
+  const visibleCount = count ?? getQuestionCountByBreakpoint();
+
+  // 5. Selección aleatoria verdadera
+  return randomPickMultiple(pool, visibleCount);
 }
 
 /**

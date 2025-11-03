@@ -747,6 +747,7 @@ const Chat = () => {
 
                   {/* Preguntas sugeridas con gating */}
                   <SuggestedQuestions
+                    key={currentConversationId || 'welcome'} // Forzar remontaje en nueva conversación
                     userId={currentUser.id}
                     integrations={integrations}
                     onQuestionClick={(question) => {
