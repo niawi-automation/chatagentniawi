@@ -161,7 +161,11 @@ const Chat = () => {
     );
   };
 
-  const sendMessageToAPI = async (userMessage: string, atts: Attachment[]): Promise<string> => {
+  const sendMessageToAPI = async (
+    userMessage: string,
+    atts: Attachment[],
+    onStreamUpdate?: (accumulatedContent: string, isComplete: boolean) => void
+  ): Promise<void> => {
     if (!selectedAgent) {
       throw new Error('No hay agente seleccionado');
     }
@@ -205,55 +209,86 @@ const Chat = () => {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
-      // Leer el texto completo de la respuesta
-      const responseText = await response.text();
-      console.log('📥 Respuesta recibida, longitud:', responseText.length);
+      // Procesar el stream en tiempo real
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No se pudo obtener el reader del stream');
+      }
 
-      // Procesar la respuesta que puede venir en diferentes formatos:
-      // 1. JSON único: [{"output": "..."}] o {"output": "..."}
-      // 2. Streaming NDJSON: múltiples líneas de JSON con "content"
-      // 3. Streaming concatenado: múltiples objetos JSON sin separador
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+      let buffer = ''; // Buffer para chunks incompletos
 
-      const outputs: string[] = [];
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
 
-      // Intentar procesar como NDJSON (newline-delimited JSON)
-      const lines = responseText.trim().split('\n').filter(line => line.trim());
+          if (done) {
+            console.log('✅ Stream completado, total caracteres:', accumulatedContent.length);
+            if (onStreamUpdate) {
+              onStreamUpdate(accumulatedContent, true);
+            }
+            break;
+          }
 
-      if (lines.length > 1) {
-        // Múltiples líneas - procesar cada una (formato streaming n8n)
-        console.log(`📋 Detectado formato NDJSON con ${lines.length} líneas`);
-        for (const line of lines) {
-          try {
-            const chunk = JSON.parse(line);
-            const extractedOutput = extractOutputFromChunk(chunk);
-            if (extractedOutput) outputs.push(extractedOutput);
-          } catch (lineError) {
-            console.warn('⚠️ No se pudo parsear línea:', line.substring(0, 50));
+          // Decodificar el chunk
+          const chunkText = decoder.decode(value, { stream: true });
+          buffer += chunkText;
+
+          // Procesar líneas completas del buffer
+          const lines = buffer.split('\n');
+          // Guardar la última línea incompleta en el buffer
+          buffer = lines.pop() || '';
+
+          // Procesar cada línea completa
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) continue;
+
+            try {
+              const chunk = JSON.parse(trimmedLine);
+              const extractedContent = extractOutputFromChunk(chunk);
+
+              if (extractedContent) {
+                accumulatedContent += extractedContent;
+                console.log(`📝 +${extractedContent.length} chars | Total: ${accumulatedContent.length}`);
+
+                // Notificar la actualización inmediatamente
+                if (onStreamUpdate) {
+                  onStreamUpdate(accumulatedContent, false);
+                }
+              }
+            } catch (parseError) {
+              console.warn('⚠️ No se pudo parsear línea:', trimmedLine.substring(0, 50));
+            }
           }
         }
-      } else {
-        // Una sola línea - intentar parsear como JSON normal
-        try {
-          const data = JSON.parse(responseText);
-          const extractedOutput = extractOutputFromChunk(data);
-          if (extractedOutput) outputs.push(extractedOutput);
-        } catch (singleParseError) {
-          // Si falla, intentar buscar múltiples objetos JSON concatenados
-          console.log('⚠️ Intentando extraer múltiples JSONs concatenados...');
-          const extracted = extractMultipleJSONs(responseText);
-          outputs.push(...extracted);
+
+        // Procesar cualquier contenido restante en el buffer
+        if (buffer.trim()) {
+          try {
+            const chunk = JSON.parse(buffer.trim());
+            const extractedContent = extractOutputFromChunk(chunk);
+            if (extractedContent) {
+              accumulatedContent += extractedContent;
+              if (onStreamUpdate) {
+                onStreamUpdate(accumulatedContent, true);
+              }
+            }
+          } catch (parseError) {
+            console.warn('⚠️ No se pudo parsear buffer final:', buffer.substring(0, 50));
+          }
         }
+
+      } finally {
+        reader.releaseLock();
       }
 
-      if (outputs.length > 0) {
-        // Concatenar todos los outputs recibidos (sin separador para streaming palabra por palabra)
-        const finalOutput = outputs.join('');
-        console.log('✅ Output procesado exitosamente, longitud:', finalOutput.length);
-        return finalOutput;
+      if (!accumulatedContent) {
+        console.error('❌ No se recibió contenido del stream');
+        throw new Error('No se recibió contenido del webhook');
       }
 
-      console.error('❌ No se pudo extraer output de la respuesta');
-      throw new Error('No se pudo extraer output de la respuesta');
     } catch (error) {
       console.error('Error al comunicarse con el agente:', error);
       throw error;
@@ -383,47 +418,61 @@ const Chat = () => {
       attachments: attachments.length > 0 ? attachments : undefined
     };
 
-    const loadingMessageObj: Message = {
-      id: Date.now() + 1,
+    // Mensajes de carga dinámicos y amigables
+    const loadingMessages = [
+      'Analizando tu consulta',
+      'Procesando la información',
+      'Conectando con las fuentes de datos',
+      'Preparando tu respuesta',
+      'Pensando en la mejor manera de ayudarte'
+    ];
+    const randomLoadingMessage = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+
+    const assistantMessageId = Date.now() + 1;
+    const assistantMessageObj: Message = {
+      id: assistantMessageId,
       type: 'assistant',
-      content: `${selectedAgent.name} está analizando tu consulta...`,
+      content: '',
       timestamp: new Date(),
       isLoading: true,
       agentId: selectedAgent.id
     };
 
-    // Actualizar conversación con mensaje del usuario y mensaje de carga
-    const updatedMessages = [...messages, userMessageObj, loadingMessageObj];
+    // Actualizar conversación con mensaje del usuario y mensaje inicial del asistente
+    let currentMessages = [...messages, userMessageObj, assistantMessageObj];
     if (currentConversationId) {
-      updateConversationMessages(currentConversationId, updatedMessages);
+      updateConversationMessages(currentConversationId, currentMessages);
     }
 
     try {
-      const aiResponse = await sendMessageToAPI(userMessage, attachments);
+      // Función de callback para actualizar el contenido en tiempo real
+      const onStreamUpdate = (accumulatedContent: string, isComplete: boolean) => {
+        currentMessages = currentMessages.map(msg =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+                content: accumulatedContent || randomLoadingMessage,
+                isLoading: !isComplete
+              }
+            : msg
+        );
 
-      // Actualizar el mensaje de carga con la respuesta real
-      const finalMessages = updatedMessages.map(msg =>
-        msg.id === loadingMessageObj.id
-          ? {
-              ...msg,
-              content: aiResponse,
-              isLoading: false
-            }
-          : msg
-      );
+        if (currentConversationId) {
+          updateConversationMessages(currentConversationId, currentMessages);
+        }
+      };
 
-      if (currentConversationId) {
-        updateConversationMessages(currentConversationId, finalMessages);
-      }
+      // Llamar a sendMessageToAPI con streaming
+      await sendMessageToAPI(userMessage, attachments, onStreamUpdate);
 
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
         : 'Error desconocido al procesar tu mensaje';
 
-      // Actualizar el mensaje de carga con el error
-      const errorMessages = updatedMessages.map(msg =>
-        msg.id === loadingMessageObj.id
+      // Actualizar el mensaje con el error
+      currentMessages = currentMessages.map(msg =>
+        msg.id === assistantMessageId
           ? {
               ...msg,
               content: `Lo siento, hubo un problema al procesar tu mensaje: ${errorMessage}. Por favor, inténtalo nuevamente.`,
@@ -434,7 +483,7 @@ const Chat = () => {
       );
 
       if (currentConversationId) {
-        updateConversationMessages(currentConversationId, errorMessages);
+        updateConversationMessages(currentConversationId, currentMessages);
       }
     } finally {
       setIsLoading(false);
@@ -925,7 +974,7 @@ const Chat = () => {
                         className={`max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 ${
                           msg.type === 'user'
                             ? 'bg-niawi-primary text-white ml-auto shadow-lg shadow-niawi-primary/30 hover:shadow-xl hover:shadow-niawi-primary/40'
-                            : `backdrop-blur-sm bg-niawi-border/20 text-foreground shadow-sm hover:shadow-md ${
+                            : `backdrop-blur-sm ${msg.isLoading ? 'bg-gradient-to-r from-niawi-border/20 via-niawi-primary/10 to-niawi-border/20 animate-pulse-subtle' : 'bg-niawi-border/20'} text-foreground shadow-sm hover:shadow-md ${
                                 msg.hasError ? 'border border-niawi-danger/50' : ''
                               }`
                         }`}
@@ -939,7 +988,18 @@ const Chat = () => {
                         )}
                         
                         <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
-                          {renderMessageContent(msg.content)}
+                          {msg.isLoading ? (
+                            <div className="flex items-center gap-2">
+                              <span>{msg.content}</span>
+                              <span className="flex gap-1">
+                                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                              </span>
+                            </div>
+                          ) : (
+                            renderMessageContent(msg.content)
+                          )}
                         </div>
                         {renderAttachments(msg.attachments)}
                         

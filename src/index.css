@@ -424,6 +424,21 @@
     }
   }
 
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseSubtle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.95;
+      transform: scale(1.002);
+    }
+  }
+
   @keyframes progressBar {
     from {
       transform: translateX(-100%);
