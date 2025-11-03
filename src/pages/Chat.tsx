@@ -207,66 +207,52 @@ const Chat = () => {
 
       // Leer el texto completo de la respuesta
       const responseText = await response.text();
-      console.log('📥 Respuesta recibida (COMPLETA):', responseText);
-      console.log('📏 Longitud de respuesta:', responseText.length);
+      console.log('📥 Respuesta recibida, longitud:', responseText.length);
 
       // Procesar la respuesta que puede venir en diferentes formatos:
       // 1. JSON único: [{"output": "..."}] o {"output": "..."}
-      // 2. Streaming NDJSON: múltiples líneas de JSON
+      // 2. Streaming NDJSON: múltiples líneas de JSON con "content"
       // 3. Streaming concatenado: múltiples objetos JSON sin separador
 
       const outputs: string[] = [];
 
       // Intentar procesar como NDJSON (newline-delimited JSON)
       const lines = responseText.trim().split('\n').filter(line => line.trim());
-      console.log('📋 Número de líneas detectadas:', lines.length);
 
       if (lines.length > 1) {
-        // Múltiples líneas - procesar cada una
+        // Múltiples líneas - procesar cada una (formato streaming n8n)
         console.log(`📋 Detectado formato NDJSON con ${lines.length} líneas`);
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          console.log(`📄 Línea ${i + 1}:`, line);
+        for (const line of lines) {
           try {
             const chunk = JSON.parse(line);
-            console.log(`✅ Línea ${i + 1} parseada:`, chunk);
             const extractedOutput = extractOutputFromChunk(chunk);
-            console.log(`📤 Output extraído de línea ${i + 1}:`, extractedOutput);
             if (extractedOutput) outputs.push(extractedOutput);
           } catch (lineError) {
-            console.warn(`⚠️ No se pudo parsear línea ${i + 1}:`, line, lineError);
+            console.warn('⚠️ No se pudo parsear línea:', line.substring(0, 50));
           }
         }
       } else {
         // Una sola línea - intentar parsear como JSON normal
-        console.log('📄 Una sola línea detectada, intentando parsing único');
         try {
           const data = JSON.parse(responseText);
-          console.log('✅ JSON parseado exitosamente:', data);
           const extractedOutput = extractOutputFromChunk(data);
-          console.log('📤 Output extraído:', extractedOutput);
           if (extractedOutput) outputs.push(extractedOutput);
         } catch (singleParseError) {
           // Si falla, intentar buscar múltiples objetos JSON concatenados
-          console.log('⚠️ Parsing único falló:', singleParseError);
-          console.log('🔍 Intentando extraer múltiples JSONs concatenados...');
+          console.log('⚠️ Intentando extraer múltiples JSONs concatenados...');
           const extracted = extractMultipleJSONs(responseText);
-          console.log('📤 JSONs extraídos:', extracted);
           outputs.push(...extracted);
         }
       }
 
-      console.log('📦 Total de outputs acumulados:', outputs);
-
       if (outputs.length > 0) {
-        // Concatenar todos los outputs recibidos
-        const finalOutput = outputs.join('\n\n');
-        console.log('✅ Output procesado exitosamente:', finalOutput);
+        // Concatenar todos los outputs recibidos (sin separador para streaming palabra por palabra)
+        const finalOutput = outputs.join('');
+        console.log('✅ Output procesado exitosamente, longitud:', finalOutput.length);
         return finalOutput;
       }
 
       console.error('❌ No se pudo extraer output de la respuesta');
-      console.error('❌ responseText original:', responseText);
       throw new Error('No se pudo extraer output de la respuesta');
     } catch (error) {
       console.error('Error al comunicarse con el agente:', error);
@@ -274,38 +260,43 @@ const Chat = () => {
     }
   };
 
-  // Función auxiliar para extraer output de un chunk JSON
+  // Función auxiliar para extraer output/content de un chunk JSON
   const extractOutputFromChunk = (chunk: any): string | null => {
-    console.log('🔍 extractOutputFromChunk recibió:', chunk);
-    console.log('🔍 Tipo de chunk:', typeof chunk, Array.isArray(chunk) ? '(array)' : '');
-
     if (!chunk) {
-      console.log('⚠️ Chunk es null o undefined');
       return null;
     }
 
     if (Array.isArray(chunk)) {
-      console.log('📋 Chunk es un array con', chunk.length, 'elementos');
-      // Si es un array, extraer outputs de todos los elementos
+      // Si es un array, extraer outputs/contents de todos los elementos
       const outputs = chunk
-        .map((item, index) => {
-          console.log(`  📄 Elemento ${index}:`, item);
-          console.log(`  🔑 item?.output:`, item?.output);
-          return item?.output;
+        .map(item => {
+          // Intentar primero 'output', luego 'content'
+          if (item?.output && typeof item.output === 'string') {
+            return item.output;
+          }
+          if (item?.content && typeof item.content === 'string') {
+            return item.content;
+          }
+          return null;
         })
-        .filter(output => {
-          const isValid = output && typeof output === 'string';
-          console.log(`  ✅ Output válido:`, isValid, output);
-          return isValid;
-        });
-      console.log('📤 Outputs extraídos del array:', outputs);
-      return outputs.length > 0 ? outputs.join('\n\n') : null;
-    } else if (chunk.output && typeof chunk.output === 'string') {
-      console.log('✅ Chunk tiene output directo:', chunk.output);
-      return chunk.output;
+        .filter(output => output !== null);
+
+      return outputs.length > 0 ? outputs.join('') : null;
+    } else {
+      // Objeto individual
+      // Primero intentar 'output' (formato antiguo)
+      if (chunk.output && typeof chunk.output === 'string') {
+        return chunk.output;
+      }
+      // Luego intentar 'content' (formato streaming de n8n)
+      if (chunk.content && typeof chunk.content === 'string') {
+        // Solo retornar el content si type es 'item' (ignorar 'begin' y 'end')
+        if (!chunk.type || chunk.type === 'item') {
+          return chunk.content;
+        }
+      }
     }
 
-    console.log('⚠️ Chunk no tiene formato reconocido. Keys:', Object.keys(chunk));
     return null;
   };
 
