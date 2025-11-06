@@ -191,7 +191,7 @@ const Chat = () => {
 
         // Ejecutar sendMessageToAPI con timeout
         await Promise.race([
-          sendMessageToAPI(userMessage, atts, wrappedStreamUpdate),
+          sendMessageToAPI(userMessage, atts, wrappedStreamUpdate, attempt), // ← Pasar número de intento
           timeoutPromise
         ]);
 
@@ -237,7 +237,8 @@ const Chat = () => {
   const sendMessageToAPI = async (
     userMessage: string,
     atts: Attachment[],
-    onStreamUpdate?: (accumulatedContent: string, isComplete: boolean) => void
+    onStreamUpdate?: (accumulatedContent: string, isComplete: boolean) => void,
+    attemptNumber: number = 1 // ← NUEVO: Número de intento
   ): Promise<void> => {
     if (!selectedAgent) {
       throw new Error('No hay agente seleccionado');
@@ -251,7 +252,9 @@ const Chat = () => {
         throw new Error('Endpoint del chat no configurado. Configura VITE_CHAT_API_URL en variables de entorno.');
       }
 
-      console.log('📡 Enviando mensaje a:', apiUrl);
+      const isRetry = attemptNumber > 1;
+
+      console.log(`📡 Enviando mensaje a: ${apiUrl} ${isRetry ? `(Intento ${attemptNumber} - RETRY)` : '(Primer intento)'}`);
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -274,7 +277,13 @@ const Chat = () => {
             width: a.width,
             height: a.height,
             durationMs: a.durationMs
-          }))
+          })),
+          // ← NUEVO: Metadata de retry
+          ...(isRetry && {
+            isRetryRequest: true,
+            retryAttempt: attemptNumber,
+            retrieveLastResponse: true
+          })
         })
       });
 
@@ -297,7 +306,7 @@ const Chat = () => {
           const { done, value } = await reader.read();
 
           if (done) {
-            console.log('✅ Stream completado, total caracteres:', accumulatedContent.length);
+            console.log(`✅ Stream completado${isRetry ? ' (desde memoria caché)' : ''}, total caracteres:`, accumulatedContent.length);
             if (onStreamUpdate) {
               onStreamUpdate(accumulatedContent, true);
             }
