@@ -161,6 +161,79 @@ const Chat = () => {
     );
   };
 
+  // Sistema de retry con timeout y backoff exponencial
+  const sendMessageWithRetry = async (
+    userMessage: string,
+    atts: Attachment[],
+    onStreamUpdate?: (accumulatedContent: string, isComplete: boolean, retryInfo?: { attempt: number; maxRetries: number; isRetrying: boolean }) => void,
+    maxRetries: number = 3,
+    initialDelay: number = 1000
+  ): Promise<void> => {
+    let lastError: Error | null = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Intento ${attempt}/${maxRetries}`);
+
+        // Promise con timeout de 60 segundos
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 60000)
+        );
+
+        // Wrapper para pasar información de retry al stream update
+        const wrappedStreamUpdate = onStreamUpdate ? (content: string, isComplete: boolean) => {
+          onStreamUpdate(content, isComplete, {
+            attempt,
+            maxRetries,
+            isRetrying: attempt > 1 && !isComplete
+          });
+        } : undefined;
+
+        // Ejecutar sendMessageToAPI con timeout
+        await Promise.race([
+          sendMessageToAPI(userMessage, atts, wrappedStreamUpdate),
+          timeoutPromise
+        ]);
+
+        console.log(`✅ Éxito en intento ${attempt}`);
+        return; // Éxito - salir del loop
+
+      } catch (error) {
+        lastError = error as Error;
+        const isTimeout = lastError.message === 'timeout';
+
+        console.warn(`⚠️ Intento ${attempt} falló:`, lastError.message);
+
+        // Si no es el último intento, preparar retry
+        if (attempt < maxRetries) {
+          // Calcular delay con backoff exponencial: 1s, 2s, 4s
+          const delay = initialDelay * Math.pow(2, attempt - 1);
+
+          // Feedback al usuario según el tipo de error
+          if (onStreamUpdate) {
+            const retryMessage = isTimeout
+              ? `🔄 Esto está tomando más tiempo de lo esperado, reintentando (${attempt + 1}/${maxRetries})...\n\n💡 **Tip:** El agente está procesando tu pregunta en segundo plano. La respuesta estará lista en el próximo intento.`
+              : `🔄 Reintentando (${attempt + 1}/${maxRetries})... Tu respuesta está casi lista`;
+
+            onStreamUpdate(retryMessage, false, {
+              attempt: attempt + 1,
+              maxRetries,
+              isRetrying: true
+            });
+          }
+
+          // Esperar antes del siguiente intento
+          console.log(`⏳ Esperando ${delay}ms antes del siguiente intento...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    // Si llegamos aquí, todos los intentos fallaron
+    console.error(`❌ Todos los intentos (${maxRetries}) fallaron`);
+    throw lastError;
+  };
+
   const sendMessageToAPI = async (
     userMessage: string,
     atts: Attachment[],
@@ -446,13 +519,20 @@ const Chat = () => {
 
     try {
       // Función de callback para actualizar el contenido en tiempo real
-      const onStreamUpdate = (accumulatedContent: string, isComplete: boolean) => {
+      const onStreamUpdate = (
+        accumulatedContent: string,
+        isComplete: boolean,
+        retryInfo?: { attempt: number; maxRetries: number; isRetrying: boolean }
+      ) => {
         currentMessages = currentMessages.map(msg =>
           msg.id === assistantMessageId
             ? {
                 ...msg,
                 content: accumulatedContent || randomLoadingMessage,
-                isLoading: !isComplete
+                isLoading: !isComplete,
+                retryAttempt: retryInfo?.attempt,
+                maxRetries: retryInfo?.maxRetries,
+                isRetrying: retryInfo?.isRetrying
               }
             : msg
         );
@@ -462,20 +542,31 @@ const Chat = () => {
         }
       };
 
-      // Llamar a sendMessageToAPI con streaming
-      await sendMessageToAPI(userMessage, attachments, onStreamUpdate);
+      // Llamar a sendMessageWithRetry con sistema de retry y streaming
+      await sendMessageWithRetry(userMessage, attachments, onStreamUpdate, 3, 1000);
 
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Error desconocido al procesar tu mensaje';
+      const errorObj = error instanceof Error ? error : new Error('Error desconocido');
+      const isTimeout = errorObj.message === 'timeout';
+
+      // Mensaje de error personalizado según el tipo
+      let errorMessage: string;
+      if (isTimeout) {
+        errorMessage = `⏱️ El agente está procesando información compleja y necesita más tiempo. Hemos intentado ${3} veces pero el procesamiento aún no está completo.\n\n**Sugerencia:** Intenta hacer la pregunta nuevamente en unos segundos, o simplifica tu consulta.`;
+      } else if (errorObj.message.includes('network') || errorObj.message.includes('fetch')) {
+        errorMessage = `🌐 Hubo un problema de conexión con el servidor.\n\n**Sugerencia:** Verifica tu conexión a internet e intenta nuevamente.`;
+      } else if (errorObj.message.includes('Error 500') || errorObj.message.includes('Error 503')) {
+        errorMessage = `🔧 El servidor está experimentando problemas temporales.\n\n**Sugerencia:** Por favor, intenta nuevamente en unos momentos.`;
+      } else {
+        errorMessage = `❌ Lo siento, hubo un problema al procesar tu mensaje: ${errorObj.message}\n\n**Sugerencia:** Por favor, inténtalo nuevamente.`;
+      }
 
       // Actualizar el mensaje con el error
       currentMessages = currentMessages.map(msg =>
         msg.id === assistantMessageId
           ? {
               ...msg,
-              content: `Lo siento, hubo un problema al procesar tu mensaje: ${errorMessage}. Por favor, inténtalo nuevamente.`,
+              content: errorMessage,
               isLoading: false,
               hasError: true
             }
@@ -980,13 +1071,23 @@ const Chat = () => {
                         }`}
                         style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                       >
+                        {/* Indicador de retry */}
+                        {msg.isRetrying && msg.retryAttempt && msg.maxRetries && (
+                          <div className="flex items-center gap-2 mb-2 px-2 py-1 bg-niawi-primary/10 border border-niawi-primary/30 rounded-lg">
+                            <RotateCcw className="w-3.5 h-3.5 text-niawi-primary animate-spin" />
+                            <span className="text-xs font-medium text-niawi-primary">
+                              Reintentando {msg.retryAttempt}/{msg.maxRetries}
+                            </span>
+                          </div>
+                        )}
+
                         {msg.hasError && (
                           <div className="flex items-center gap-2 mb-2 text-niawi-danger">
                             <AlertCircle className="w-4 h-4" />
                             <span className="text-xs font-medium">Error</span>
                           </div>
                         )}
-                        
+
                         <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
                           {msg.isLoading ? (
                             <div className="flex items-center gap-2">

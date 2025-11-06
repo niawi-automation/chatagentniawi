@@ -125,6 +125,10 @@ export interface Message {
   attachments?: Attachment[];
   // Transcripción opcional para notas de voz
   transcript?: string;
+  // Sistema de retry
+  retryAttempt?: number; // Número del intento actual (1, 2, 3...)
+  maxRetries?: number; // Máximo de intentos configurados
+  isRetrying?: boolean; // Si está en proceso de retry
 }
 
 export interface ApiResponse {
