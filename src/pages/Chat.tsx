@@ -167,7 +167,8 @@ const Chat = () => {
     atts: Attachment[],
     onStreamUpdate?: (accumulatedContent: string, isComplete: boolean, retryInfo?: { attempt: number; maxRetries: number; isRetrying: boolean }) => void,
     maxRetries: number = 3,
-    initialDelay: number = 1000
+    initialDelay: number = 1000,
+    previousMessages?: Message[] // ← NUEVO: Mensajes previos
   ): Promise<void> => {
     let lastError: Error | null = null;
 
@@ -191,7 +192,7 @@ const Chat = () => {
 
         // Ejecutar sendMessageToAPI con timeout
         await Promise.race([
-          sendMessageToAPI(userMessage, atts, wrappedStreamUpdate, attempt), // ← Pasar número de intento
+          sendMessageToAPI(userMessage, atts, wrappedStreamUpdate, attempt, previousMessages), // ← Pasar mensajes previos
           timeoutPromise
         ]);
 
@@ -238,7 +239,8 @@ const Chat = () => {
     userMessage: string,
     atts: Attachment[],
     onStreamUpdate?: (accumulatedContent: string, isComplete: boolean) => void,
-    attemptNumber: number = 1 // ← NUEVO: Número de intento
+    attemptNumber: number = 1, // ← NUEVO: Número de intento
+    previousMessages?: Message[] // ← NUEVO: Mensajes previos para contexto
   ): Promise<void> => {
     if (!selectedAgent) {
       throw new Error('No hay agente seleccionado');
@@ -254,6 +256,31 @@ const Chat = () => {
 
       const isRetry = attemptNumber > 1;
 
+      // ← NUEVO: Enriquecer mensaje en retry con contexto de pregunta anterior
+      let enrichedMessage = userMessage;
+      let previousQuestion = '';
+
+      if (isRetry && previousMessages && previousMessages.length > 0) {
+        // Buscar el último mensaje del asistente (el que hizo una pregunta)
+        const lastAssistantMessage = [...previousMessages]
+          .reverse()
+          .find(msg => msg.type === 'assistant' && !msg.isLoading);
+
+        if (lastAssistantMessage && lastAssistantMessage.content) {
+          // Extraer la última pregunta del mensaje del asistente
+          const content = lastAssistantMessage.content;
+          const lines = content.split('\n');
+          const lastLine = lines[lines.length - 1].trim();
+
+          // Si la última línea es una pregunta (contiene '?'), capturarla
+          if (lastLine.includes('?')) {
+            previousQuestion = lastLine;
+            enrichedMessage = `${previousQuestion}\n\n${userMessage}`;
+            console.log('🔄 Mensaje enriquecido con contexto de pregunta anterior');
+          }
+        }
+      }
+
       console.log(`📡 Enviando mensaje a: ${apiUrl} ${isRetry ? `(Intento ${attemptNumber} - RETRY)` : '(Primer intento)'}`);
 
       const response = await fetch(apiUrl, {
@@ -262,7 +289,7 @@ const Chat = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          mensaje: userMessage,
+          mensaje: enrichedMessage, // ← Usar mensaje enriquecido
           usuario: currentUser?.id || 'anonymous',
           conversationId: currentConversationId, // ID único de la conversación
           attachments: atts.map(a => ({
@@ -282,7 +309,8 @@ const Chat = () => {
           ...(isRetry && {
             isRetryRequest: true,
             retryAttempt: attemptNumber,
-            retrieveLastResponse: true
+            retrieveLastResponse: true,
+            ...(previousQuestion && { previousQuestion })
           })
         })
       });
@@ -552,7 +580,7 @@ const Chat = () => {
       };
 
       // Llamar a sendMessageWithRetry con sistema de retry y streaming
-      await sendMessageWithRetry(userMessage, attachments, onStreamUpdate, 3, 1000);
+      await sendMessageWithRetry(userMessage, attachments, onStreamUpdate, 3, 1000, messages);
 
     } catch (error) {
       const errorObj = error instanceof Error ? error : new Error('Error desconocido');
