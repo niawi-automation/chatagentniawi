@@ -62,7 +62,7 @@ const DashboardLayout = () => {
         path: '/dashboard/recommendations',
         icon: TrendingUp,
         badge: '3',
-        badgeColor: 'bg-niawi-danger',
+        badgeColor: 'bg-red-500',
         subtitle: 'Insights estratégicos basados en IA',
         permission: { module: 'analytics' as const, action: 'view' }
       });
@@ -74,7 +74,7 @@ const DashboardLayout = () => {
       path: '/dashboard/chat',
       icon: Bot,
       badge: 'IA',
-      badgeColor: 'bg-niawi-primary',
+      badgeColor: 'bg-primary',
       subtitle: 'Conversa con agentes de IA especializados',
       permission: { module: 'chat' as const, action: 'access' }
     });
@@ -100,7 +100,7 @@ const DashboardLayout = () => {
         path: '/dashboard/integrations',
         icon: Zap,
         badge: '4/5',
-        badgeColor: 'bg-niawi-warning',
+        badgeColor: 'bg-yellow-500',
         subtitle: 'Ecosistema empresarial conectado',
         permission: null // No necesita permiso específico, solo rol
       });
@@ -143,9 +143,9 @@ const DashboardLayout = () => {
   // Mostrar loading mientras se verifica autenticación
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-niawi-bg flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-niawi-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Verificando autenticación...</p>
         </div>
       </div>
@@ -329,7 +329,7 @@ const DashboardLayout = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="text-sidebar-foreground/70 hover:text-niawi-danger transition-colors"
+                  className="text-sidebar-foreground/70 hover:text-destructive transition-colors"
                   title="Cerrar sesión"
                 >
                   <LogOut className="w-4 h-4" />
@@ -344,7 +344,7 @@ const DashboardLayout = () => {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="w-full border-sidebar-border hover:bg-niawi-danger/10 hover:border-niawi-danger hover:text-niawi-danger transition-all"
+                  className="w-full border-sidebar-border hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Cerrar sesión

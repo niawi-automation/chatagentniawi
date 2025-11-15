@@ -60,11 +60,11 @@ const Index = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" className="border-niawi-border hover:bg-niawi-surface">
+            <Button variant="outline" className="border-border hover:bg-card">
               <Calendar className="w-4 h-4 mr-2" />
               Este Mes
             </Button>
-            <Button className="bg-niawi-primary hover:bg-niawi-primary/90">
+            <Button className="bg-primary hover:bg-primary/90">
               <Download className="w-4 h-4 mr-2" />
               Exportar
             </Button>
@@ -74,7 +74,7 @@ const Index = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {stats.map((stat, index) => (
-            <Card key={index} className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover-lift animate-slide-in-up shadow-md" style={{ animationDelay: `${index * 0.1}s` }}>
+            <Card key={index} className="bg-card/95 backdrop-blur-sm border-border hover-lift animate-slide-in-up shadow-md" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -96,7 +96,7 @@ const Index = () => {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Revenue Chart */}
-          <Card className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.4s' }}>
+          <Card className="bg-card/95 backdrop-blur-sm border-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.4s' }}>
             <CardHeader>
               <CardTitle className="text-foreground">Ingresos por Mes</CardTitle>
               <CardDescription>Comparación últimos 6 meses</CardDescription>
@@ -112,7 +112,7 @@ const Index = () => {
           </Card>
 
           {/* Conversion Chart */}
-          <Card className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.5s' }}>
+          <Card className="bg-card/95 backdrop-blur-sm border-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.5s' }}>
             <CardHeader>
               <CardTitle className="text-foreground">Conversiones</CardTitle>
               <CardDescription>Embudo de ventas</CardDescription>
@@ -131,7 +131,7 @@ const Index = () => {
         {/* Recent Activity & Alerts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Activity */}
-          <Card className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.6s' }}>
+          <Card className="bg-card/95 backdrop-blur-sm border-border animate-slide-in-up shadow-md" style={{ animationDelay: '0.6s' }}>
             <CardHeader>
               <CardTitle className="text-foreground">Actividad Reciente</CardTitle>
               <CardDescription>Últimas acciones del sistema</CardDescription>
@@ -139,7 +139,7 @@ const Index = () => {
             <CardContent>
               <div className="space-y-4">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-niawi-bg/50 animate-slide-in-right hover:bg-niawi-bg/70 transition-colors duration-300" style={{ animationDelay: `${0.7 + index * 0.1}s` }}>
+                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background/50 animate-slide-in-right hover:bg-background/70 transition-colors duration-300" style={{ animationDelay: `${0.7 + index * 0.1}s` }}>
                     <div className={`p-2 rounded-lg ${activity.bgColor} animate-bounce-slow`} style={{ animationDelay: `${0.8 + index * 0.1}s` }}>
                       <activity.icon className={`w-4 h-4 ${activity.iconColor}`} />
                     </div>
@@ -154,7 +154,7 @@ const Index = () => {
           </Card>
 
           {/* System Alerts */}
-          <Card className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border shadow-md">
+          <Card className="bg-card/95 backdrop-blur-sm border-border shadow-md">
             <CardHeader>
               <CardTitle className="text-foreground">Alertas del Sistema</CardTitle>
               <CardDescription>Notificaciones importantes</CardDescription>

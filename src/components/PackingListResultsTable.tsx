@@ -115,7 +115,7 @@ export const PackingListResultsTable: React.FC<PackingListResultsTableProps> = (
 
   if (!transformedData || transformedData.length === 0) {
     return (
-      <div className="border border-niawi-border rounded-lg p-6 text-center text-muted-foreground">
+      <div className="border border-border rounded-lg p-6 text-center text-muted-foreground">
         Sin datos para mostrar
       </div>
     );
@@ -147,18 +147,18 @@ export const PackingListResultsTable: React.FC<PackingListResultsTableProps> = (
             placeholder="Buscar en la tabla..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-xs bg-transparent border-niawi-border text-foreground placeholder:text-muted-foreground"
+            className="max-w-xs bg-transparent border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
-        <Button onClick={handleExport} size="sm" className="bg-niawi-accent hover:bg-niawi-accent/90">
+        <Button onClick={handleExport} size="sm" className="bg-green-500 hover:bg-green-500/90">
           Exportar a Excel
         </Button>
       </div>
 
-      <div className="border border-niawi-border rounded-lg overflow-auto">
+      <div className="border border-border rounded-lg overflow-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-niawi-bg/50">
+            <TableRow className="bg-muted">
               {PACKING_LIST_TABLE_COLUMNS.map((column) => (
                 <TableHead key={column} className="text-foreground whitespace-nowrap">
                   {PACKING_LIST_COLUMN_NAMES[column] || column}
@@ -168,7 +168,7 @@ export const PackingListResultsTable: React.FC<PackingListResultsTableProps> = (
           </TableHeader>
           <TableBody>
             {paginated.map((row, idx) => (
-              <TableRow key={idx} className="hover:bg-niawi-bg/30">
+              <TableRow key={idx} className="hover:bg-accent">
                 {PACKING_LIST_TABLE_COLUMNS.map((column, ci) => (
                   <TableCell key={ci} className="text-foreground whitespace-nowrap">
                     {row[column] == null ? '' : String(row[column])}
@@ -187,7 +187,7 @@ export const PackingListResultsTable: React.FC<PackingListResultsTableProps> = (
 
         <div className="flex items-center gap-3">
           <select
-            className="bg-transparent border border-niawi-border rounded-md px-2 py-1 text-sm text-foreground"
+            className="bg-transparent border border-border rounded-md px-2 py-1 text-sm text-foreground"
             value={pageSize}
             onChange={(e) => {
               const size = Number(e.target.value);
@@ -196,26 +196,26 @@ export const PackingListResultsTable: React.FC<PackingListResultsTableProps> = (
             }}
           >
             {pageSizeOptions.map((opt) => (
-              <option key={opt} value={opt} className="bg-niawi-surface text-foreground">
+              <option key={opt} value={opt} className="bg-card text-foreground">
                 {opt} / página
               </option>
             ))}
           </select>
 
           <div className="inline-flex items-center gap-1">
-            <Button variant="outline" size="sm" className="border-niawi-border" onClick={() => setPage(1)} disabled={page === 1}>
+            <Button variant="outline" size="sm" className="border-border" onClick={() => setPage(1)} disabled={page === 1}>
               «
             </Button>
-            <Button variant="outline" size="sm" className="border-niawi-border" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+            <Button variant="outline" size="sm" className="border-border" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
               ‹
             </Button>
             <span className="text-sm text-muted-foreground px-2">
               {page} / {totalPages}
             </span>
-            <Button variant="outline" size="sm" className="border-niawi-border" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+            <Button variant="outline" size="sm" className="border-border" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
               ›
             </Button>
-            <Button variant="outline" size="sm" className="border-niawi-border" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+            <Button variant="outline" size="sm" className="border-border" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
               »
             </Button>
           </div>

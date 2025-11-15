@@ -23,21 +23,21 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       case 'dots':
         return (
           <div className="flex space-x-1">
-            <div className={`${sizeClasses[size]} bg-niawi-primary rounded-full animate-bounce`} style={{ animationDelay: '0ms' }}></div>
-            <div className={`${sizeClasses[size]} bg-niawi-primary rounded-full animate-bounce`} style={{ animationDelay: '150ms' }}></div>
-            <div className={`${sizeClasses[size]} bg-niawi-primary rounded-full animate-bounce`} style={{ animationDelay: '300ms' }}></div>
+            <div className={`${sizeClasses[size]} bg-primary rounded-full animate-bounce`} style={{ animationDelay: '0ms' }}></div>
+            <div className={`${sizeClasses[size]} bg-primary rounded-full animate-bounce`} style={{ animationDelay: '150ms' }}></div>
+            <div className={`${sizeClasses[size]} bg-primary rounded-full animate-bounce`} style={{ animationDelay: '300ms' }}></div>
           </div>
         );
-      
+
       case 'pulse':
         return (
-          <div className={`${sizeClasses[size]} bg-niawi-primary rounded-full animate-pulse-slow`}></div>
+          <div className={`${sizeClasses[size]} bg-primary rounded-full animate-pulse-slow`}></div>
         );
-      
+
       case 'circle':
       default:
         return (
-          <div className={`${sizeClasses[size]} border-2 border-niawi-border border-t-niawi-primary rounded-full animate-spin`}></div>
+          <div className={`${sizeClasses[size]} border-2 border-border border-t-primary rounded-full animate-spin`}></div>
         );
     }
   };

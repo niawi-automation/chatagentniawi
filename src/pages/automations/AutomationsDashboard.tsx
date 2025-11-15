@@ -16,29 +16,29 @@ const AutomationsDashboard: React.FC = () => {
   const items = [
     {
       icon: FileSpreadsheet,
-      colorBox: 'bg-niawi-primary/20',
-      colorIcon: 'text-niawi-primary',
+      colorBox: 'bg-primary/20',
+      colorIcon: 'text-primary',
       label: 'Total Procesos',
       value: isLoading ? '...' : formatNumber(stats?.totalProcesses || 0),
     },
     {
       icon: CheckCircle,
-      colorBox: 'bg-niawi-accent/20',
-      colorIcon: 'text-niawi-accent',
+      colorBox: 'bg-green-500/20',
+      colorIcon: 'text-green-600',
       label: 'Exitosos',
       value: isLoading ? '...' : formatNumber(stats?.successfulProcesses || 0),
     },
     {
       icon: XCircle,
-      colorBox: 'bg-niawi-danger/20',
-      colorIcon: 'text-niawi-danger',
+      colorBox: 'bg-destructive/20',
+      colorIcon: 'text-destructive',
       label: 'Fallidos',
       value: isLoading ? '...' : formatNumber(stats?.failedProcesses || 0),
     },
     {
       icon: Clock,
-      colorBox: 'bg-niawi-warning/20',
-      colorIcon: 'text-niawi-warning',
+      colorBox: 'bg-yellow-500/20',
+      colorIcon: 'text-yellow-600',
       label: 'Pendientes',
       value: isLoading ? '...' : formatNumber(stats?.pendingProcesses || 0),
     },
@@ -47,7 +47,7 @@ const AutomationsDashboard: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {items.map((item, idx) => (
-        <Card key={idx} className="bg-niawi-surface border-niawi-border">
+        <Card key={idx} className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg ${item.colorBox} flex items-center justify-center`}>

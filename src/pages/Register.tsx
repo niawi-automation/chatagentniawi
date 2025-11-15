@@ -71,7 +71,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-niawi-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Header */}
         <div className="text-center">
@@ -99,7 +99,7 @@ const Register = () => {
         )}
 
         {/* Formulario de registro */}
-        <Card className="bg-niawi-surface border-niawi-border">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-center text-foreground">Información de Registro</CardTitle>
             <CardDescription className="text-center">
@@ -121,7 +121,7 @@ const Register = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={`mt-1 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                    className={`mt-1 bg-background border-border focus:border-primary text-foreground ${
                       errors.email ? 'border-red-500' : ''
                     }`}
                     placeholder="tu@empresa.com"
@@ -144,7 +144,7 @@ const Register = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`pr-10 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                      className={`pr-10 bg-background border-border focus:border-primary text-foreground ${
                         errors.password ? 'border-red-500' : ''
                       }`}
                       placeholder="••••••••"
@@ -189,7 +189,7 @@ const Register = () => {
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`pr-10 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                      className={`pr-10 bg-background border-border focus:border-primary text-foreground ${
                         errors.confirmPassword ? 'border-red-500' : ''
                       }`}
                       placeholder="••••••••"
@@ -215,7 +215,7 @@ const Register = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-white"
               >
                 {isLoading ? (
                   <>
@@ -246,9 +246,9 @@ const Register = () => {
         <div className="text-center space-y-3">
           <p className="text-sm text-muted-foreground">
             ¿Ya tienes cuenta?{' '}
-            <Link 
-              to="/login" 
-              className="text-niawi-primary hover:text-niawi-accent underline"
+            <Link
+              to="/login"
+              className="text-primary hover:text-green-600 underline"
             >
               Inicia sesión aquí
             </Link>
@@ -259,7 +259,7 @@ const Register = () => {
         <div className="text-center text-sm text-muted-foreground">
           <p>
             ¿Problemas para registrarte?{' '}
-            <a href="mailto:soporte@niawi.tech" className="text-niawi-primary hover:text-niawi-accent">
+            <a href="mailto:soporte@niawi.tech" className="text-primary hover:text-green-600">
               Contacta soporte
             </a>
           </p>

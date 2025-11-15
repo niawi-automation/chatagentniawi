@@ -26,17 +26,17 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
                 {isDark ? 'Modo Oscuro' : 'Modo Claro'}
               </span>
             )}
-            <div className="flex items-center gap-2 p-1 rounded-lg bg-niawi-border/30 hover:bg-niawi-border/50 transition-all duration-200">
+            <div className="flex items-center gap-2 p-1 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200">
               <Sun className={`w-4 h-4 transition-all duration-300 ${
-                isDark ? 'text-muted-foreground opacity-50' : 'text-niawi-warning'
+                isDark ? 'text-muted-foreground opacity-50' : 'text-yellow-500'
               }`} />
               <Switch
                 checked={isDark}
                 onCheckedChange={toggleTheme}
-                className="data-[state=checked]:bg-niawi-primary data-[state=unchecked]:bg-niawi-warning"
+                className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-yellow-500"
               />
               <Moon className={`w-4 h-4 transition-all duration-300 ${
-                isDark ? 'text-niawi-primary' : 'text-muted-foreground opacity-50'
+                isDark ? 'text-primary' : 'text-muted-foreground opacity-50'
               }`} />
             </div>
           </div>

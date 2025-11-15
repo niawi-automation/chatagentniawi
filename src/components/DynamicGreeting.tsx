@@ -48,8 +48,8 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
   userName,
   userId,
   agentIcon: AgentIcon = Sparkles,
-  agentColor = 'text-niawi-accent',
-  agentBgColor = 'bg-niawi-accent/10',
+  agentColor = 'text-green-600',
+  agentBgColor = 'bg-green-500/10',
   className = ''
 }) => {
   // Calcular franja horaria y contenidos dinámicos - SE RECALCULA EN CADA RENDER
@@ -125,8 +125,8 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
 
       {/* Badge de franja horaria (sutil) */}
       <div className="flex justify-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-niawi-border/20 text-xs text-muted-foreground">
-          <div className="w-1.5 h-1.5 rounded-full bg-niawi-accent" />
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/20 text-xs text-muted-foreground">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
           <span>{DAYPART_ES[daypart]}</span>
         </div>
       </div>

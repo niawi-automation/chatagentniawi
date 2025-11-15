@@ -81,14 +81,14 @@ const ConfirmEmail = () => {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-niawi-bg flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           {/* Logo and Header */}
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <img 
-                src={EtresBrandSvg} 
-                alt="E.tres Agent" 
+              <img
+                src={EtresBrandSvg}
+                alt="E.tres Agent"
                 className="h-16 w-auto"
               />
             </div>
@@ -99,7 +99,7 @@ const ConfirmEmail = () => {
           </div>
 
           {/* Mensaje de éxito */}
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
@@ -118,7 +118,7 @@ const ConfirmEmail = () => {
                 <div className="space-y-3 pt-4">
                   <Button
                     onClick={() => navigate('/login')}
-                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                   >
                     Iniciar Sesión
                   </Button>
@@ -139,7 +139,7 @@ const ConfirmEmail = () => {
           <div className="text-center text-sm text-muted-foreground">
             <p>
               ¿Necesitas ayuda?{' '}
-              <a href="mailto:soporte@niawi.tech" className="text-niawi-primary hover:text-niawi-accent">
+              <a href="mailto:soporte@niawi.tech" className="text-primary hover:text-green-600">
                 Contacta soporte
               </a>
             </p>
@@ -153,14 +153,14 @@ const ConfirmEmail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-niawi-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <img 
-              src={EtresBrandSvg} 
-              alt="E.tres Agent" 
+            <img
+              src={EtresBrandSvg}
+              alt="E.tres Agent"
               className="h-16 w-auto"
             />
           </div>
@@ -181,7 +181,7 @@ const ConfirmEmail = () => {
         )}
 
         {/* Formulario */}
-        <Card className="bg-niawi-surface border-niawi-border">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-center text-foreground">Confirmación de Email</CardTitle>
             <CardDescription className="text-center">
@@ -211,7 +211,7 @@ const ConfirmEmail = () => {
                   <Button
                     onClick={handleConfirmEmail}
                     disabled={isLoading}
-                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                   >
                     {isLoading ? (
                       <>
@@ -252,7 +252,7 @@ const ConfirmEmail = () => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground"
+                      className="mt-1 bg-background border-border focus:border-primary text-foreground"
                       placeholder="tu@empresa.com"
                     />
                   </div>
@@ -260,7 +260,7 @@ const ConfirmEmail = () => {
                   <Button
                     onClick={handleResendConfirmation}
                     disabled={isLoading || !email}
-                    className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                   >
                     {isLoading ? (
                       <>
@@ -292,9 +292,9 @@ const ConfirmEmail = () => {
         {/* Links adicionales */}
         <div className="text-center space-y-3">
           <p className="text-sm text-muted-foreground">
-            <Link 
-              to="/login" 
-              className="text-niawi-primary hover:text-niawi-accent underline inline-flex items-center"
+            <Link
+              to="/login"
+              className="text-primary hover:text-green-600 underline inline-flex items-center"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
               Volver al inicio de sesión
@@ -306,7 +306,7 @@ const ConfirmEmail = () => {
         <div className="text-center text-sm text-muted-foreground">
           <p>
             ¿Problemas con la confirmación?{' '}
-            <a href="mailto:soporte@niawi.tech" className="text-niawi-primary hover:text-niawi-accent">
+            <a href="mailto:soporte@niawi.tech" className="text-primary hover:text-green-600">
               Contacta soporte
             </a>
           </p>

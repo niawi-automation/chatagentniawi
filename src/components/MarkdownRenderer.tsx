@@ -24,32 +24,32 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           // Tablas con estilos optimizados para chat
           table: ({ children }) => (
             <div className="overflow-x-auto my-3 max-w-full">
-              <table className="w-full border border-niawi-border rounded-lg overflow-hidden table-auto">
+              <table className="w-full border border-border rounded-lg overflow-hidden table-auto">
                 {children}
               </table>
             </div>
           ),
-          
+
           thead: ({ children }) => (
-            <thead className="bg-niawi-border/30">
+            <thead className="bg-muted">
               {children}
             </thead>
           ),
-          
+
           tbody: ({ children }) => (
-            <tbody className="divide-y divide-niawi-border/20">
+            <tbody className="divide-y divide-muted">
               {children}
             </tbody>
           ),
-          
+
           tr: ({ children }) => (
-            <tr className="hover:bg-niawi-border/10 transition-colors">
+            <tr className="hover:bg-muted transition-colors">
               {children}
             </tr>
           ),
-          
+
           th: ({ children }) => (
-            <th className="px-3 py-2 text-left text-xs font-semibold text-foreground border-b border-niawi-border/30 min-w-0">
+            <th className="px-3 py-2 text-left text-xs font-semibold text-foreground border-b border-border min-w-0">
               <div className="truncate">
                 {children}
               </div>
@@ -97,61 +97,61 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           // Código inline y bloques
           code: ({ node, className, children, ...props }) => {
             const isInline = !className?.includes('language-');
-            
+
             if (isInline) {
               return (
-                <code 
-                  className="bg-niawi-border/20 px-1 py-0.5 rounded text-xs font-mono"
+                <code
+                  className="bg-muted px-1 py-0.5 rounded text-xs font-mono"
                   {...props}
                 >
                   {children}
                 </code>
               );
             }
-            
+
             return (
-              <code 
-                className="block bg-niawi-border/20 p-3 rounded-lg text-xs font-mono overflow-x-auto my-2"
+              <code
+                className="block bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto my-2"
                 {...props}
               >
                 {children}
               </code>
             );
           },
-          
+
           pre: ({ children }) => children,
-          
+
           // Enlaces
           a: ({ href, children }) => (
-            <a 
+            <a
               href={href}
-              className="text-niawi-primary hover:underline"
+              className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
               {children}
             </a>
           ),
-          
+
           // Texto en negrita y cursiva
           strong: ({ children }) => (
             <strong className="font-semibold">{children}</strong>
           ),
-          
+
           em: ({ children }) => (
             <em className="italic">{children}</em>
           ),
-          
+
           // Blockquotes
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-niawi-border pl-4 my-2 italic text-muted-foreground">
+            <blockquote className="border-l-4 border-border pl-4 my-2 italic text-muted-foreground">
               {children}
             </blockquote>
           ),
-          
+
           // Separadores
           hr: () => (
-            <hr className="border-niawi-border my-4" />
+            <hr className="border-border my-4" />
           ),
         }}
       >

@@ -205,11 +205,11 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
       return (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-niawi-warning animate-spin" />
-            <span className="text-sm text-niawi-warning">Procesando archivo...</span>
+            <Clock className="w-4 h-4 text-yellow-600 animate-spin" />
+            <span className="text-sm text-yellow-600">Procesando archivo...</span>
           </div>
-          <Progress value={undefined} className="h-2 bg-niawi-border/30">
-            <div className="h-full w-full bg-gradient-to-r from-niawi-primary via-niawi-secondary to-niawi-accent animate-shimmer"></div>
+          <Progress value={undefined} className="h-2 bg-muted/30">
+            <div className="h-full w-full bg-gradient-to-r from-primary via-cyan-600 to-green-500 animate-shimmer"></div>
           </Progress>
         </div>
       );
@@ -219,13 +219,13 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
       return (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-niawi-accent animate-bounce-slow" />
-            <span className="text-sm text-niawi-accent">Procesamiento completado</span>
+            <CheckCircle className="w-4 h-4 text-green-600 animate-bounce-slow" />
+            <span className="text-sm text-green-600">Procesamiento completado</span>
           </div>
-          
+
           {state.currentResults.data && state.currentResults.data.length > 0 && (
             <div className="space-y-2">
-              <Badge variant="outline" className="border-niawi-accent text-niawi-accent">
+              <Badge variant="outline" className="border-green-600 text-green-600">
                 {state.currentResults.recordCount || state.currentResults.data.length} registros procesados
               </Badge>
               
@@ -233,7 +233,7 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
                 <Button
                   onClick={handleDownload}
                   size="sm"
-                  className="w-full bg-niawi-accent hover:bg-niawi-accent/90 btn-magnetic hover:shadow-xl hover:shadow-niawi-accent/40"
+                  className="w-full bg-green-500 hover:bg-green-500/90 btn-magnetic hover:shadow-xl hover:shadow-green-500/40"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Descargar Archivo
@@ -249,7 +249,7 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
   };
 
   return (
-    <Card className={`bg-niawi-surface border-niawi-border hover-lift animate-slide-in-up ${config.borderColor}`}>
+    <Card className={`bg-card border-border hover-lift animate-slide-in-up ${config.borderColor}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-xl ${config.color} flex items-center justify-center`}>
@@ -271,14 +271,14 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
           onDrop={handleDrop}
           className={`border-2 border-dashed rounded-xl p-6 text-center backdrop-blur-sm ${
             state.selectedFile
-              ? 'border-niawi-accent bg-niawi-accent/10 shadow-lg shadow-niawi-accent/20'
-              : 'border-niawi-border hover:border-niawi-primary/60 hover:bg-niawi-primary/5 hover:shadow-md animate-glow-pulse'
+              ? 'border-green-600 bg-green-500/10 shadow-lg shadow-green-500/20'
+              : 'border-border hover:border-primary/60 hover:bg-primary/5 hover:shadow-md animate-glow-pulse'
           }`}
           style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
           {state.selectedFile ? (
             <div className="space-y-2">
-              <FileSpreadsheet className="w-8 h-8 text-niawi-accent mx-auto" />
+              <FileSpreadsheet className="w-8 h-8 text-green-600 mx-auto" />
               <p className="text-sm font-medium text-foreground">{state.selectedFile.name}</p>
               <p className="text-xs text-muted-foreground">
                 {(state.selectedFile.size / (1024 * 1024)).toFixed(2)} MB
@@ -301,7 +301,7 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => document.getElementById(`file-input-${processType}`)?.click()}
-                className="border-niawi-border hover:bg-niawi-surface"
+                className="border-border hover:bg-card"
               >
                 Seleccionar archivo
               </Button>
@@ -320,7 +320,7 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
         {state.selectedFile && !state.isProcessing && !state.currentResults && (
           <Button
             onClick={handleProcessFile}
-            className="w-full bg-niawi-primary hover:bg-niawi-primary/90 btn-magnetic hover:shadow-xl hover:shadow-niawi-primary/40"
+            className="w-full bg-primary hover:bg-primary/90 btn-magnetic hover:shadow-xl hover:shadow-primary/40"
           >
             <FileSpreadsheet className="w-4 h-4 mr-2" />
             Procesar Archivo
@@ -332,9 +332,9 @@ export const AutomationProcessCard: React.FC<AutomationProcessCardProps> = ({
 
         {/* Mensaje de error */}
         {state.error && (
-          <Alert className="border-niawi-danger/20 bg-niawi-danger/5">
-            <AlertCircle className="h-4 w-4 text-niawi-danger" />
-            <AlertDescription className="text-niawi-danger">
+          <Alert className="border-destructive/20 bg-destructive/5">
+            <AlertCircle className="h-4 w-4 text-destructive" />
+            <AlertDescription className="text-destructive">
               {state.error}
             </AlertDescription>
           </Alert>

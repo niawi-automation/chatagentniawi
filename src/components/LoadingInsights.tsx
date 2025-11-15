@@ -153,19 +153,19 @@ const LoadingInsights: React.FC<LoadingInsightsProps> = ({
       aria-live="polite"
       aria-atomic="true"
     >
-      <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-niawi-accent/10 via-niawi-primary/10 to-niawi-accent/10 border border-niawi-border/30">
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-green-500/10 via-primary/10 to-green-500/10 border border-border/30">
         {/* Icono animado */}
         <div className="flex-shrink-0 mt-0.5">
           <div className="relative">
-            <Lightbulb className="w-5 h-5 text-niawi-accent animate-pulse-slow" />
-            <TrendingUp className="w-3 h-3 text-niawi-primary absolute -top-1 -right-1 animate-bounce" />
+            <Lightbulb className="w-5 h-5 text-green-600 animate-pulse-slow" />
+            <TrendingUp className="w-3 h-3 text-primary absolute -top-1 -right-1 animate-bounce" />
           </div>
         </div>
 
         {/* Contenido del tip */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-medium text-niawi-accent uppercase tracking-wide">
+            <span className="text-xs font-medium text-green-600 uppercase tracking-wide">
               Insight accionable
             </span>
             {selectedTips.length > 1 && (
@@ -199,8 +199,8 @@ const LoadingInsights: React.FC<LoadingInsightsProps> = ({
                 key={index}
                 className={`w-1 h-1 rounded-full transition-all duration-500 ${
                   index === currentTipIndex
-                    ? 'bg-niawi-accent w-1.5 h-1.5'
-                    : 'bg-niawi-border/40'
+                    ? 'bg-green-500 w-1.5 h-1.5'
+                    : 'bg-muted/40'
                 }`}
               />
             ))}
@@ -210,9 +210,9 @@ const LoadingInsights: React.FC<LoadingInsightsProps> = ({
 
       {/* Barra de progreso de rotación */}
       {selectedTips.length > 1 && (
-        <div className="mt-2 h-0.5 bg-niawi-border/20 rounded-full overflow-hidden">
+        <div className="mt-2 h-0.5 bg-muted/20 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-niawi-accent to-niawi-primary animate-progress-bar"
+            className="h-full bg-gradient-to-r from-green-500 to-primary animate-progress-bar"
             style={{
               animation: 'progressBar 7s linear infinite'
             }}

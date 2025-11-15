@@ -121,7 +121,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-niawi-surface border-niawi-border">
+      <DialogContent className="max-w-2xl bg-card border-border">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
             <Avatar className={`w-10 h-10 ${agent.bgColor}`}>
@@ -134,7 +134,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="bg-niawi-border/30">
+          <TabsList className="bg-muted/50">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="webhook">Webhook/API</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -169,7 +169,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-niawi-bg border-niawi-border"
+                  className="bg-background border-border"
                 />
               </div>
 
@@ -179,7 +179,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="bg-niawi-bg border-niawi-border resize-none"
+                  className="bg-background border-border resize-none"
                   rows={3}
                 />
               </div>
@@ -187,7 +187,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
           </TabsContent>
 
           <TabsContent value="webhook" className="space-y-4">
-            <Card className="bg-niawi-bg border-niawi-border">
+            <Card className="bg-background border-border">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Globe className="w-4 h-4" />
@@ -203,13 +203,13 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
                       value={formData.webhookUrl}
                       onChange={(e) => setFormData(prev => ({ ...prev, webhookUrl: e.target.value }))}
                       placeholder="https://tu-n8n-instance.com/webhook/agent"
-                      className="bg-niawi-surface border-niawi-border"
+                      className="bg-card border-border"
                     />
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={copyWebhookUrl}
-                      className="border-niawi-border"
+                      className="border-border"
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -225,7 +225,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
                     size="sm"
                     onClick={handleTestWebhook}
                     disabled={isTesting || !formData.webhookUrl}
-                    className="border-niawi-border"
+                    className="border-border"
                   >
                     <TestTube className="w-4 h-4 mr-2" />
                     {isTesting ? 'Probando...' : 'Probar Webhook'}
@@ -245,7 +245,7 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
                   )}
                 </div>
 
-                <div className="bg-niawi-border/20 p-3 rounded text-xs">
+                <div className="bg-muted/20 p-3 rounded text-xs">
                   <p className="font-medium mb-1">Formato de petición:</p>
                   <pre className="text-muted-foreground">
 {`{
@@ -262,36 +262,36 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
 
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-niawi-bg border-niawi-border">
+              <Card className="bg-background border-border">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">{agent.users || 0}</div>
                   <div className="text-xs text-muted-foreground">Usuarios Activos</div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-niawi-bg border-niawi-border">
+
+              <Card className="bg-background border-border">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">{agent.conversations || 0}</div>
                   <div className="text-xs text-muted-foreground">Conversaciones</div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-niawi-bg border-niawi-border">
+
+              <Card className="bg-background border-border">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">{agent.usage || 0}%</div>
                   <div className="text-xs text-muted-foreground">Uso Promedio</div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-niawi-bg border-niawi-border">
+
+              <Card className="bg-background border-border">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">{agent.accuracy || 0}%</div>
                   <div className="text-xs text-muted-foreground">Precisión</div>
                 </CardContent>
               </Card>
             </div>
-            
-            <Card className="bg-niawi-bg border-niawi-border">
+
+            <Card className="bg-background border-border">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Activity className="w-4 h-4" />
@@ -308,10 +308,10 @@ const AgentConfigModal: React.FC<AgentConfigModalProps> = ({
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="border-niawi-border">
+          <Button variant="outline" onClick={onClose} className="border-border">
             Cancelar
           </Button>
-          <Button onClick={handleSave} className="bg-niawi-primary hover:bg-niawi-primary/90">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
             Guardar Cambios
           </Button>
         </DialogFooter>

@@ -318,7 +318,7 @@ const Settings = () => {
         {/* Tab General */}
         <TabsContent value="general" className="space-y-6">
           {/* Notifications */}
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Bell className="w-5 h-5" />
@@ -343,7 +343,7 @@ const Settings = () => {
           </Card>
 
           {/* AI Preferences */}
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground">Preferencias de IA</CardTitle>
               <CardDescription>Personaliza el comportamiento del asistente</CardDescription>
@@ -361,7 +361,7 @@ const Settings = () => {
           </Card>
 
           {/* Data & Privacy */}
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Database className="w-5 h-5" />
@@ -374,7 +374,7 @@ const Settings = () => {
                 <Label htmlFor="data-analytics" className="text-foreground">Analytics de uso</Label>
                 <Switch id="data-analytics" defaultChecked />
               </div>
-              <Button variant="outline" className="border-niawi-border hover:bg-niawi-surface">
+              <Button variant="outline" className="border-border hover:bg-card">
                 <Download className="w-4 h-4 mr-2" />
                 Exportar datos
               </Button>
@@ -387,25 +387,25 @@ const Settings = () => {
           <TabsContent value="users" className="space-y-6">
             {/* Estadísticas de usuarios */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-niawi-surface border-niawi-border">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
-                  <div className="text-2xl font-bold text-niawi-primary">{userStats.total}</div>
+                  <div className="text-2xl font-bold text-primary">{userStats.total}</div>
                   <p className="text-sm text-muted-foreground">Total Usuarios</p>
                 </CardContent>
               </Card>
-              <Card className="bg-niawi-surface border-niawi-border">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="text-2xl font-bold text-green-500">{userStats.active}</div>
                   <p className="text-sm text-muted-foreground">Usuarios Activos</p>
                 </CardContent>
               </Card>
-              <Card className="bg-niawi-surface border-niawi-border">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="text-2xl font-bold text-purple-500">{userStats.byRole.admin || 0}</div>
                   <p className="text-sm text-muted-foreground">Administradores</p>
                 </CardContent>
               </Card>
-              <Card className="bg-niawi-surface border-niawi-border">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="text-2xl font-bold text-blue-500">{company.maxUsers - company.currentUsers}</div>
                   <p className="text-sm text-muted-foreground">Espacios Disponibles</p>
@@ -414,7 +414,7 @@ const Settings = () => {
             </div>
 
             {/* Gestión de usuarios */}
-            <Card className="bg-niawi-surface border-niawi-border">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
@@ -424,7 +424,7 @@ const Settings = () => {
                   {canCreateUsers && (
                     <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
                       <DialogTrigger asChild>
-                        <Button className="bg-niawi-primary hover:bg-niawi-accent">
+                        <Button className="bg-primary hover:bg-green-500">
                           <Plus className="w-4 h-4 mr-2" />
                           Crear Usuario
                         </Button>
@@ -507,7 +507,7 @@ const Settings = () => {
         {/* Tab Actividad */}
         {canViewAnalytics && (
           <TabsContent value="activity" className="space-y-6">
-            <Card className="bg-niawi-surface border-niawi-border">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Activity className="w-5 h-5" />
@@ -518,7 +518,7 @@ const Settings = () => {
               <CardContent>
                 <div className="space-y-4">
                   {recentLogs.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between p-3 bg-niawi-border/30 rounded-lg">
+                    <div key={log.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div>
                         <p className="text-sm font-medium text-foreground">{log.details}</p>
                         <p className="text-xs text-muted-foreground">
@@ -540,7 +540,7 @@ const Settings = () => {
         {/* Tab Seguridad */}
         {canManageSettings && (
           <TabsContent value="security" className="space-y-6">
-            <Card className="bg-niawi-surface border-niawi-border">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Lock className="w-5 h-5" />
@@ -587,7 +587,7 @@ const Settings = () => {
 
         {/* Tab Acerca de */}
         <TabsContent value="about">
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-foreground">Acerca de Copiloto Niawi</CardTitle>
               <CardDescription>Información del sistema y la empresa</CardDescription>
@@ -604,8 +604,8 @@ const Settings = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Sitio web:</span>
-                  <a href="https://etres.stores/" target="_blank" rel="noopener noreferrer" 
-                     className="ml-2 text-niawi-primary hover:text-niawi-accent transition-colors">
+                  <a href="https://etres.stores/" target="_blank" rel="noopener noreferrer"
+                     className="ml-2 text-primary hover:text-green-500 transition-colors">
                     etres.stores
                   </a>
                 </div>

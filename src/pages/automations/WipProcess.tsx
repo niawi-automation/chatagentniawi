@@ -46,7 +46,7 @@ const WipProcess: React.FC = () => {
     <div className="space-y-6">
       {isWaiting && (
         <div className="sticky top-0 z-20">
-          <div className="mb-4 rounded-lg bg-niawi-primary text-white px-4 py-3 shadow">
+          <div className="mb-4 rounded-lg bg-primary text-white px-4 py-3 shadow">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5" />
@@ -62,7 +62,7 @@ const WipProcess: React.FC = () => {
       )}
 
       {currentResults && currentResults.data && currentResults.data.length > 0 && (
-        <Card className="bg-niawi-surface border-niawi-border">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -72,19 +72,19 @@ const WipProcess: React.FC = () => {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-niawi-accent text-white">
+                <Badge className="bg-green-500 text-white">
                   <CheckCircle className="w-3 h-3 mr-1" /> Completado
                 </Badge>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg bg-niawi-accent/10 border border-niawi-accent/30 px-4 py-3 flex items-center justify-between">
+            <div className="rounded-lg bg-green-500/10 border border-green-600/30 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-foreground">
-                <Clock className="w-4 h-4 text-niawi-accent" />
+                <Clock className="w-4 h-4 text-green-600" />
                 <span className="text-sm">Tiempo total de procesamiento</span>
               </div>
-              <span className="font-mono text-xl text-niawi-accent">
+              <span className="font-mono text-xl text-green-600">
                 {Math.floor(elapsedMs / 60000).toString().padStart(2, '0')}:
                 {Math.floor((elapsedMs % 60000) / 1000).toString().padStart(2, '0')}
               </span>
@@ -103,7 +103,7 @@ const WipProcess: React.FC = () => {
                     link.download = 'WIP_procesado.xlsx';
                     link.click();
                   }}
-                  className="bg-niawi-accent hover:bg-niawi-accent/90"
+                  className="bg-green-500 hover:bg-green-500/90"
                 >
                   <Download className="w-4 h-4 mr-2" /> Descargar archivo procesado
                 </Button>
@@ -114,7 +114,7 @@ const WipProcess: React.FC = () => {
       )}
 
       <Accordion type="single" collapsible defaultValue={currentResults ? undefined : 'upload'}>
-        <AccordionItem value="upload" className="border border-niawi-border rounded-lg">
+        <AccordionItem value="upload" className="border border-border rounded-lg">
           <AccordionTrigger className="px-4 text-foreground">Cargar nuevo archivo</AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <AutomationProcessCard

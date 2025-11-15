@@ -53,7 +53,7 @@ const Chat = () => {
   if (!selectedAgent) {
     return (
       <div className="max-w-4xl mx-auto h-[calc(100vh-120px)] flex items-center justify-center">
-        <Card className="bg-niawi-surface border-niawi-border p-6">
+        <Card className="bg-card border-border p-6">
           <p className="text-center text-muted-foreground">Cargando agente...</p>
         </Card>
       </div>
@@ -108,7 +108,7 @@ const Chat = () => {
           const dataUrl = hasInlineData ? `data:${att.mimeType};base64,${att.data}` : undefined;
           if (att.kind === 'image') {
             return (
-              <div key={key} className="rounded-lg overflow-hidden border border-niawi-border/40 bg-niawi-border/10">
+              <div key={key} className="rounded-lg overflow-hidden border border-border/40 bg-muted/10">
                 {hasInlineData ? (
                   <img src={dataUrl} alt={att.name} className="max-w-full h-auto block" />
                 ) : (
@@ -121,7 +121,7 @@ const Chat = () => {
             return (
               <div
                 key={key}
-                className="p-2 rounded-lg border border-niawi-border/40 bg-white text-foreground shadow w-[260px] sm:w-[360px]"
+                className="p-2 rounded-lg border border-border/40 bg-white text-foreground shadow w-[260px] sm:w-[360px]"
               >
                 {hasInlineData ? (
                   <audio controls className="w-full">
@@ -152,7 +152,7 @@ const Chat = () => {
           }
           // document/other
           return (
-            <div key={key} className="p-2 rounded-lg border border-niawi-border/40 bg-niawi-border/10 text-xs">
+            <div key={key} className="p-2 rounded-lg border border-border/40 bg-muted/10 text-xs">
               {att.name} • {Math.round(att.size / 1024)} KB
             </div>
           );

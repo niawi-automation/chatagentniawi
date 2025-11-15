@@ -66,8 +66,8 @@ const Login = () => {
     <div className="min-h-screen gradient-primary flex items-center justify-center p-4 relative overflow-hidden">
       {/* Ambient Light Overlay */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-niawi-primary/10 rounded-full blur-3xl animate-float-subtle"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-niawi-secondary/10 rounded-full blur-3xl animate-float-subtle" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-20 left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float-subtle"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-float-subtle" style={{ animationDelay: '2s' }}></div>
       </div>
       
       <div className="w-full max-w-md space-y-8 relative z-10">
@@ -117,7 +117,7 @@ const Login = () => {
         )}
 
         {/* Login Form - Glass Premium */}
-        <Card className="glass-premium border-niawi-border/50 shadow-2xl specular-reflection ambient-pattern">
+        <Card className="glass-premium border-border/50 shadow-2xl specular-reflection ambient-pattern">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
@@ -133,7 +133,7 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={`mt-1 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300 ${
+                    className={`mt-1 bg-background/50 backdrop-blur-sm border-border focus:border-primary text-foreground input-enhanced transition-all duration-300 ${
                       errors.email ? 'border-red-500' : ''
                     }`}
                     placeholder="tu@empresa.com"
@@ -156,7 +156,7 @@ const Login = () => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`pr-10 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary text-foreground input-enhanced transition-all duration-300 ${
+                      className={`pr-10 bg-background/50 backdrop-blur-sm border-border focus:border-primary text-foreground input-enhanced transition-all duration-300 ${
                         errors.password ? 'border-red-500' : ''
                       }`}
                       placeholder="••••••••"
@@ -180,9 +180,9 @@ const Login = () => {
               </div>
 
               <div className="flex items-center justify-end">
-                <Link 
-                  to="/forgot-password" 
-                  className="text-sm text-niawi-primary hover:text-niawi-accent underline"
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary hover:text-green-600 underline"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -191,7 +191,7 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white btn-magnetic hover:shadow-xl hover:shadow-niawi-primary/40 transition-all duration-300"
+                className="w-full bg-primary hover:bg-primary/90 text-white btn-magnetic hover:shadow-xl hover:shadow-primary/40 transition-all duration-300"
               >
                 {isLoading ? (
                   <>
@@ -213,9 +213,9 @@ const Login = () => {
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
             ¿No tienes una cuenta?{' '}
-            <Link 
-              to="/register" 
-              className="text-niawi-primary hover:text-niawi-accent underline font-medium"
+            <Link
+              to="/register"
+              className="text-primary hover:text-green-600 underline font-medium"
             >
               Regístrate aquí
             </Link>

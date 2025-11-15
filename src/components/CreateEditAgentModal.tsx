@@ -118,7 +118,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-niawi-surface border-niawi-border max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl bg-card border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground">
             {agent ? 'Editar Agente' : 'Crear Nuevo Agente'}
@@ -127,7 +127,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
 
         <div className="space-y-6">
           {/* Vista previa del agente */}
-          <Card className="bg-niawi-bg border-niawi-border">
+          <Card className="bg-background border-border">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <Avatar className={`w-12 h-12 ${selectedIconData.bgColor}`}>
@@ -162,7 +162,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Ej: Agente de Marketing"
-                className="bg-niawi-bg border-niawi-border"
+                className="bg-background border-border"
               />
             </div>
 
@@ -173,7 +173,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
                 value={formData.department}
                 onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
                 placeholder="Ej: Marketing Digital"
-                className="bg-niawi-bg border-niawi-border"
+                className="bg-background border-border"
               />
             </div>
           </div>
@@ -185,7 +185,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Describe las funciones y especialidades de este agente..."
-              className="bg-niawi-bg border-niawi-border resize-none"
+              className="bg-background border-border resize-none"
               rows={3}
             />
           </div>
@@ -199,7 +199,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
                 value={formData.endpoint}
                 onChange={(e) => setFormData(prev => ({ ...prev, endpoint: e.target.value }))}
                 placeholder="/marketing"
-                className="bg-niawi-bg border-niawi-border"
+                className="bg-background border-border"
               />
               <p className="text-xs text-muted-foreground">
                 Ruta del endpoint (se genera automáticamente si se deja vacío)
@@ -209,10 +209,10 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
             <div className="space-y-2">
               <Label htmlFor="status">Estado</Label>
               <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as any }))}>
-                <SelectTrigger className="bg-niawi-bg border-niawi-border">
+                <SelectTrigger className="bg-background border-border">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-niawi-surface border-niawi-border">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="active">Activo</SelectItem>
                   <SelectItem value="new">Nuevo</SelectItem>
                   <SelectItem value="maintenance">Mantenimiento</SelectItem>
@@ -228,7 +228,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
               value={formData.webhookUrl}
               onChange={(e) => setFormData(prev => ({ ...prev, webhookUrl: e.target.value }))}
               placeholder="https://tu-n8n-instance.com/webhook/marketing"
-              className="bg-niawi-bg border-niawi-border"
+              className="bg-background border-border"
             />
             <p className="text-xs text-muted-foreground">
               URL donde se enviarán las consultas y se recibirán las respuestas
@@ -242,7 +242,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
               value={formData.capabilities}
               onChange={(e) => setFormData(prev => ({ ...prev, capabilities: e.target.value }))}
               placeholder="Análisis, Campañas, SEO, Redes Sociales"
-              className="bg-niawi-bg border-niawi-border"
+              className="bg-background border-border"
             />
             <p className="text-xs text-muted-foreground">
               Separar con comas las capacidades del agente
@@ -252,7 +252,7 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
           {/* Selección de ícono */}
           <div className="space-y-2">
             <Label>Ícono del Agente</Label>
-            <div className="grid grid-cols-6 gap-2 max-h-32 overflow-y-auto border border-niawi-border rounded p-2">
+            <div className="grid grid-cols-6 gap-2 max-h-32 overflow-y-auto border border-border rounded p-2">
               {AVAILABLE_ICONS.map((iconData, index) => {
                 const IconComponent = iconData.icon;
                 return (
@@ -262,8 +262,8 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
                     onClick={() => setFormData(prev => ({ ...prev, selectedIcon: index }))}
                     className={`p-2 rounded-lg transition-colors ${
                       formData.selectedIcon === index
-                        ? 'ring-2 ring-niawi-primary'
-                        : 'hover:bg-niawi-border/30'
+                        ? 'ring-2 ring-primary'
+                        : 'hover:bg-muted'
                     }`}
                   >
                     <div className={`w-8 h-8 rounded ${iconData.bgColor} flex items-center justify-center`}>
@@ -277,12 +277,12 @@ const CreateEditAgentModal: React.FC<CreateEditAgentModalProps> = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="border-niawi-border">
+          <Button variant="outline" onClick={onClose} className="border-border">
             Cancelar
           </Button>
-          <Button 
-            onClick={handleSave} 
-            className="bg-niawi-primary hover:bg-niawi-primary/90"
+          <Button
+            onClick={handleSave}
+            className="bg-primary hover:bg-primary/90"
             disabled={!formData.name.trim() || !formData.department.trim()}
           >
             {agent ? 'Actualizar' : 'Crear'} Agente

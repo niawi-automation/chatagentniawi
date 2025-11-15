@@ -38,9 +38,9 @@ class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
-          <Card className="max-w-md w-full bg-niawi-surface border-niawi-border">
+          <Card className="max-w-md w-full bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-niawi-danger">
+              <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="w-5 h-5" />
                 Algo salió mal
               </CardTitle>
@@ -49,19 +49,19 @@ class ErrorBoundary extends Component<Props, State> {
               <p className="text-sm text-muted-foreground">
                 Se produjo un error inesperado. Por favor, intenta recargar la página.
               </p>
-              
+
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <div className="bg-niawi-border/20 p-3 rounded text-xs font-mono text-red-300 overflow-auto max-h-32">
+                <div className="bg-muted p-3 rounded text-xs font-mono text-red-300 overflow-auto max-h-32">
                   {this.state.error.toString()}
                 </div>
               )}
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={this.handleReset}
                   variant="outline"
                   size="sm"
-                  className="border-niawi-border hover:bg-niawi-border/50"
+                  className="border-border hover:bg-muted"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Reintentar
@@ -69,7 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <Button
                   onClick={() => window.location.reload()}
                   size="sm"
-                  className="bg-niawi-primary hover:bg-niawi-primary/90"
+                  className="bg-primary hover:bg-primary/90"
                 >
                   Recargar página
                 </Button>

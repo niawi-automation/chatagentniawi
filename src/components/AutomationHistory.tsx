@@ -29,10 +29,10 @@ const STATUS_LABELS: Record<ProcessStatus, string> = {
 };
 
 const STATUS_COLORS: Record<ProcessStatus, string> = {
-  pending: 'bg-niawi-warning text-white',
-  processing: 'bg-niawi-primary text-white',
-  completed: 'bg-niawi-accent text-white',
-  failed: 'bg-niawi-danger text-white'
+  pending: 'bg-yellow-500 text-white',
+  processing: 'bg-primary text-white',
+  completed: 'bg-green-500 text-white',
+  failed: 'bg-destructive text-white'
 };
 
 interface AutomationHistoryProps {
@@ -111,9 +111,9 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
 
   if (error) {
     return (
-      <Card className="bg-niawi-surface border-niawi-border">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
-          <div className="text-center text-niawi-danger">
+          <div className="text-center text-destructive">
             <p>Error al cargar el historial</p>
             <Button
               variant="outline"
@@ -130,7 +130,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
   }
 
   return (
-    <Card className="bg-niawi-surface border-niawi-border">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div>
@@ -143,7 +143,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
             variant="outline"
             onClick={() => refetch()}
             disabled={isLoading}
-            className="border-niawi-border hover:bg-niawi-surface"
+            className="border-border hover:bg-card"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Actualizar
@@ -153,11 +153,11 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
 
       <CardContent className="space-y-4">
         {/* Filtros */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-niawi-bg/50 rounded-lg border border-niawi-border/50">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-background/50 rounded-lg border border-border/50">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Tipo de Proceso</label>
             <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as ProcessType | 'all')}>
-              <SelectTrigger className="border-niawi-border">
+              <SelectTrigger className="border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -172,7 +172,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Estado</label>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ProcessStatus | 'all')}>
-              <SelectTrigger className="border-niawi-border">
+              <SelectTrigger className="border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -191,13 +191,13 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left border-niawi-border hover:bg-niawi-surface"
+                  className="w-full justify-start text-left border-border hover:bg-card"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateFrom ? format(dateFrom, 'dd/MM/yyyy') : 'Seleccionar'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-niawi-surface border-niawi-border">
+              <PopoverContent className="w-auto p-0 bg-card border-border">
                 <Calendar
                   mode="single"
                   selected={dateFrom}
@@ -214,7 +214,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
               placeholder="Buscar por archivo o usuario..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="border-niawi-border"
+              className="border-border"
             />
           </div>
         </div>
@@ -223,15 +223,15 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
         {isLoading ? (
           <div className="flex items-center justify-center p-8">
             <div className="text-center">
-              <RefreshCw className="w-8 h-8 text-niawi-primary animate-spin mx-auto mb-2" />
+              <RefreshCw className="w-8 h-8 text-primary animate-spin mx-auto mb-2" />
               <p className="text-muted-foreground">Cargando historial...</p>
             </div>
           </div>
         ) : (
-          <div className="border border-niawi-border rounded-lg overflow-hidden">
+          <div className="border border-border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-niawi-bg/50">
+                <TableRow className="bg-background/50">
                   <TableHead className="text-foreground">Archivo</TableHead>
                   <TableHead className="text-foreground">Tipo</TableHead>
                   <TableHead className="text-foreground">Usuario</TableHead>
@@ -250,7 +250,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
                   </TableRow>
                 ) : (
                   filteredProcesses.map((process) => (
-                    <TableRow key={process.id} className="hover:bg-niawi-bg/30">
+                    <TableRow key={process.id} className="hover:bg-background/30">
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <FileSpreadsheet className="w-4 h-4 text-muted-foreground" />
@@ -258,7 +258,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="border-niawi-border">
+                        <Badge variant="outline" className="border-border">
                           {PROCESS_TYPE_LABELS[process.type]}
                         </Badge>
                       </TableCell>
@@ -281,7 +281,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
                               variant="ghost"
                               size="sm"
                               onClick={() => onViewResults?.(process)}
-                              className="text-niawi-primary hover:text-niawi-primary/80"
+                              className="text-primary hover:text-primary/80"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -291,7 +291,7 @@ export const AutomationHistory: React.FC<AutomationHistoryProps> = ({ onViewResu
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDownload(process)}
-                              className="text-niawi-accent hover:text-niawi-accent/80"
+                              className="text-green-600 hover:text-green-600/80"
                             >
                               <Download className="w-4 h-4" />
                             </Button>

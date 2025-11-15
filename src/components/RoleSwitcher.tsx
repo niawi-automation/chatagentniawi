@@ -53,22 +53,22 @@ const RoleSwitcher = () => {
   if (import.meta.env.PROD) return null;
 
   return (
-    <Card className="fixed bottom-4 right-4 w-80 bg-niawi-surface border-niawi-border z-50 shadow-lg">
+    <Card className="fixed bottom-4 right-4 w-80 bg-card border-border z-50 shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm text-foreground flex items-center gap-2">
-          <Shield className="w-4 h-4 text-niawi-primary" />
+          <Shield className="w-4 h-4 text-primary" />
           Cambiar Rol (Dev Mode)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="text-xs text-muted-foreground mb-3">
-          Rol actual: <Badge className="bg-niawi-primary text-white text-xs">{currentUser?.role}</Badge>
+          Rol actual: <Badge className="bg-primary text-white text-xs">{currentUser?.role}</Badge>
         </div>
-        
+
         {roles.map((roleConfig) => {
           const Icon = roleConfig.icon;
           const isActive = currentUser?.role === roleConfig.role;
-          
+
           return (
             <Button
               key={roleConfig.role}
@@ -76,9 +76,9 @@ const RoleSwitcher = () => {
               size="sm"
               onClick={() => handleRoleChange(roleConfig.role as any)}
               className={`w-full justify-start h-auto p-3 ${
-                isActive 
-                  ? 'bg-niawi-primary text-white' 
-                  : 'border-niawi-border hover:bg-niawi-border/50'
+                isActive
+                  ? 'bg-primary text-white'
+                  : 'border-border hover:bg-muted'
               }`}
             >
               <div className="flex items-center gap-3 w-full">
@@ -93,9 +93,9 @@ const RoleSwitcher = () => {
             </Button>
           );
         })}
-        
-        <div className="text-xs text-muted-foreground pt-2 border-t border-niawi-border">
-          💡 Cambia el rol para probar diferentes niveles de acceso a los agentes
+
+        <div className="text-xs text-muted-foreground pt-2 border-t border-border">
+          Cambia el rol para probar diferentes niveles de acceso a los agentes
         </div>
       </CardContent>
     </Card>

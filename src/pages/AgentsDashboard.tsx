@@ -100,10 +100,10 @@ const AgentsDashboard: React.FC = () => {
             <p className="text-muted-foreground">Gestiona y configura tus agentes IA • {agents.length} agentes totales</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={resetToDefaults} className="border-niawi-border">
+            <Button variant="outline" onClick={resetToDefaults} className="border-border">
               Resetear
             </Button>
-            <Button onClick={handleCreateAgent} className="bg-niawi-primary hover:bg-niawi-primary/90">
+            <Button onClick={handleCreateAgent} className="bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               Crear Agente
             </Button>
@@ -112,7 +112,7 @@ const AgentsDashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -127,7 +127,7 @@ const AgentsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -142,7 +142,7 @@ const AgentsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -157,7 +157,7 @@ const AgentsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -177,9 +177,10 @@ const AgentsDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {agents.map((agent) => {
             const Icon = agent.icon;
-            
+
+
             return (
-              <Card key={agent.id} className="bg-niawi-surface border-niawi-border hover:border-niawi-primary/50 transition-colors">
+              <Card key={agent.id} className="bg-card border-border hover:border-primary/50 transition-colors">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -199,7 +200,7 @@ const AgentsDashboard: React.FC = () => {
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-niawi-surface border-niawi-border">
+                      <DropdownMenuContent align="end" className="bg-card border-border">
                         <DropdownMenuItem onClick={() => handleConfigureAgent(agent)}>
                           <Settings className="w-4 h-4 mr-2" />
                           Configurar
@@ -267,7 +268,7 @@ const AgentsDashboard: React.FC = () => {
                     </div>
                   )}
 
-                  <Separator className="bg-niawi-border" />
+                  <Separator className="bg-border" />
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
@@ -285,19 +286,19 @@ const AgentsDashboard: React.FC = () => {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="flex-1 border-niawi-border"
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 border-border"
                       onClick={() => handleConfigureAgent(agent)}
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Configurar
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="border-niawi-border"
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-border"
                       onClick={() => handleEditAgent(agent)}
                     >
                       <Edit className="w-4 h-4" />
@@ -311,14 +312,14 @@ const AgentsDashboard: React.FC = () => {
 
         {/* Estado vacío */}
         {agents.length === 0 && (
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-8 text-center">
               <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No hay agentes configurados</h3>
               <p className="text-muted-foreground mb-4">
                 Comienza creando tu primer agente IA personalizado
               </p>
-              <Button onClick={handleCreateAgent} className="bg-niawi-primary hover:bg-niawi-primary/90">
+              <Button onClick={handleCreateAgent} className="bg-primary hover:bg-primary/90">
                 <Plus className="w-4 h-4 mr-2" />
                 Crear Primer Agente
               </Button>
@@ -352,7 +353,7 @@ const AgentsDashboard: React.FC = () => {
 
       {/* Dialog de Confirmación de Eliminación */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-niawi-surface border-niawi-border">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar agente?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -360,7 +361,7 @@ const AgentsDashboard: React.FC = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-niawi-border">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="border-border">Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmDeleteAgent}
               className="bg-red-500 hover:bg-red-600"

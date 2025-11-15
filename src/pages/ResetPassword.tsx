@@ -89,14 +89,14 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-niawi-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <img 
-              src={EtresBrandSvg} 
-              alt="E.tres Agent" 
+            <img
+              src={EtresBrandSvg}
+              alt="E.tres Agent"
               className="h-16 w-auto"
             />
           </div>
@@ -117,7 +117,7 @@ const ResetPassword = () => {
         )}
 
         {/* Formulario */}
-        <Card className="bg-niawi-surface border-niawi-border">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-center text-foreground">Restablecer Contraseña</CardTitle>
             <CardDescription className="text-center">
@@ -139,7 +139,7 @@ const ResetPassword = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={`mt-1 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                    className={`mt-1 bg-background border-border focus:border-primary text-foreground ${
                       errors.email ? 'border-red-500' : ''
                     }`}
                     placeholder="tu@empresa.com"
@@ -160,7 +160,7 @@ const ResetPassword = () => {
                     required
                     value={resetCode}
                     onChange={(e) => setResetCode(e.target.value)}
-                    className={`mt-1 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                    className={`mt-1 bg-background border-border focus:border-primary text-foreground ${
                       errors.resetCode ? 'border-red-500' : ''
                     }`}
                     placeholder="Código del email"
@@ -183,7 +183,7 @@ const ResetPassword = () => {
                       required
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className={`pr-10 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                      className={`pr-10 bg-background border-border focus:border-primary text-foreground ${
                         errors.newPassword ? 'border-red-500' : ''
                       }`}
                       placeholder="••••••••"
@@ -228,7 +228,7 @@ const ResetPassword = () => {
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`pr-10 bg-niawi-bg border-niawi-border focus:border-niawi-primary text-foreground ${
+                      className={`pr-10 bg-background border-border focus:border-primary text-foreground ${
                         errors.confirmPassword ? 'border-red-500' : ''
                       }`}
                       placeholder="••••••••"
@@ -254,7 +254,7 @@ const ResetPassword = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-white"
               >
                 {isLoading ? (
                   <>
@@ -276,7 +276,7 @@ const ResetPassword = () => {
         <Alert className="bg-blue-500/10 border-blue-500/20">
           <Key className="h-4 w-4 text-blue-500" />
           <AlertDescription className="text-blue-500">
-            <strong>Importante:</strong> El código de recuperación tiene una validez limitada. 
+            <strong>Importante:</strong> El código de recuperación tiene una validez limitada.
             Si tienes problemas, solicita un nuevo código desde la página de recuperación.
           </AlertDescription>
         </Alert>
@@ -284,18 +284,18 @@ const ResetPassword = () => {
         {/* Links adicionales */}
         <div className="text-center space-y-3">
           <p className="text-sm text-muted-foreground">
-            <Link 
-              to="/login" 
-              className="text-niawi-primary hover:text-niawi-accent underline inline-flex items-center"
+            <Link
+              to="/login"
+              className="text-primary hover:text-green-600 underline inline-flex items-center"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
               Volver al inicio de sesión
             </Link>
           </p>
           <p className="text-sm text-muted-foreground">
-            <Link 
-              to="/forgot-password" 
-              className="text-niawi-primary hover:text-niawi-accent underline"
+            <Link
+              to="/forgot-password"
+              className="text-primary hover:text-green-600 underline"
             >
               Solicitar nuevo código
             </Link>
@@ -306,7 +306,7 @@ const ResetPassword = () => {
         <div className="text-center text-sm text-muted-foreground">
           <p>
             ¿Problemas para restablecer tu contraseña?{' '}
-            <a href="mailto:soporte@niawi.tech" className="text-niawi-primary hover:text-niawi-accent">
+            <a href="mailto:soporte@niawi.tech" className="text-primary hover:text-green-600">
               Contacta soporte
             </a>
           </p>

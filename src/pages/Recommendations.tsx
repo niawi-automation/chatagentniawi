@@ -163,7 +163,7 @@ const Recommendations = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-center py-12">
           <div className="flex items-center gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-niawi-primary" />
+            <RefreshCw className="w-6 h-6 animate-spin text-primary" />
             <span className="text-foreground">Cargando recomendaciones...</span>
           </div>
         </div>
@@ -175,7 +175,7 @@ const Recommendations = () => {
     return (
       <div className="space-y-6">
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="text-niawi-danger mb-4">
+          <div className="text-destructive mb-4">
             <span className="text-lg">⚠️ Error al cargar recomendaciones</span>
           </div>
           <p className="text-muted-foreground mb-4">{error}</p>
@@ -317,7 +317,7 @@ const Recommendations = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                                           <div className="flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4 text-niawi-accent" />
+                      <TrendingUp className="w-4 h-4 text-green-600" />
                       <span className="text-sm text-muted-foreground">{rec.estimatedRevenue}</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -403,14 +403,14 @@ const Recommendations = () => {
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Impacto Estimado</h4>
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-niawi-accent" />
-                      <span className="text-lg font-bold text-niawi-accent">{selectedRecommendation.estimatedRevenue}</span>
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <span className="text-lg font-bold text-green-600">{selectedRecommendation.estimatedRevenue}</span>
                     </div>
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Prioridad</h4>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-niawi-secondary">#{selectedRecommendation.prioridad}</span>
+                      <span className="text-lg font-bold text-cyan-600">#{selectedRecommendation.prioridad}</span>
                     </div>
                   </div>
                 </div>
