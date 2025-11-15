@@ -951,7 +951,7 @@ const Chat = () => {
           <CardContent className="flex-1 p-0 flex flex-col overflow-hidden relative">
             {/* Banner de título de conversación - Solo si hay conversación activa */}
             {isActiveConversation && currentConversation && (
-              <div className="border-b border-niawi-border bg-niawi-surface/80 backdrop-blur-sm px-4 py-3 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
+              <div className="border-b border-border bg-card/80 backdrop-blur-sm px-4 py-3 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
                 <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
                   {/* Título editable */}
                   <div className="flex-1 min-w-0">
@@ -964,7 +964,7 @@ const Chat = () => {
                           onChange={(e) => setEditedTitle(e.target.value)}
                           onKeyDown={handleKeyDownTitle}
                           onBlur={handleSaveTitle}
-                          className="flex-1 px-3 py-1.5 text-base font-semibold bg-niawi-bg border border-niawi-border rounded-lg focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:border-transparent"
+                          className="flex-1 px-3 py-1.5 text-base font-semibold bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                           placeholder="Nombre de la conversación"
                           maxLength={100}
                         />
@@ -972,7 +972,7 @@ const Chat = () => {
                           size="sm"
                           variant="ghost"
                           onClick={handleSaveTitle}
-                          className="h-8 w-8 p-0 hover:bg-niawi-border/50"
+                          className="h-8 w-8 p-0 hover:bg-accent"
                           title="Guardar"
                         >
                           <Check className="w-4 h-4 text-green-600" />
@@ -987,7 +987,7 @@ const Chat = () => {
                           size="sm"
                           variant="ghost"
                           onClick={handleStartEditTitle}
-                          className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 hover:bg-niawi-border/50 transition-opacity"
+                          className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 hover:bg-accent transition-opacity"
                           title="Editar nombre"
                         >
                           <Edit2 className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
@@ -1004,7 +1004,7 @@ const Chat = () => {
                           size="sm"
                           variant="ghost"
                           onClick={handleStartEditTitle}
-                          className="h-8 px-2 hover:bg-niawi-border/50"
+                          className="h-8 px-2 hover:bg-accent"
                           title="Editar nombre"
                         >
                           <Edit2 className="w-4 h-4 text-muted-foreground hover:text-foreground" />
@@ -1013,7 +1013,7 @@ const Chat = () => {
                           size="sm"
                           variant="ghost"
                           onClick={handleDeleteConversation}
-                          className="h-8 px-2 hover:bg-red-500/10 hover:text-red-600"
+                          className="h-8 px-2 hover:bg-destructive/10 hover:text-destructive"
                           title="Eliminar conversación"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1023,7 +1023,7 @@ const Chat = () => {
                           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                           size="sm"
                           variant="outline"
-                          className="h-8 px-2 border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary"
+                          className="h-8 px-2 border-input hover:bg-primary hover:text-primary-foreground hover:border-primary"
                           title="Gestionar conversaciones"
                         >
                           <Menu className="w-4 h-4" />
@@ -1042,7 +1042,7 @@ const Chat = () => {
 
             {/* Messages Area */}
             <div
-              className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border chat-messages ${
+              className={`flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-16 xl:px-24 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border chat-messages ${
                 !isActiveConversation ? 'flex items-center justify-center' : 'space-y-6'
               }`}
               onDragOver={(e) => { e.preventDefault(); }}
@@ -1101,25 +1101,25 @@ const Chat = () => {
                       <div
                         className={`max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 ${
                           msg.type === 'user'
-                            ? 'bg-niawi-primary text-white ml-auto shadow-lg shadow-niawi-primary/30 hover:shadow-xl hover:shadow-niawi-primary/40'
-                            : `backdrop-blur-sm ${msg.isLoading ? 'bg-gradient-to-r from-niawi-border/20 via-niawi-primary/10 to-niawi-border/20 animate-pulse-subtle' : 'bg-niawi-border/20'} text-foreground shadow-sm hover:shadow-md ${
-                                msg.hasError ? 'border border-niawi-danger/50' : ''
+                            ? 'bg-primary text-primary-foreground ml-auto shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40'
+                            : `backdrop-blur-sm ${msg.isLoading ? 'bg-gradient-to-r from-muted/50 via-primary/10 to-muted/50 animate-pulse-subtle' : 'bg-muted/50'} text-foreground shadow-sm hover:shadow-md ${
+                                msg.hasError ? 'border border-destructive/50' : ''
                               }`
                         }`}
                         style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                       >
                         {/* Indicador de retry */}
                         {msg.isRetrying && msg.retryAttempt && msg.maxRetries && (
-                          <div className="flex items-center gap-2 mb-2 px-2 py-1 bg-niawi-primary/10 border border-niawi-primary/30 rounded-lg">
-                            <RotateCcw className="w-3.5 h-3.5 text-niawi-primary animate-spin" />
-                            <span className="text-xs font-medium text-niawi-primary">
+                          <div className="flex items-center gap-2 mb-2 px-2 py-1 bg-primary/10 border border-primary/30 rounded-lg">
+                            <RotateCcw className="w-3.5 h-3.5 text-primary animate-spin" />
+                            <span className="text-xs font-medium text-primary">
                               Reintentando {msg.retryAttempt}/{msg.maxRetries}
                             </span>
                           </div>
                         )}
 
                         {msg.hasError && (
-                          <div className="flex items-center gap-2 mb-2 text-niawi-danger">
+                          <div className="flex items-center gap-2 mb-2 text-destructive">
                             <AlertCircle className="w-4 h-4" />
                             <span className="text-xs font-medium">Error</span>
                           </div>
@@ -1182,7 +1182,7 @@ const Chat = () => {
                     variant="outline"
                     size="sm"
                     onClick={handleNewConversation}
-                    className="border-niawi-border hover:bg-niawi-border/50 hover:scale-105 transition-all"
+                    className="border-input hover:bg-accent hover:scale-105 transition-all"
                     disabled={isLoading}
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />
@@ -1198,7 +1198,7 @@ const Chat = () => {
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 size="sm"
                 variant="outline"
-                className={`fixed top-6 right-4 md:right-6 z-40 bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:bg-niawi-primary hover:text-white hover:border-niawi-primary shadow-lg transition-all duration-300 ${
+                className={`fixed top-6 right-4 md:right-6 z-40 bg-card/95 backdrop-blur-sm border-border hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-lg transition-all duration-300 ${
                   isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                 }`}
                 title="Gestionar conversaciones"
@@ -1214,18 +1214,18 @@ const Chat = () => {
 
             {/* Sidebar de conversaciones - Desliza desde la derecha */}
             <div
-              className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-niawi-surface border-l border-niawi-border shadow-2xl transition-transform duration-300 ease-in-out ${
+              className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-card border-l border-border shadow-2xl transition-transform duration-300 ease-in-out ${
                 isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
             >
               {/* Header del sidebar con botón cerrar */}
-              <div className="p-4 border-b border-niawi-border flex items-center justify-between">
+              <div className="p-4 border-b border-border flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground">Gestionar conversaciones</h2>
                 <Button
                   onClick={() => setIsSidebarOpen(false)}
                   size="sm"
                   variant="ghost"
-                  className="hover:bg-niawi-border/50"
+                  className="hover:bg-accent"
                 >
                   <X className="w-5 h-5" />
                 </Button>
@@ -1259,7 +1259,7 @@ const Chat = () => {
             )}
 
             {/* Input Area */}
-            <div className="border-t border-niawi-border px-4 py-6 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
+            <div className="border-t border-border px-4 py-6 md:px-8 lg:px-16 xl:px-24 flex-shrink-0">
               <div className="max-w-5xl mx-auto">
               <form onSubmit={handleSendMessage} className="flex gap-3 items-end">
                 <div className="flex-1 relative">
@@ -1270,7 +1270,7 @@ const Chat = () => {
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
                     placeholder="Escribe tu mensaje aquí..."
-                    className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-niawi-bg/50 backdrop-blur-sm border-niawi-border focus:border-niawi-primary input-enhanced"
+                    className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-background/50 backdrop-blur-sm border-input focus:border-primary input-enhanced"
                     disabled={isLoading || !selectedAgent}
                     rows={1}
                   />
@@ -1294,7 +1294,7 @@ const Chat = () => {
                   />
                   {/* Indicador de shortcuts */}
                   <div className="absolute -bottom-5 left-0 text-xs text-muted-foreground opacity-75">
-                    <kbd className="px-1 py-0.5 bg-niawi-border/30 rounded text-xs">Enter</kbd> enviar • <kbd className="px-1 py-0.5 bg-niawi-border/30 rounded text-xs">Shift+Enter</kbd> nueva línea
+                    <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Enter</kbd> enviar • <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Shift+Enter</kbd> nueva línea
                   </div>
                 </div>
                 
@@ -1314,7 +1314,7 @@ const Chat = () => {
                   type="submit"
                   size="sm"
                   disabled={(message.trim().length === 0 && attachments.length === 0) || isLoading || !selectedAgent}
-                  className="bg-niawi-primary hover:bg-niawi-primary/90 text-white h-[44px] px-4 btn-magnetic hover:shadow-xl hover:shadow-niawi-primary/50"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground h-[44px] px-4 btn-magnetic hover:shadow-xl hover:shadow-primary/50"
                 >
                   {isLoading ? (
                     <Brain className="w-4 h-4 animate-pulse-slow" />
@@ -1328,7 +1328,7 @@ const Chat = () => {
               {attachments.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {attachments.map(att => (
-                    <div key={att.id} className="flex items-center gap-2 px-2 py-1 rounded-full border border-niawi-border/60 bg-niawi-border/20 text-xs">
+                    <div key={att.id} className="flex items-center gap-2 px-2 py-1 rounded-full border border-border bg-muted/50 text-xs">
                       <span className="max-w-[160px] truncate">{att.name}</span>
                       <button
                         type="button"

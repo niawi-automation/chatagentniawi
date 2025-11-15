@@ -195,12 +195,12 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen max-h-screen gradient-dashboard flex overflow-hidden">
       {/* Sidebar - Glass Effect */}
-      <div className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-80'} w-80 bg-niawi-surface/95 backdrop-blur-md border-r border-niawi-border/50 transform ${
+      <div className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-80'} w-80 bg-sidebar-background/95 backdrop-blur-md border-r border-sidebar-border transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } sidebar-transition lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none`}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header - User Profile */}
-          <div className={`border-b border-niawi-border flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'px-3 py-4' : 'p-6 pb-5'}`}>
+          <div className={`border-b border-sidebar-border flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'px-3 py-4' : 'p-6 pb-5'}`}>
             {sidebarCollapsed ? (
               <div className="flex flex-col items-center gap-3">
                 {/* Botón expandir cuando está colapsado */}
@@ -208,20 +208,20 @@ const DashboardLayout = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSidebarCollapsed(false)}
-                  className="hidden lg:flex text-muted-foreground hover:text-foreground hover:bg-niawi-border/50 transition-all duration-200"
+                  className="hidden lg:flex text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200"
                   title="Expandir sidebar"
                 >
                   <Menu className="w-4 h-4" />
                 </Button>
-                
+
                 <div className="relative">
                   <Avatar className="w-10 h-10">
                     <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
-                    <AvatarFallback className="bg-niawi-primary text-white">
+                    <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
                       {authUser ? getUserInitials(authUser.name) : 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-niawi-surface ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
                 </div>
               </div>
             ) : (
@@ -231,17 +231,17 @@ const DashboardLayout = () => {
                     <div className="relative flex-shrink-0">
                       <Avatar className="w-12 h-12">
                         <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
-                        <AvatarFallback className="bg-niawi-primary text-white text-base">
+                        <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-base">
                           {authUser ? getUserInitials(authUser.name) : 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-niawi-surface ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
+                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-base font-semibold text-foreground truncate">
+                      <p className="text-base font-semibold text-sidebar-foreground truncate">
                         {authUser?.name || 'Usuario'}
                       </p>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-sidebar-foreground/70 truncate">
                         {authUser?.email || 'Sin email'}
                       </p>
                     </div>
@@ -252,18 +252,18 @@ const DashboardLayout = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => setSidebarCollapsed(true)}
-                    className="hidden lg:flex text-muted-foreground hover:text-foreground hover:bg-niawi-border/50 transition-all duration-200 flex-shrink-0"
+                    className="hidden lg:flex text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 flex-shrink-0"
                     title="Colapsar sidebar"
                   >
                     <Menu className="w-4 h-4" />
                   </Button>
-                  
+
                   {/* Botón cerrar móvil */}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSidebarOpen(false)}
-                    className="lg:hidden text-muted-foreground hover:text-foreground hover:bg-niawi-border/50 transition-all duration-200 flex-shrink-0"
+                    className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 flex-shrink-0"
                   >
                     <Menu className="w-5 h-5" />
                   </Button>
@@ -276,7 +276,7 @@ const DashboardLayout = () => {
           </div>
 
           {/* Navigation */}
-          <nav className={`flex-1 ${sidebarCollapsed ? 'p-3' : 'p-6'} space-y-2 overflow-y-auto scrollbar-thin scrollbar-track-niawi-surface scrollbar-thumb-niawi-border transition-all duration-300`}>
+          <nav className={`flex-1 ${sidebarCollapsed ? 'p-3' : 'p-6'} space-y-2 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-sidebar-border transition-all duration-300`}>
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -286,8 +286,8 @@ const DashboardLayout = () => {
                   onClick={() => setSidebarOpen(false)}
                   className={`group flex items-center ${sidebarCollapsed ? 'px-2 py-3 justify-center' : 'px-4 py-3'} rounded-xl relative ${
                     isActive(item.path)
-                      ? 'bg-niawi-primary text-white shadow-lg hover:shadow-xl hover:shadow-niawi-primary/40 animate-glow-pulse'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-niawi-border/30 hover:backdrop-blur-sm hover:shadow-md'
+                      ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg hover:shadow-xl hover:shadow-sidebar-primary/40 animate-glow-pulse'
+                      : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent hover:backdrop-blur-sm hover:shadow-md'
                   }`}
                   style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', transform: 'translateZ(0)' }}
                   title={sidebarCollapsed ? item.title : undefined}
@@ -321,7 +321,7 @@ const DashboardLayout = () => {
           </nav>
 
           {/* Footer - Theme Toggle & Logout */}
-          <div className={`${sidebarCollapsed ? 'p-3' : 'p-6'} border-t border-niawi-border flex-shrink-0 transition-all duration-300`}>
+          <div className={`${sidebarCollapsed ? 'p-3' : 'p-6'} border-t border-sidebar-border flex-shrink-0 transition-all duration-300`}>
             {sidebarCollapsed ? (
               <div className="flex flex-col items-center gap-3">
                 <ThemeToggle className="scale-90" />
@@ -329,7 +329,7 @@ const DashboardLayout = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="text-muted-foreground hover:text-niawi-danger transition-colors"
+                  className="text-sidebar-foreground/70 hover:text-niawi-danger transition-colors"
                   title="Cerrar sesión"
                 >
                   <LogOut className="w-4 h-4" />
@@ -337,14 +337,14 @@ const DashboardLayout = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-niawi-border/20 hover:bg-niawi-border/30 transition-colors">
-                  <span className="text-sm text-muted-foreground">Tema</span>
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-sidebar-accent hover:bg-sidebar-accent/80 transition-colors">
+                  <span className="text-sm text-sidebar-foreground/70">Tema</span>
                   <ThemeToggle />
                 </div>
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="w-full border-niawi-border hover:bg-niawi-danger/10 hover:border-niawi-danger hover:text-niawi-danger transition-all"
+                  className="w-full border-sidebar-border hover:bg-niawi-danger/10 hover:border-niawi-danger hover:text-niawi-danger transition-all"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Cerrar sesión
@@ -358,13 +358,13 @@ const DashboardLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Mobile header - Glass */}
-        <div className="lg:hidden bg-niawi-surface/95 backdrop-blur-md border-b border-niawi-border/50 px-4 py-4 flex-shrink-0 shadow-lg">
+        <div className="lg:hidden bg-card/95 backdrop-blur-md border-b border-border px-4 py-4 flex-shrink-0 shadow-lg">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="text-muted-foreground hover:text-foreground hover:bg-niawi-border/30 transition-colors"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               <Menu className="w-5 h-5" />
             </Button>

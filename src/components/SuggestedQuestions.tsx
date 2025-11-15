@@ -92,7 +92,7 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
     <div className={`space-y-6 ${className}`}>
       {/* Header de sección */}
       <div className="flex items-center justify-center gap-2 text-base text-muted-foreground">
-        <Zap className="w-5 h-5 text-niawi-accent" />
+        <Zap className="w-5 h-5 text-accent-foreground" />
         <span>Sugerencias para comenzar</span>
       </div>
 
@@ -103,8 +103,8 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
             key={question.id}
             onClick={() => handleQuestionClick(question)}
             disabled={isLoading}
-            className="group relative text-left p-5 rounded-xl border border-niawi-border bg-niawi-border/10
-                     hover:bg-niawi-border/20 hover:border-niawi-primary/30 hover:scale-[1.02]
+            className="group relative text-left p-5 rounded-xl border border-border bg-muted/50
+                     hover:bg-muted hover:border-primary/30 hover:scale-[1.02]
                      transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
                      focus:outline-none focus:ring-2 focus:ring-niawi-primary focus:ring-offset-2"
             aria-label={`Pregunta sugerida: ${question.text}`}
@@ -115,8 +115,8 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
 
             {/* Contenido */}
             <div className="relative flex items-start gap-3">
-              <Zap className="w-5 h-5 text-niawi-accent flex-shrink-0 mt-0.5
-                            group-hover:text-niawi-primary transition-colors" />
+              <Zap className="w-5 h-5 text-accent-foreground flex-shrink-0 mt-0.5
+                            group-hover:text-primary transition-colors" />
               <span className="text-base text-foreground leading-relaxed">
                 {question.text}
               </span>

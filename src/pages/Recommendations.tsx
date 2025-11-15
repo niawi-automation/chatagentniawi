@@ -200,11 +200,11 @@ const Recommendations = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" size="sm" className="border-niawi-border hover:bg-niawi-surface">
+            <Button variant="outline" size="sm" className="border-input hover:bg-accent">
               <Filter className="w-4 h-4 mr-2" />
               Filtros
             </Button>
-            <Button variant="outline" size="sm" className="border-niawi-border hover:bg-niawi-surface">
+            <Button variant="outline" size="sm" className="border-input hover:bg-accent">
               <Calendar className="w-4 h-4 mr-2" />
               Fecha
             </Button>
@@ -232,7 +232,7 @@ const Recommendations = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {metrics.map((metric, index) => (
-            <Card key={index} className="bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover-lift animate-slide-in-up shadow-md" style={{ animationDelay: `${index * 0.1}s` }}>
+            <Card key={index} className="bg-card/95 backdrop-blur-sm border-border hover-lift animate-slide-in-up shadow-md" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-4 text-center">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${metric.color} mb-2 animate-counter`} style={{ animationDelay: `${index * 0.2}s` }}>
                   <span className="text-xl font-bold">{metric.value}</span>
@@ -246,19 +246,19 @@ const Recommendations = () => {
         {/* Filter Tabs */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex flex-wrap gap-2">
-            <Button variant="default" size="sm" className="bg-niawi-primary text-white">
+            <Button variant="default" size="sm" className="bg-primary text-primary-foreground">
               Todas
-              <Badge className="ml-2 bg-niawi-accent text-white">
+              <Badge className="ml-2 bg-accent text-accent-foreground">
                 {recommendations.length}
               </Badge>
             </Button>
-            <Button variant="outline" size="sm" className="border-niawi-border hover:bg-niawi-surface">
+            <Button variant="outline" size="sm" className="border-input hover:bg-accent">
               Nuevas
               <Badge className="ml-2 bg-blue-500 text-white">
                 {recommendations.filter(r => r.estado.toLowerCase() === 'nueva').length}
               </Badge>
             </Button>
-            <Button variant="outline" size="sm" className="border-niawi-border hover:bg-niawi-surface">
+            <Button variant="outline" size="sm" className="border-input hover:bg-accent">
               Aplicadas
               <Badge className="ml-2 bg-green-500 text-white">
                 {recommendations.filter(r => r.estado.toLowerCase() === 'aplicada').length}
@@ -274,9 +274,9 @@ const Recommendations = () => {
             : "space-y-4"
         }>
           {filteredRecommendations.map((rec, index) => (
-            <Card 
-              key={rec.id} 
-              className={`bg-niawi-surface/95 backdrop-blur-sm border-niawi-border hover:border-niawi-primary/50 cursor-pointer animate-slide-in-up hover-lift shadow-md ${
+            <Card
+              key={rec.id}
+              className={`bg-card/95 backdrop-blur-sm border-border hover:border-primary/50 cursor-pointer animate-slide-in-up hover-lift shadow-md ${
                 viewMode === 'list' ? 'p-4' : ''
               }`}
               onClick={() => openModal(rec)}
@@ -285,8 +285,8 @@ const Recommendations = () => {
               <CardHeader className={viewMode === 'list' ? 'pb-2' : ''}>
                 <div className={`flex ${viewMode === 'list' ? 'items-center' : 'items-start'} justify-between gap-4`}>
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="p-2 rounded-lg bg-niawi-primary/10 flex-shrink-0">
-                      <TrendingUp className="w-5 h-5 text-niawi-primary" />
+                    <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
+                      <TrendingUp className="w-5 h-5 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <CardTitle className={`text-foreground ${viewMode === 'list' ? 'text-lg' : 'text-base'} truncate`}>
@@ -326,7 +326,7 @@ const Recommendations = () => {
                       </span>
                     </div>
                     </div>
-                    <Button size="sm" variant="ghost" className="text-niawi-primary hover:bg-niawi-primary/10">
+                    <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10">
                       Ver detalles
                     </Button>
                   </div>
@@ -342,7 +342,7 @@ const Recommendations = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-muted-foreground font-medium">{rec.estimatedRevenue}</span>
                     </div>
-                    <Button size="sm" variant="ghost" className="text-niawi-primary hover:bg-niawi-primary/10">
+                    <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10">
                       Ver detalles
                     </Button>
                   </div>
@@ -354,7 +354,7 @@ const Recommendations = () => {
 
         {/* Empty State */}
         {filteredRecommendations.length === 0 && (
-          <Card className="bg-niawi-surface border-niawi-border">
+          <Card className="bg-card border-border">
             <CardContent className="p-8 text-center">
               <Brain className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No hay recomendaciones</h3>
@@ -368,13 +368,13 @@ const Recommendations = () => {
 
       {/* Recommendation Detail Modal */}
       <Dialog open={!!selectedRecommendation} onOpenChange={() => setSelectedRecommendation(null)}>
-        <DialogContent className="max-w-2xl bg-niawi-surface border-niawi-border">
+        <DialogContent className="max-w-2xl bg-card border-border">
           {selectedRecommendation && (
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-niawi-primary/10">
-                    <TrendingUp className="w-5 h-5 text-niawi-primary" />
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <TrendingUp className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <DialogTitle className="text-xl text-foreground">{selectedRecommendation.mensaje}</DialogTitle>
@@ -417,7 +417,7 @@ const Recommendations = () => {
 
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Análisis Detallado</h4>
-                  <div className="bg-niawi-border/20 rounded-lg p-4">
+                  <div className="bg-muted/50 rounded-lg p-4">
                     <p className="text-sm text-muted-foreground">{selectedRecommendation.descripcion}</p>
                   </div>
                 </div>
@@ -427,7 +427,7 @@ const Recommendations = () => {
                 <Button variant="outline" onClick={() => setSelectedRecommendation(null)}>
                   Cerrar
                 </Button>
-                <Button className="bg-niawi-primary hover:bg-niawi-primary/90">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Aplicar Recomendación
                 </Button>
               </DialogFooter>

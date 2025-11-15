@@ -92,11 +92,11 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* Botón Nueva Conversación */}
-      <div className="p-4 border-b border-niawi-border">
+      <div className="p-4 border-b border-border">
         <Button
           onClick={onNewConversation}
           size="sm"
-          className="w-full bg-niawi-primary hover:bg-niawi-primary/90 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nueva Conversación
@@ -121,8 +121,8 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
                 key={conv.id}
                 className={`group relative rounded-lg border transition-all duration-200 ${
                   conv.id === currentConversationId
-                    ? 'bg-niawi-primary/10 border-niawi-primary'
-                    : 'bg-niawi-surface border-niawi-border hover:bg-niawi-border/50 hover:border-niawi-primary/30'
+                    ? 'bg-primary/10 border-primary'
+                    : 'bg-card border-border hover:bg-accent hover:border-primary/30'
                 }`}
               >
                 {editingId === conv.id ? (
@@ -136,18 +136,18 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
                         if (e.key === 'Enter') handleSaveEdit();
                         if (e.key === 'Escape') handleCancelEdit();
                       }}
-                      className="flex-1 px-2 py-1 text-sm bg-niawi-bg border border-niawi-border rounded focus:outline-none focus:border-niawi-primary"
+                      className="flex-1 px-2 py-1 text-sm bg-background border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
                       autoFocus
                     />
                     <button
                       onClick={handleSaveEdit}
-                      className="p-1 hover:bg-niawi-primary/20 rounded text-niawi-primary"
+                      className="p-1 hover:bg-primary/20 rounded text-primary"
                     >
                       <Check className="w-4 h-4" />
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="p-1 hover:bg-niawi-danger/20 rounded text-niawi-danger"
+                      className="p-1 hover:bg-destructive/20 rounded text-destructive"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -185,7 +185,7 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
                             e.stopPropagation();
                             handleStartEdit(conv.id, conv.title);
                           }}
-                          className="p-1 hover:bg-niawi-primary/20 rounded text-niawi-primary"
+                          className="p-1 hover:bg-primary/20 rounded text-primary"
                           title="Renombrar"
                         >
                           <Edit2 className="w-3 h-3" />
@@ -195,7 +195,7 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
                             e.stopPropagation();
                             handleDelete(conv.id);
                           }}
-                          className="p-1 hover:bg-niawi-danger/20 rounded text-niawi-danger"
+                          className="p-1 hover:bg-destructive/20 rounded text-destructive"
                           title="Eliminar"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -224,7 +224,7 @@ const ConversationsSidebar: React.FC<ConversationsSidebarProps> = ({
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-niawi-danger hover:bg-niawi-danger/90"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             >
               Eliminar
             </AlertDialogAction>

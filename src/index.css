@@ -237,7 +237,16 @@
     @apply bg-gradient-to-r from-niawi-primary to-niawi-accent bg-clip-text text-transparent;
   }
 
-  /* Page-specific gradients */
+  /* Page-specific gradients - Theme-aware */
+  .gradient-primary,
+  .gradient-dashboard,
+  .gradient-chat,
+  .gradient-recommendations,
+  .gradient-automations,
+  .gradient-agents {
+    transition: background 0.3s ease;
+  }
+
   .gradient-primary {
     background: var(--gradient-primary) !important;
   }
@@ -261,7 +270,7 @@
   .gradient-agents {
     background: var(--gradient-agents) !important;
   }
-  
+
   /* Force gradient application */
   .page-container {
     background: var(--gradient-primary) !important;
@@ -610,6 +619,19 @@
     backdrop-filter: blur(12px);
     background: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Glass premium - theme-aware */
+  .dark .glass-premium {
+    backdrop-filter: blur(16px) saturate(200%);
+    background: rgba(17, 24, 39, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .light .glass-premium {
+    backdrop-filter: blur(16px) saturate(200%);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .text-gradient {
