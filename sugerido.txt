@@ -438,6 +438,6 @@ Gating estricto para evitar prometer lo que no existe.
 
 Dialectos y branding parametrizados por tenant.
 
-Seed diaria + cooldown para no repetir.
+Seed diaria + cooldown para no repetir. Ok test
 
 Si quieres, te empaqueto este JSON en dos archivos (greetings.json y loading_tips.json) y te doy un helper TS listo para pegar en tu proyecto (Next/React).
