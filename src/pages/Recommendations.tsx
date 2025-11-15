@@ -83,13 +83,13 @@ const Recommendations = () => {
   const getPriorityColor = (impacto: string) => {
     switch (impacto.toLowerCase()) {
       case 'alto':
-        return 'bg-niawi-danger';
+        return 'bg-red-500 text-white';
       case 'medio':
-        return 'bg-niawi-warning';
+        return 'bg-yellow-500 text-white';
       case 'bajo':
-        return 'bg-niawi-accent';
+        return 'bg-green-500 text-white';
       default:
-        return 'bg-niawi-warning';
+        return 'bg-yellow-500 text-white';
     }
   };
 
@@ -133,15 +133,15 @@ const Recommendations = () => {
   };
 
   const metrics = data ? [
-    { label: 'Total', value: data.stats.total, color: 'bg-niawi-surface text-foreground' },
-    { label: 'Nuevas', value: data.stats.nuevas, color: 'bg-niawi-primary text-white' },
-    { label: 'Aplicadas', value: data.stats.aplicadas, color: 'bg-niawi-accent text-white' },
-    { label: 'Críticas', value: data.stats.criticas, color: 'bg-niawi-danger text-white' }
+    { label: 'Total', value: data.stats.total, color: 'bg-muted text-foreground' },
+    { label: 'Nuevas', value: data.stats.nuevas, color: 'bg-primary text-primary-foreground' },
+    { label: 'Aplicadas', value: data.stats.aplicadas, color: 'bg-green-500 text-white' },
+    { label: 'Críticas', value: data.stats.criticas, color: 'bg-red-500 text-white' }
   ] : [
-    { label: 'Total', value: 0, color: 'bg-niawi-surface text-foreground' },
-    { label: 'Nuevas', value: 0, color: 'bg-niawi-primary text-white' },
-    { label: 'Aplicadas', value: 0, color: 'bg-niawi-accent text-white' },
-    { label: 'Críticas', value: 0, color: 'bg-niawi-danger text-white' }
+    { label: 'Total', value: 0, color: 'bg-muted text-foreground' },
+    { label: 'Nuevas', value: 0, color: 'bg-primary text-primary-foreground' },
+    { label: 'Aplicadas', value: 0, color: 'bg-green-500 text-white' },
+    { label: 'Críticas', value: 0, color: 'bg-red-500 text-white' }
   ];
 
   const recommendations = data?.recommendations || [];
@@ -208,7 +208,7 @@ const Recommendations = () => {
               <Calendar className="w-4 h-4 mr-2" />
               Fecha
             </Button>
-            <div className="flex border border-niawi-border rounded-lg">
+            <div className="flex border border-border rounded-lg">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
@@ -321,7 +321,7 @@ const Recommendations = () => {
                       <span className="text-sm text-muted-foreground">{rec.estimatedRevenue}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs px-2 py-1 bg-niawi-border/30 rounded text-muted-foreground">
+                      <span className="text-xs px-2 py-1 bg-muted rounded text-muted-foreground">
                         #{rec.prioridad}
                       </span>
                     </div>

@@ -1028,7 +1028,7 @@ const Chat = () => {
                         >
                           <Menu className="w-4 h-4" />
                           {getConversationsMetadata().length > 1 && (
-                            <span className="ml-1.5 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-primary text-primary-foreground text-xs rounded-full font-semibold">
                               {getConversationsMetadata().length}
                             </span>
                           )}
@@ -1205,7 +1205,7 @@ const Chat = () => {
               >
                 <Menu className="w-4 h-4" />
                 {getConversationsMetadata().length > 0 && (
-                  <span className="ml-2 px-1.5 py-0.5 bg-niawi-primary text-white text-xs rounded-full font-semibold">
+                  <span className="ml-2 px-1.5 py-0.5 bg-primary text-primary-foreground text-xs rounded-full font-semibold">
                     {getConversationsMetadata().length}
                   </span>
                 )}
