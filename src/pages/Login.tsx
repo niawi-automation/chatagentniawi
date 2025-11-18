@@ -78,7 +78,7 @@ const Login = () => {
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-float-subtle" style={{ animationDelay: '2s' }}></div>
       </div>
       
-      <div className="w-full max-w-md space-y-8 relative z-10">
+      <div className="w-full max-w-sm space-y-8 relative z-10">
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
