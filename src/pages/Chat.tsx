@@ -50,17 +50,6 @@ const Chat = () => {
   const currentConversation = getCurrentConversation();
   const messages = currentConversation?.messages || [];
 
-  // Validación de selectedAgent
-  if (!selectedAgent) {
-    return (
-      <div className="max-w-4xl mx-auto h-[calc(100vh-120px)] flex items-center justify-center">
-        <Card className="bg-card border-border p-6">
-          <p className="text-center text-muted-foreground">Cargando agente...</p>
-        </Card>
-      </div>
-    );
-  }
-
   // Determinar si estamos en una conversación activa
   const isActiveConversation = messages.length > 0;
 
@@ -68,7 +57,7 @@ const Chat = () => {
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setMessage(value);
-    
+
     // Auto-resize del textarea
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -92,6 +81,17 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Validación de selectedAgent o currentUser - DESPUÉS de todos los hooks
+  if (!selectedAgent || !currentUser) {
+    return (
+      <div className="max-w-4xl mx-auto h-[calc(100vh-120px)] flex items-center justify-center">
+        <Card className="bg-card border-border p-6">
+          <p className="text-center text-muted-foreground">Cargando...</p>
+        </Card>
+      </div>
+    );
+  }
 
   // Función para renderizar el contenido del mensaje con Markdown completo
   const renderMessageContent = (content: string) => {
@@ -1063,6 +1063,7 @@ const Chat = () => {
                   {/* Saludo dinámico */}
                   <DynamicGreeting
                     userName={currentUser.name}
+                    userEmail={currentUser.email}
                     userId={currentUser.id}
                     agentIcon={selectedAgent.icon}
                     agentColor={selectedAgent.color}

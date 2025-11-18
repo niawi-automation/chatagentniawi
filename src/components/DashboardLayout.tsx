@@ -10,6 +10,7 @@ import ThemeToggle from './ThemeToggle';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAgent } from '@/hooks/useAgent';
 import { hasPermission } from '@/constants/agents';
+import { formatUserDisplay, extractDisplayName } from '@/utils/userMapper';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -148,9 +149,13 @@ const DashboardLayout = () => {
     return location.pathname === path;
   };
 
-  // Función para obtener las iniciales del usuario
-  const getUserInitials = (name: string) => {
-    return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
+  // Función para obtener las iniciales del usuario desde el email
+  const getUserInitials = (email: string) => {
+    const displayName = extractDisplayName(email);
+    if (displayName) {
+      return displayName.charAt(0).toUpperCase();
+    }
+    return email.charAt(0).toUpperCase();
   };
 
   // Función para obtener el color del badge del rol
@@ -202,7 +207,7 @@ const DashboardLayout = () => {
                   <Avatar className="w-10 h-10">
                     <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
                     <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
-                      {currentUser ? getUserInitials(currentUser.name) : 'U'}
+                      {currentUser ? getUserInitials(currentUser.email) : 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${currentUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
@@ -216,14 +221,14 @@ const DashboardLayout = () => {
                       <Avatar className="w-12 h-12">
                         <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
                         <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-base">
-                          {currentUser ? getUserInitials(currentUser.name) : 'U'}
+                          {currentUser ? getUserInitials(currentUser.email) : 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${currentUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-semibold text-sidebar-foreground truncate">
-                        {currentUser?.name || 'Usuario'}
+                        {currentUser ? formatUserDisplay(currentUser.email) : 'Usuario'}
                       </p>
                       <p className="text-sm text-sidebar-foreground/70 truncate">
                         {currentUser?.email || 'Sin email'}

@@ -153,3 +153,112 @@ export const isValidUserInfo = (userInfo: UserInfo | null): boolean => {
     userInfo.email.includes('@')
   );
 };
+
+/**
+ * Capitaliza la primera letra de un string
+ *
+ * @param str - String a capitalizar
+ * @returns String con primera letra en mayúscula
+ *
+ * @example
+ * capitalize('demo') // Returns: 'Demo'
+ * capitalize('multipoint') // Returns: 'Multipoint'
+ */
+export const capitalize = (str: string): string => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+/**
+ * Extrae el nombre del usuario desde el email
+ * Patrón esperado: nombre.cliente@dominio.com
+ *
+ * @param email - Email del usuario
+ * @returns Nombre capitalizado o vacío si no se puede extraer
+ *
+ * @example
+ * extractDisplayName('demo.multipoint@ema.com') // Returns: 'Demo'
+ * extractDisplayName('juan.garmin@ema.com') // Returns: 'Juan'
+ */
+export const extractDisplayName = (email: string): string => {
+  try {
+    if (!email || !email.includes('@')) return '';
+
+    // Obtener la parte antes del @
+    const localPart = email.split('@')[0];
+
+    // Si tiene punto, tomar la primera parte (nombre)
+    if (localPart.includes('.')) {
+      const name = localPart.split('.')[0];
+      return capitalize(name);
+    }
+
+    // Si no tiene punto, capitalizar todo el localPart
+    return capitalize(localPart);
+  } catch (error) {
+    console.error('Error al extraer nombre del email:', error);
+    return '';
+  }
+};
+
+/**
+ * Extrae el nombre del cliente desde el email
+ * Patrón esperado: nombre.cliente@dominio.com
+ *
+ * @param email - Email del usuario
+ * @returns Nombre del cliente capitalizado o vacío si no se puede extraer
+ *
+ * @example
+ * extractClientName('demo.multipoint@ema.com') // Returns: 'Multipoint'
+ * extractClientName('juan.garmin@ema.com') // Returns: 'Garmin'
+ */
+export const extractClientName = (email: string): string => {
+  try {
+    if (!email || !email.includes('@')) return '';
+
+    // Obtener la parte antes del @
+    const localPart = email.split('@')[0];
+
+    // Si tiene punto, tomar la segunda parte (cliente)
+    if (localPart.includes('.')) {
+      const parts = localPart.split('.');
+      if (parts.length >= 2) {
+        return capitalize(parts[1]);
+      }
+    }
+
+    // Si no tiene punto, no hay cliente identificable
+    return '';
+  } catch (error) {
+    console.error('Error al extraer cliente del email:', error);
+    return '';
+  }
+};
+
+/**
+ * Formatea el email para mostrar como "Nombre | Cliente"
+ * Patrón esperado: nombre.cliente@dominio.com
+ *
+ * @param email - Email del usuario
+ * @returns String formateado "Nombre | Cliente" o el email si no se puede formatear
+ *
+ * @example
+ * formatUserDisplay('demo.multipoint@ema.com') // Returns: 'Demo | Multipoint'
+ * formatUserDisplay('juan.garmin@ema.com') // Returns: 'Juan | Garmin'
+ * formatUserDisplay('admin@ema.com') // Returns: 'Admin'
+ */
+export const formatUserDisplay = (email: string): string => {
+  const displayName = extractDisplayName(email);
+  const clientName = extractClientName(email);
+
+  if (displayName && clientName) {
+    return `${displayName} | ${clientName}`;
+  }
+
+  if (displayName) {
+    return displayName;
+  }
+
+  // Fallback: retornar el email
+  return email;
+};

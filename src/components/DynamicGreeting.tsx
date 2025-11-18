@@ -19,9 +19,11 @@ import {
   replacePlaceholders,
   type Daypart
 } from '@/utils/chatHelpers';
+import { extractDisplayName } from '@/utils/userMapper';
 
 interface DynamicGreetingProps {
   userName?: string;
+  userEmail?: string; // Email para extraer nombre del patrón nombre.cliente@dominio
   userId: string;
   agentIcon?: React.ComponentType<{ className?: string }>;
   agentColor?: string;
@@ -46,6 +48,7 @@ function getGreetingByDaypart(daypart: Daypart): string {
  */
 const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
   userName,
+  userEmail,
   userId,
   agentIcon: AgentIcon = Sparkles,
   agentColor = 'text-green-600',
@@ -91,8 +94,11 @@ const DynamicGreeting: React.FC<DynamicGreetingProps> = ({
     };
   }); // Sin dependencies = recalcula en cada render
 
-  // Nombre del usuario (primer nombre)
-  const firstName = userName?.split(' ')[0] || '';
+  // Nombre del usuario extraído del email (patrón: nombre.cliente@dominio)
+  // Si hay userEmail, extraer nombre de ahí; si no, usar userName como fallback
+  const firstName = userEmail
+    ? extractDisplayName(userEmail)
+    : (userName?.split(' ')[0] || '');
 
   return (
     <div className={`space-y-6 ${className}`}>
