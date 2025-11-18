@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -187,15 +187,6 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-primary hover:text-green-600 underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-
               <Button
                 type="submit"
                 disabled={isLoading}
@@ -216,19 +207,6 @@ const Login = () => {
             </form>
           </CardContent>
         </Card>
-
-        {/* Link a registro */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{' '}
-            <Link
-              to="/register"
-              className="text-primary hover:text-green-600 underline font-medium"
-            >
-              Regístrate aquí
-            </Link>
-          </p>
-        </div>
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground">
