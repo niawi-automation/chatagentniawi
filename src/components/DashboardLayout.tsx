@@ -16,22 +16,8 @@ const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
+  const { isAuthenticated, isLoading, logout } = useAuthContext();
   const { currentUser } = useAgent();
-  
-  // Mapear el usuario del backend al formato del sistema de roles actual
-  // Como el backend no maneja roles, mapeamos todos los usuarios autenticados como super_admin
-  const authUser = useMemo(() => {
-    if (!user) return null;
-    
-    return {
-      id: user.email,
-      email: user.email,
-      name: user.userName || user.email,
-      role: 'super_admin' as const,
-      accessType: 'full' as const
-    };
-  }, [user]);
   
   
 
@@ -169,26 +155,24 @@ const DashboardLayout = () => {
 
   // Función para obtener el color del badge del rol
   const getRoleBadgeColor = () => {
-    if (!authUser) return 'bg-gray-500';
-    switch (authUser.role) {
+    if (!currentUser) return 'bg-gray-500';
+    switch (currentUser.role) {
       case 'super_admin': return 'bg-red-500';
       case 'admin': return 'bg-purple-500';
       case 'manager': return 'bg-blue-500';
       case 'employee': return 'bg-green-500';
-      case 'bot_user': return 'bg-orange-500';
       default: return 'bg-gray-500';
     }
   };
 
   const getRoleLabel = () => {
-    if (!authUser) return 'Usuario';
-    switch (authUser.role) {
+    if (!currentUser) return 'Usuario';
+    switch (currentUser.role) {
       case 'super_admin': return 'Super Admin';
       case 'admin': return 'Administrador';
       case 'manager': return 'Manager';
       case 'employee': return 'Empleado';
-      case 'bot_user': return 'Usuario Bot';
-      default: return authUser.role;
+      default: return currentUser.role;
     }
   };
 
@@ -218,10 +202,10 @@ const DashboardLayout = () => {
                   <Avatar className="w-10 h-10">
                     <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
                     <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
-                      {authUser ? getUserInitials(authUser.name) : 'U'}
+                      {currentUser ? getUserInitials(currentUser.name) : 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${currentUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
                 </div>
               </div>
             ) : (
@@ -232,17 +216,17 @@ const DashboardLayout = () => {
                       <Avatar className="w-12 h-12">
                         <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
                         <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-base">
-                          {authUser ? getUserInitials(authUser.name) : 'U'}
+                          {currentUser ? getUserInitials(currentUser.name) : 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${authUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
+                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getRoleBadgeColor()} rounded-full border-2 border-sidebar-background ${currentUser?.role === 'super_admin' ? 'animate-pulse-slow' : ''}`}></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-semibold text-sidebar-foreground truncate">
-                        {authUser?.name || 'Usuario'}
+                        {currentUser?.name || 'Usuario'}
                       </p>
                       <p className="text-sm text-sidebar-foreground/70 truncate">
-                        {authUser?.email || 'Sin email'}
+                        {currentUser?.email || 'Sin email'}
                       </p>
                     </div>
                   </div>

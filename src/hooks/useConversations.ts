@@ -7,9 +7,11 @@
  * - Cargar/guardar mensajes por conversación
  * - Eliminar conversaciones
  * - Generar títulos automáticos basados en el primer mensaje
+ * - Aislamiento de conversaciones por usuario (localStorage)
+ * - Detección y limpieza al cambiar de usuario
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Conversation, ConversationMetadata } from '@/types/conversation';
 import type { Message } from '@/types/agents';
 
@@ -41,13 +43,69 @@ function generateTitle(messages: Message[]): string {
 }
 
 /**
+ * Limpia conversaciones del usuario hardcodeado anterior
+ * Se ejecuta una sola vez al iniciar la aplicación
+ */
+function cleanupOldConversations(): void {
+  try {
+    // IDs de usuarios hardcodeados que deben limpiarse
+    const oldUserIds = ['1', 'anonymous'];
+
+    oldUserIds.forEach(oldId => {
+      const key = `${CONVERSATIONS_STORAGE_KEY}-${oldId}`;
+      const exists = localStorage.getItem(key);
+
+      if (exists) {
+        localStorage.removeItem(key);
+        console.log(`🧹 Conversaciones antiguas eliminadas para usuario: ${oldId}`);
+      }
+    });
+  } catch (error) {
+    console.error('Error al limpiar conversaciones antiguas:', error);
+  }
+}
+
+/**
  * Hook principal de conversaciones
  */
 export function useConversations(userId: string) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
-  // Cargar conversaciones del localStorage al montar
+  // Referencia para trackear el userId anterior
+  const previousUserIdRef = useRef<string | null>(null);
+
+  // Referencia para ejecutar cleanup solo una vez
+  const cleanupExecutedRef = useRef(false);
+
+  // Limpiar conversaciones antiguas del usuario hardcodeado (solo una vez)
+  useEffect(() => {
+    if (!cleanupExecutedRef.current) {
+      cleanupOldConversations();
+      cleanupExecutedRef.current = true;
+    }
+  }, []);
+
+  // Detectar cambio de usuario y resetear estado
+  useEffect(() => {
+    const previousUserId = previousUserIdRef.current;
+
+    // Si cambió el userId (y no es la primera carga)
+    if (previousUserId !== null && previousUserId !== userId) {
+      console.log(`🔄 Cambio de usuario detectado: ${previousUserId} → ${userId}`);
+
+      // Resetear estado de conversaciones
+      setConversations([]);
+      setCurrentConversationId(null);
+
+      console.log('✨ Estado de conversaciones reseteado');
+    }
+
+    // Actualizar referencia del userId anterior
+    previousUserIdRef.current = userId;
+  }, [userId]);
+
+  // Cargar conversaciones del localStorage al montar o cambiar usuario
   useEffect(() => {
     loadConversations();
   }, [userId]);

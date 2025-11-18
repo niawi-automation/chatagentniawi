@@ -3,6 +3,8 @@ import type { Agent, User, AgentContextType } from '../types/agents';
 import { resolveUserAgentAccess, getUserEffectiveAgents, validateAgentAssignment, createAgentAssignmentLog } from '../constants/agents';
 import { useAgentsManager, type AgentWithMetrics } from '../hooks/useAgentsManager';
 import { useUsersManager } from '../hooks/useUsersManager';
+import { useAuthContext } from './AuthContext';
+import { mapUserInfoToUser, isValidUserInfo } from '@/utils/userMapper';
 
 // Create context with proper typing
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -11,12 +13,15 @@ const AgentContext = createContext<AgentContextType | undefined>(undefined);
 export { AgentContext };
 
 export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Obtener usuario autenticado real desde AuthContext
+  const { user: authUser } = useAuthContext();
+
   // Usar el hook de gestión de agentes dinámico
   const { agents: managedAgents, getActiveAgents } = useAgentsManager();
-  
+
   // Usar el hook de gestión de usuarios para acceder a funciones de asignación
-  const { 
-    assignAgentsToUser: assignAgentsHook, 
+  const {
+    assignAgentsToUser: assignAgentsHook,
     revokeAgentsFromUser: revokeAgentsHook,
     getUserAssignedAgents,
     createActivityLog
@@ -24,27 +29,10 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Estado inicial del agente seleccionado (convertir AgentWithMetrics a Agent)
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  
-  // Usuario actual con nuevo sistema de permisos
-  // TODO: Sistema de Roles - En producción esto vendrá de autenticación JWT
-  const [currentUser, setCurrentUser] = useState<User | null>({
-    id: '1',
-    name: 'Super Administrador',
-    email: 'admin@example.com',
-    role: 'super_admin', // Cambiar para probar: 'super_admin', 'admin', 'manager', 'employee'
-    companyId: 'company1',
-    availableAgents: [],
-    permissions: {
-      agents: { view: true, create: true, edit: true, delete: true, configure: true, assign: true },
-      users: { view: true, create: true, edit: true, delete: true, assignRoles: true, assignAgents: true },
-      analytics: { view: true, export: true },
-      settings: { view: true, edit: true, advanced: true },
-      chat: { access: ['operations', 'hr', 'sales', 'documents'], export: true, history: true }
-    },
-    isActive: true,
-    createdAt: new Date(),
-    lastLogin: new Date()
-  });
+
+  // Usuario actual sincronizado con AuthContext
+  // Se mapea automáticamente desde el usuario autenticado del backend
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Convertir AgentWithMetrics a Agent (compatible con el tipo original)
   const convertToAgent = useCallback((agentWithMetrics: AgentWithMetrics): Agent => {
@@ -167,6 +155,20 @@ export const AgentProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Agentes disponibles memoizados para performance
   const availableAgents = useMemo(() => getAvailableAgents(), [getAvailableAgents]);
+
+  // Efecto para sincronizar usuario autenticado del backend con currentUser
+  useEffect(() => {
+    if (authUser && isValidUserInfo(authUser)) {
+      // Usuario autenticado válido: mapear a User completo
+      const mappedUser = mapUserInfoToUser(authUser);
+      setCurrentUser(mappedUser);
+      console.log('✅ Usuario sincronizado:', mappedUser.email, '(ID:', mappedUser.id, ')');
+    } else {
+      // No hay usuario autenticado: limpiar estado
+      setCurrentUser(null);
+      console.log('🔒 Sesión cerrada - Usuario limpiado');
+    }
+  }, [authUser]); // Ejecutar cada vez que cambia el usuario autenticado
 
   // Efecto para inicializar el agente seleccionado
   useEffect(() => {
