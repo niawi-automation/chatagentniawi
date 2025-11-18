@@ -14,6 +14,7 @@ import { useIntegrations } from '@/hooks/useIntegrations';
 import { useConversations } from '@/hooks/useConversations';
 import type { Message, ApiResponse, Attachment } from '@/types/agents';
 import { toast } from '@/hooks/use-toast';
+import { getCurrentClientConfig } from '@/services/clientConfig';
 
 const Chat = () => {
   const [message, setMessage] = useState('');
@@ -247,11 +248,19 @@ const Chat = () => {
     }
 
     try {
-      // Usar variable de entorno VITE_CHAT_API_URL o fallback al endpoint del agente
-      const apiUrl = import.meta.env.VITE_CHAT_API_URL || getAgentEndpoint(selectedAgent.id);
+      // MULTI-CLIENTE: Obtener URL dinámica del cliente actual
+      let apiUrl: string;
+      try {
+        const clientConfig = getCurrentClientConfig();
+        apiUrl = clientConfig.chatApiUrl;
+      } catch (clientError) {
+        // Si no hay cliente configurado, usar fallback al endpoint del agente
+        console.warn('No se pudo obtener configuración del cliente, usando endpoint por defecto:', clientError);
+        apiUrl = getAgentEndpoint(selectedAgent.id);
+      }
 
       if (!apiUrl) {
-        throw new Error('Endpoint del chat no configurado. Configura VITE_CHAT_API_URL en variables de entorno.');
+        throw new Error('Endpoint del chat no configurado. Verifica la configuración del cliente.');
       }
 
       const isRetry = attemptNumber > 1;

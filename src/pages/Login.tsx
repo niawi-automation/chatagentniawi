@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import EtresBrandSvg from '@/assets/images/etres-brand.svg';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { validateEmail } from '@/utils/validators';
+import { validateClientEmail } from '@/utils/clientValidator';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -42,7 +43,14 @@ const Login = () => {
     e.preventDefault();
     setErrors({});
 
-    // Validaciones
+    // VALIDACIÓN MULTI-CLIENTE: Validar patrón de email antes de enviar
+    const clientValidation = validateClientEmail(email);
+    if (!clientValidation.isValid) {
+      setErrors({ email: clientValidation.error || 'Email inválido' });
+      return;
+    }
+
+    // Validación básica de email (formato)
     if (!validateEmail(email)) {
       setErrors({ email: 'Por favor ingresa un email válido' });
       return;

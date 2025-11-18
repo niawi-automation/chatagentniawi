@@ -1,11 +1,25 @@
 // Utilidades de validación y sanitización
 
+import { validateClientEmail as validateClientEmailPattern } from './clientValidator';
+
 /**
  * Validar formato de email
  */
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email.trim());
+};
+
+/**
+ * Validar email con patrón de cliente multi-tenant
+ * Wrapper para facilitar el uso de la validación de cliente
+ *
+ * @param email - Email a validar
+ * @returns true si el email es válido y tiene un cliente configurado
+ */
+export const validateClientEmail = (email: string): boolean => {
+  const result = validateClientEmailPattern(email);
+  return result.isValid;
 };
 
 /**

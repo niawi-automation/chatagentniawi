@@ -3,6 +3,7 @@
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, setTokenExpiresAt, clearTokens, isTokenExpired } from '@/utils/tokenManager';
 import { LoginResponse, RefreshTokenResponse } from '@/types/auth';
 import logger from '@/utils/logger';
+import { getCurrentClient, getClientConfig } from './clientConfig';
 
 // Configuración del cliente - Función para asegurar HTTPS en producción
 const getBaseUrl = () => {
@@ -19,12 +20,28 @@ const getBaseUrl = () => {
 };
 
 const BASE_URL = getBaseUrl();
-const CLIENT_ID = import.meta.env.VITE_AUTH_CLIENT_ID;
 
-// Validar que CLIENT_ID esté configurado
-if (!CLIENT_ID) {
-  throw new Error('VITE_AUTH_CLIENT_ID no está configurado. Configura las variables de entorno.');
-}
+/**
+ * Obtiene el CLIENT_ID dinámicamente basado en el cliente actual
+ * Lee el cliente desde sessionStorage y obtiene su configuración
+ *
+ * @returns CLIENT_ID del cliente actual o null si no hay cliente activo
+ */
+const getClientId = (): string | null => {
+  try {
+    const client = getCurrentClient();
+    if (!client) {
+      // No hay cliente en sesión, puede ser antes del login
+      return null;
+    }
+
+    const config = getClientConfig(client);
+    return config.clientId;
+  } catch (error) {
+    logger.error('Error obteniendo CLIENT_ID:', error);
+    return null;
+  }
+};
 
 // Log para verificar la configuración solo en desarrollo
 logger.debug('Configuración API:', {
@@ -53,13 +70,20 @@ const refreshToken = async (): Promise<RefreshTokenResponse> => {
   // El refreshToken está en una cookie HTTP-only, no necesitamos enviarlo en el body
   const bodyData = refreshTokenValue ? { refreshToken: refreshTokenValue } : {};
 
+  const clientId = getClientId();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  // Solo agregar CLIENT_ID si existe (después del login)
+  if (clientId) {
+    headers['ClientId'] = clientId;
+    headers['Client-Id'] = clientId;
+  }
+
   const response = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'ClientId': CLIENT_ID,
-      'Client-Id': CLIENT_ID,
-    },
+    headers,
     body: JSON.stringify(bodyData),
     credentials: 'include', // Incluir cookies en las requests (importante para cookies HTTP-only)
     redirect: 'manual', // Interceptar redirecciones para convertir HTTP a HTTPS
@@ -118,10 +142,15 @@ const makeRequest = async <T>(
   // Agregar headers base
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'ClientId': CLIENT_ID,
-    'Client-Id': CLIENT_ID,
     ...options.headers,
   };
+
+  // Agregar CLIENT_ID dinámicamente si existe
+  const clientId = getClientId();
+  if (clientId) {
+    headers['ClientId'] = clientId;
+    headers['Client-Id'] = clientId;
+  }
 
   // Agregar Authorization header si hay token y no es una llamada de auth
   const accessToken = getAccessToken();
@@ -278,10 +307,18 @@ export const makeLoginRequest = async <T>(
 ): Promise<T> => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'ClientId': CLIENT_ID,
-    'Client-Id': CLIENT_ID,
     ...options.headers,
   };
+
+  // MULTI-CLIENTE: Agregar CLIENT_ID dinámicamente desde sessionStorage
+  // El cliente ya debe estar almacenado ANTES de llamar al login (ver AuthContext)
+  const clientId = getClientId();
+  if (clientId) {
+    headers['ClientId'] = clientId;
+    headers['Client-Id'] = clientId;
+  } else {
+    logger.warn('makeLoginRequest: No se encontró CLIENT_ID en sessionStorage. Asegúrate de que el cliente se haya almacenado antes del login.');
+  }
 
   const fullUrl = `${BASE_URL}${endpoint}`;
   logger.debug('Login Request iniciado');
@@ -385,11 +422,16 @@ export const makeRegisterRequest = async <T>(
 ): Promise<T> => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'ClientId': CLIENT_ID,
-    'Client-Id': CLIENT_ID,
     'Accept': 'application/problem+json',
     ...options.headers,
   };
+
+  // MULTI-CLIENTE: Agregar CLIENT_ID dinámicamente
+  const clientId = getClientId();
+  if (clientId) {
+    headers['ClientId'] = clientId;
+    headers['Client-Id'] = clientId;
+  }
 
   let response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,

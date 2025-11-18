@@ -18,6 +18,13 @@ import {
 } from '@/utils/tokenManager';
 import { getFriendlyErrorMessage, isTwoFactorRequiredError, isLockoutError } from '@/utils/validators';
 import logger from '@/utils/logger';
+import {
+  getClientFromEmail,
+  storeCurrentClient,
+  getCurrentClient,
+  clearCurrentClient,
+  extractClientFromEmail
+} from '@/services/clientConfig';
 
 // Crear el contexto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [currentClient, setCurrentClient] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -63,34 +71,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       clearError();
 
+      // VALIDACIÓN MULTI-CLIENTE: Extraer y validar cliente del email
+      let clientIdentifier: string;
+      try {
+        const { client } = getClientFromEmail(email);
+        clientIdentifier = client;
+      } catch (clientError: any) {
+        // Error específico de cliente (patrón inválido o cliente no configurado)
+        setLastError(clientError.message);
+        throw clientError;
+      }
+
+      // Almacenar cliente ANTES de hacer login (para que apiClient lo use)
+      storeCurrentClient(clientIdentifier);
+      setCurrentClient(clientIdentifier);
+
       const response = await authLogin(email, password, twoFactorCode);
-      
+
       // Obtener información del usuario
       const userInfo = await getUserInfo();
-      
+
       // Actualizar estado
       updateAuthState(response.accessToken, userInfo);
-      
+
       // Programar refresh automático
       scheduleTokenRefresh(response.expiresIn, refreshSession);
-      
+
       // Navegar al dashboard
       navigate('/dashboard');
-      
+
     } catch (error: any) {
       const errorMessage = getFriendlyErrorMessage(error);
       setLastError(errorMessage);
-      
+
       // Si requiere 2FA, no navegar
       if (isTwoFactorRequiredError(error)) {
         throw new Error('2FA_REQUIRED');
       }
-      
+
       // Si es lockout, mostrar mensaje específico
       if (isLockoutError(error)) {
         setLastError('Cuenta bloqueada por 5 minutos debido a múltiples intentos fallidos');
       }
-      
+
       throw error;
     } finally {
       setIsLoading(false);
@@ -122,6 +145,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authLogout();
     updateAuthState(null, null);
     setLastError(null);
+    // Limpiar cliente al cerrar sesión
+    clearCurrentClient();
+    setCurrentClient(null);
   }, [updateAuthState]);
 
   // Función para cerrar sesión
@@ -134,22 +160,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshSession = useCallback(async () => {
     try {
       const refreshTokenValue = getRefreshToken();
-      
+
       if (!refreshTokenValue) {
         throw new Error('No hay refresh token disponible');
       }
 
       const response = await refreshToken(refreshTokenValue);
-      
+
       // Obtener información actualizada del usuario
       const userInfo = await getUserInfo();
-      
+
+      // MULTI-CLIENTE: Re-extraer cliente del email al restaurar sesión
+      if (userInfo.email) {
+        const client = extractClientFromEmail(userInfo.email);
+        if (client) {
+          storeCurrentClient(client);
+          setCurrentClient(client);
+        }
+      }
+
       // Actualizar estado
       updateAuthState(response.accessToken, userInfo);
-      
+
       // Programar próximo refresh
       scheduleTokenRefresh(response.expiresIn, refreshSession);
-      
+
     } catch (error) {
       logger.error('Error al refrescar sesión', error);
       // Si falla el refresh, cerrar sesión
@@ -186,8 +221,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Si hay token válido, obtener información del usuario
       try {
         const userInfo = await getUserInfo();
+
+        // MULTI-CLIENTE: Re-extraer cliente del email al restaurar sesión
+        if (userInfo.email) {
+          const client = extractClientFromEmail(userInfo.email);
+          if (client) {
+            storeCurrentClient(client);
+            setCurrentClient(client);
+          }
+        }
+
         updateAuthState(token, userInfo);
-        
+
         // Programar refresh si es necesario
         const expiresAt = getTokenExpiresAt();
         if (expiresAt) {
@@ -317,6 +362,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     isLoading,
     lastError,
+    currentClient,
 
     // Acciones
     login,

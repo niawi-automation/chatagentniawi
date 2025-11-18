@@ -114,6 +114,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   lastError: string | null;
+  currentClient: string | null; // Identificador del cliente actual (garmin, multipoint, etc.)
 
   // Acciones
   login: (email: string, password: string, twoFactorCode?: string) => Promise<void>;

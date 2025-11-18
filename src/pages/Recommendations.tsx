@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Brain } from 'lucide-react';
+import { getCurrentClientConfig } from '@/services/clientConfig';
 
 interface Recommendation {
   id: number;
@@ -44,16 +45,26 @@ const Recommendations = () => {
     try {
       setLoading(true);
       setError(null);
-      const apiUrl = import.meta.env.VITE_RECOMMENDATIONS_API_URL;
-      if (!apiUrl) {
-        throw new Error('VITE_RECOMMENDATIONS_API_URL no está configurada');
+
+      // MULTI-CLIENTE: Obtener URL dinámica del cliente actual
+      let apiUrl: string;
+      try {
+        const clientConfig = getCurrentClientConfig();
+        apiUrl = clientConfig.recommendationsApiUrl;
+      } catch (clientError) {
+        throw new Error('No se pudo obtener la configuración del cliente. Verifica que hayas iniciado sesión correctamente.');
       }
+
+      if (!apiUrl) {
+        throw new Error('URL de recomendaciones no configurada para el cliente actual');
+      }
+
       const response = await fetch(apiUrl);
-      
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-      
+
       const apiData: ApiResponse = await response.json();
       setData(apiData);
     } catch (err) {
