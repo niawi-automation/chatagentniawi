@@ -250,8 +250,9 @@ const Chat = () => {
     try {
       // MULTI-CLIENTE: Obtener URL dinámica del cliente actual
       let apiUrl: string;
+      let clientConfig: ReturnType<typeof getCurrentClientConfig> | null = null;
       try {
-        const clientConfig = getCurrentClientConfig();
+        clientConfig = getCurrentClientConfig();
         apiUrl = clientConfig.chatApiUrl;
       } catch (clientError) {
         // Si no hay cliente configurado, usar fallback al endpoint del agente
@@ -301,6 +302,7 @@ const Chat = () => {
           mensaje: enrichedMessage, // ← Usar mensaje enriquecido
           usuario: currentUser?.id || 'anonymous',
           conversationId: currentConversationId, // ID único de la conversación
+          client_id: clientConfig?.clientId || null, // ← ID del cliente (garmin, multipoint, etc.)
           attachments: atts.map(a => ({
             id: a.id,
             name: a.name,
